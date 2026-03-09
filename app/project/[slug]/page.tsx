@@ -30,9 +30,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!project) return {}
 
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://coleanderson.com'
-  const ogImageUrl = project.og_image
+  const ogImageUrl = project.og_image?.asset
     ? urlFor(project.og_image).width(1200).height(630).auto('format').url()
-    : project.cover_image
+    : project.cover_image?.asset
       ? urlFor(project.cover_image).width(1200).height(630).auto('format').url()
       : undefined
 
@@ -78,11 +78,11 @@ export default async function ProjectPage({ params }: PageProps) {
 
   if (!project) notFound()
 
-  const coverUrl = project.cover_image
+  const coverUrl = project.cover_image?.asset
     ? urlFor(project.cover_image).width(1400).auto('format').url()
     : null
 
-  const coverThumb = project.cover_image
+  const coverThumb = project.cover_image?.asset
     ? urlFor(project.cover_image).width(40).blur(10).url()
     : null
 
