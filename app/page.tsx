@@ -5,6 +5,11 @@ import ProjectSidebar from "../components/ProjectSidebar";
 
 export const revalidate = 60;
 
+/**
+ * This is used to display the home page.
+ * It fetches the projects and settings from the database and displays them.
+ * @returns
+ */
 export default async function HomePage() {
   const [projects, settings] = await Promise.all([
     getAllPublishedProjects(),
@@ -48,14 +53,6 @@ export default async function HomePage() {
             <p className="mt-6 max-w-md text-lg leading-relaxed text-neutral-500">
               {bio}
             </p>
-
-            {projects.length > 0 && (
-              <p className="mt-10 text-sm text-neutral-400">
-                Select a project from the list{" "}
-                <span className="hidden md:inline">on the left</span>
-                <span className="md:hidden">above</span> to view it.
-              </p>
-            )}
 
             {settings?.contact_email && (
               <div className="mt-12">

@@ -1,27 +1,37 @@
-import Image from 'next/image'
-import type { HeroSection } from '../../types'
-import { urlFor } from '../../lib/sanity'
+import Image from "next/image";
+import type { HeroSection } from "../../types";
+import { urlFor } from "../../lib/sanity";
 
 interface HeroSectionProps {
-  section: HeroSection
+  section: HeroSection;
 }
 
+/**
+ * This is used to display a hero section with a background image.
+ * It can be used to display a heading and subheading.
+ * @param param0
+ * @returns
+ */
 export default function HeroSectionComponent({ section }: HeroSectionProps) {
   const bgUrl = section.backgroundImage
-    ? urlFor(section.backgroundImage).width(1600).height(900).auto('format').url()
-    : null
+    ? urlFor(section.backgroundImage)
+        .width(1600)
+        .height(900)
+        .auto("format")
+        .url()
+    : null;
 
   return (
     <section
       className={`relative flex min-h-[60vh] items-end p-8 ${
-        bgUrl ? 'text-white' : 'bg-neutral-100 text-neutral-900'
+        bgUrl ? "text-white" : "bg-neutral-100 text-neutral-900"
       }`}
       aria-label="Hero"
     >
       {bgUrl && (
         <Image
           src={bgUrl}
-          alt={section.backgroundImage?.alt ?? ''}
+          alt={section.backgroundImage?.alt ?? ""}
           fill
           className="object-cover"
           priority
@@ -40,5 +50,5 @@ export default function HeroSectionComponent({ section }: HeroSectionProps) {
         )}
       </div>
     </section>
-  )
+  );
 }

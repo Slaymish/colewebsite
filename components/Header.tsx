@@ -1,13 +1,21 @@
-import Link from 'next/link'
-import type { SiteSettings } from '../types'
+import Link from "next/link";
+import type { SiteSettings } from "../types";
 
 interface HeaderProps {
-  settings: SiteSettings | null
+  settings: SiteSettings | null;
 }
 
+/**
+ * This is used to display the header.
+ * It contains the name of the person, social links, contact email, and CV download link.
+ * @param param0
+ * @returns
+ */
 export default function Header({ settings }: HeaderProps) {
-  const name = settings?.name ?? 'Cole Anderson'
-  const cvUrl = settings?.cv?.url || (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url
+  const name = settings?.name ?? "Cole Anderson";
+  const cvUrl =
+    settings?.cv?.url ||
+    (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
 
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/95 backdrop-blur-sm">
@@ -62,5 +70,5 @@ export default function Header({ settings }: HeaderProps) {
         </nav>
       </div>
     </header>
-  )
+  );
 }

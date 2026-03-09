@@ -6,6 +6,11 @@ interface ProjectCardProps {
   isActive?: boolean;
 }
 
+/**
+ * These are used in the project sidebar to link to individual projects.
+ * @param param0
+ * @returns
+ */
 export default function ProjectCard({
   project,
   isActive = false,

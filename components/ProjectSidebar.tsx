@@ -1,12 +1,20 @@
-import type { ProjectSummary } from '../types'
-import ProjectCard from './ProjectCard'
+import type { ProjectSummary } from "../types";
+import ProjectCard from "./ProjectCard";
 
 interface ProjectSidebarProps {
-  projects: ProjectSummary[]
-  activeSlug?: string
+  projects: ProjectSummary[];
+  activeSlug?: string;
 }
 
-export default function ProjectSidebar({ projects, activeSlug }: ProjectSidebarProps) {
+/**
+ * This is used to display a list of projects in a sidebar.
+ * @param param0
+ * @returns
+ */
+export default function ProjectSidebar({
+  projects,
+  activeSlug,
+}: ProjectSidebarProps) {
   return (
     <aside
       className="w-full border-r border-neutral-200 md:w-72 lg:w-80 xl:w-96"
@@ -28,5 +36,5 @@ export default function ProjectSidebar({ projects, activeSlug }: ProjectSidebarP
         )}
       </div>
     </aside>
-  )
+  );
 }
