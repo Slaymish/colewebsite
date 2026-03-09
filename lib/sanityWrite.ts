@@ -15,6 +15,31 @@ export function getWriteClient() {
   })
 }
 
+/**
+ * GROQ queries expand asset references (asset->{ _id, url, metadata... }).
+ * Sanity cannot store those expanded fields — only _ref and _type belong on a reference.
+ * This recursively strips the extra fields so the patch is clean.
+ */
+function stripExpandedAssets(value: unknown): unknown {
+  if (!value || typeof value !== 'object') return value
+  if (Array.isArray(value)) return value.map(stripExpandedAssets)
+
+  const obj = value as Record<string, unknown>
+  const result: Record<string, unknown> = {}
+
+  for (const key of Object.keys(obj)) {
+    if (key === 'asset' && obj[key] && typeof obj[key] === 'object' && '_ref' in (obj[key] as object)) {
+      // Keep only the reference fields — discard _id, url, metadata, etc.
+      const ref = obj[key] as Record<string, unknown>
+      result[key] = { _type: ref._type ?? 'reference', _ref: ref._ref }
+    } else {
+      result[key] = stripExpandedAssets(obj[key])
+    }
+  }
+
+  return result
+}
+
 export interface SaveProjectPayload {
   projectId: string
   sections: Section[]
@@ -27,8 +52,11 @@ export interface SaveProjectPayload {
 export async function saveProject(payload: SaveProjectPayload): Promise<void> {
   const client = getWriteClient()
 
+  // Strip expanded asset data before writing — Sanity only accepts plain references
+  const cleanSections = stripExpandedAssets(payload.sections) as Section[]
+
   const patch: Record<string, unknown> = {
-    sections: payload.sections,
+    sections: cleanSections,
   }
 
   if (payload.status !== undefined) patch.status = payload.status
