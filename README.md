@@ -30,8 +30,6 @@ Notes
 
 - Home lists projects in a fixed left column. Clicking loads project into main area without full page reload. Also ensure `/project/:slug` works for direct linking and sharing.
 
----
-
 ## Data model
 
 ### Project (CMS)
