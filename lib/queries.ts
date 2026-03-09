@@ -65,3 +65,20 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
   if (!isSanityConfigured()) return null
   return getClient().fetch(`*[_type == "siteSettings"][0]`)
 }
+
+// Admin queries — fetch all projects regardless of status
+export async function getAllProjectsForAdmin(): Promise<ProjectSummary[]> {
+  if (!isSanityConfigured()) return []
+  return getClient().fetch(
+    `*[_type == "project"] | order(created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
+  )
+}
+
+export async function getProjectBySlugForAdmin(slug: string): Promise<Project | null> {
+  if (!isSanityConfigured()) return null
+  const results = await getClient().fetch<Project[]>(
+    `*[_type == "project" && slug.current == $slug] | order(_updatedAt desc) [0..0] { ${PROJECT_FULL_FIELDS} }`,
+    { slug },
+  )
+  return results[0] ?? null
+}

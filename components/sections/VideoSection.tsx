@@ -6,26 +6,19 @@ interface VideoSectionProps {
   section: VideoSection;
 }
 
-/**
- * This is used to get the Vimeo ID from a Vimeo URL.
- * @param url The Vimeo URL
- * @returns The Vimeo ID
- */
 function getVimeoId(url: string): string | null {
   const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   return match ? match[1] : null;
 }
 
-/**
- * This is used to display a video section.
- * @param param0
- * @returns
- */
 export default function VideoSectionComponent({ section }: VideoSectionProps) {
   if (!section.vimeoUrl) return null;
 
   const videoId = getVimeoId(section.vimeoUrl);
   if (!videoId) return null;
+
+  const aspectRatio = section.aspectRatio ?? "16/9";
+  const borderRadius = section.borderRadius ?? 2;
 
   const params = new URLSearchParams({
     autoplay: "0",
@@ -42,7 +35,10 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
   return (
     <section className="px-8 py-6">
       <figure>
-        <div className="overflow-hidden rounded-sm bg-neutral-900 aspect-video">
+        <div
+          className="overflow-hidden bg-neutral-900"
+          style={{ aspectRatio, borderRadius }}
+        >
           <iframe
             src={embedUrl}
             title={section.caption ?? "Video"}

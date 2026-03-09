@@ -6,12 +6,6 @@ interface HeroSectionProps {
   section: HeroSection;
 }
 
-/**
- * This is used to display a hero section with a background image.
- * It can be used to display a heading and subheading.
- * @param param0
- * @returns
- */
 export default function HeroSectionComponent({ section }: HeroSectionProps) {
   const bgUrl = section.backgroundImage
     ? urlFor(section.backgroundImage)
@@ -21,11 +15,33 @@ export default function HeroSectionComponent({ section }: HeroSectionProps) {
         .url()
     : null;
 
+  const minHeight = section.minHeight ?? "60vh";
+  const overlayOpacity = section.overlayOpacity ?? 0.3;
+  const textAlign = section.textAlign ?? "left";
+  const textPosition = section.textPosition ?? "bottom";
+
+  const justifyMap: Record<string, string> = {
+    top: "flex-start",
+    center: "center",
+    bottom: "flex-end",
+  };
+
+  const alignMap: Record<string, string> = {
+    left: "flex-start",
+    center: "center",
+    right: "flex-end",
+  };
+
   return (
     <section
-      className={`relative flex min-h-[60vh] items-end p-8 ${
+      className={`relative flex p-8 ${
         bgUrl ? "text-white" : "bg-neutral-100 text-neutral-900"
       }`}
+      style={{
+        minHeight,
+        alignItems: justifyMap[textPosition] ?? "flex-end",
+        justifyContent: alignMap[textAlign] ?? "flex-start",
+      }}
       aria-label="Hero"
     >
       {bgUrl && (
@@ -38,8 +54,16 @@ export default function HeroSectionComponent({ section }: HeroSectionProps) {
           sizes="100vw"
         />
       )}
-      {bgUrl && <div className="absolute inset-0 bg-black/30" />}
-      <div className="relative z-10 max-w-2xl">
+      {bgUrl && (
+        <div
+          className="absolute inset-0 bg-black"
+          style={{ opacity: overlayOpacity }}
+        />
+      )}
+      <div
+        className="relative z-10 max-w-2xl"
+        style={{ textAlign }}
+      >
         {section.heading && (
           <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
             {section.heading}

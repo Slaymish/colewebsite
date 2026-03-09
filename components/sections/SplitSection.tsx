@@ -6,11 +6,6 @@ interface SplitSectionProps {
   section: SplitSection;
 }
 
-/**
- * This is used to render the content of a split section.
- * @param content The content to render
- * @returns The rendered content
- */
 function renderContent(content: BlockContent[]) {
   return content.map((block) => {
     const text = block.children.map((child) => child.text).join("");
@@ -31,14 +26,14 @@ function renderContent(content: BlockContent[]) {
   });
 }
 
-/**
- * This is used to display a split section with an image and text.
- * The image can be on the left or right.
- * @param param0
- * @returns
- */
 export default function SplitSectionComponent({ section }: SplitSectionProps) {
   if (!section.image) return null;
+
+  const imageAspectRatio = section.imageAspectRatio ?? "4/3";
+  const verticalAlign = section.verticalAlign ?? "center";
+  const gap = section.gap ?? 24;
+  const objectFit = (section.objectFit as "cover" | "contain") ?? "cover";
+  const borderRadius = section.borderRadius ?? 2;
 
   const imageUrl = urlFor(section.image)
     .width(800)
@@ -49,18 +44,24 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   const imageLeft = section.imagePosition !== "right";
 
   const imageEl = (
-    <div className="overflow-hidden rounded-sm bg-neutral-100 aspect-[4/3]">
-      <Image
-        src={imageUrl}
-        alt={section.image.alt ?? ""}
-        width={800}
-        height={600}
-        className="h-full w-full object-cover"
-        placeholder={thumbUrl ? "blur" : "empty"}
-        blurDataURL={thumbUrl}
-        sizes="(max-width: 768px) 100vw, 50vw"
-        loading="lazy"
-      />
+    <div>
+      <div
+        className="overflow-hidden bg-neutral-100"
+        style={{ aspectRatio: imageAspectRatio, borderRadius }}
+      >
+        <Image
+          src={imageUrl}
+          alt={section.image.alt ?? ""}
+          width={800}
+          height={600}
+          className="h-full w-full"
+          style={{ objectFit }}
+          placeholder={thumbUrl ? "blur" : "empty"}
+          blurDataURL={thumbUrl}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          loading="lazy"
+        />
+      </div>
       {section.caption && (
         <p className="mt-1 text-xs text-neutral-400">{section.caption}</p>
       )}
@@ -68,17 +69,25 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   );
 
   const textEl = (
-    <div className="flex flex-col justify-center gap-4 text-base">
+    <div
+      className="flex flex-col gap-4 text-base"
+      style={{ justifyContent: verticalAlign }}
+    >
       {section.content ? renderContent(section.content) : null}
     </div>
   );
 
+  const alignClass: Record<string, string> = {
+    start: "items-start",
+    center: "items-center",
+    end: "items-end",
+  };
+
   return (
     <section className="px-8 py-6">
       <div
-        className={`grid grid-cols-1 gap-6 md:grid-cols-2 ${
-          imageLeft ? "" : "md:[&>*:first-child]:order-last"
-        }`}
+        className={`grid grid-cols-1 md:grid-cols-2 ${alignClass[verticalAlign] ?? "items-center"}`}
+        style={{ gap }}
       >
         {imageLeft ? (
           <>
