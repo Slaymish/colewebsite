@@ -18,8 +18,6 @@ Primary goal: present projects with a clean, flexible layout that is easy for Co
 - Mobile: Secondary but important. Desktop-first design.
 - Analytics: Yes (lightweight option acceptable).
 
----
-
 ## Routes
 
 - `/` — Hero then project list (home).
