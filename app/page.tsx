@@ -1,25 +1,28 @@
-import { getAllPublishedProjects, getSiteSettings } from '../lib/queries'
-import { personJsonLd, websiteJsonLd } from '../lib/structured-data'
-import Header from '../components/Header'
-import ProjectSidebar from '../components/ProjectSidebar'
+import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
+import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
+import Header from "../components/Header";
+import ProjectSidebar from "../components/ProjectSidebar";
 
-export const revalidate = 60
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [projects, settings] = await Promise.all([
     getAllPublishedProjects(),
     getSiteSettings(),
-  ])
+  ]);
 
-  const name = settings?.name ?? 'Cole Anderson'
-  const bio = settings?.bio ?? 'Designer and creative.'
+  const name = settings?.name ?? "Cole Anderson";
+  const bio = settings?.bio ?? "Designer and creative.";
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([personJsonLd(settings), websiteJsonLd(settings)]),
+          __html: JSON.stringify([
+            personJsonLd(settings),
+            websiteJsonLd(settings),
+          ]),
         }}
       />
 
@@ -42,20 +45,15 @@ export default async function HomePage() {
             >
               {name}
             </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-neutral-500">{bio}</p>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-neutral-500">
+              {bio}
+            </p>
 
             {projects.length > 0 && (
               <p className="mt-10 text-sm text-neutral-400">
-                Select a project from the list{' '}
+                Select a project from the list{" "}
                 <span className="hidden md:inline">on the left</span>
-                <span className="md:hidden">above</span>
-                {' '}to view it.
-              </p>
-            )}
-
-            {projects.length === 0 && (
-              <p className="mt-10 text-sm text-neutral-400">
-                Projects coming soon.
+                <span className="md:hidden">above</span> to view it.
               </p>
             )}
 
@@ -73,5 +71,5 @@ export default async function HomePage() {
         </main>
       </div>
     </>
-  )
+  );
 }
