@@ -7,7 +7,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSectionComponent({ section }: HeroSectionProps) {
-  const bgUrl = section.backgroundImage
+  const bgUrl = section.backgroundImage?.asset
     ? urlFor(section.backgroundImage)
         .width(1600)
         .height(900)

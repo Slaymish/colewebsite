@@ -7,7 +7,7 @@ interface ImageSectionProps {
 }
 
 export default function ImageSectionComponent({ section }: ImageSectionProps) {
-  if (!section.image) return null;
+  if (!section.image?.asset) return null;
 
   const aspectRatio = section.aspectRatio ?? "16/10";
   const objectFit = (section.objectFit as "cover" | "contain" | "fill") ?? "cover";
