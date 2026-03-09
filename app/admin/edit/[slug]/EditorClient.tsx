@@ -77,6 +77,7 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             projectId: project._id,
+            slug: project.slug.current,
             sections: project.sections ?? [],
             status: newStatus ?? project.status,
             title: project.title,
