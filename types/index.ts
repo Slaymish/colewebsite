@@ -35,12 +35,19 @@ export interface HeroSection {
   heading?: string
   subheading?: string
   backgroundImage?: SanityImage
+  minHeight?: '40vh' | '60vh' | '80vh' | '100vh'
+  overlayOpacity?: number
+  textAlign?: 'left' | 'center' | 'right'
+  textPosition?: 'top' | 'center' | 'bottom'
 }
 
 export interface TextSection {
   _type: 'textSection'
   _key: string
   content?: BlockContent[]
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  textAlign?: 'left' | 'center' | 'right'
+  fontSize?: 'sm' | 'base' | 'lg'
 }
 
 export interface ImageSection {
@@ -49,6 +56,18 @@ export interface ImageSection {
   image?: SanityImage
   caption?: string
   fullWidth?: boolean
+  aspectRatio?: string
+  objectFit?: 'cover' | 'contain' | 'fill'
+  borderRadius?: number
+  grayscale?: boolean
+  opacity?: number
+  positionMode?: 'flow' | 'free'
+  sectionHeight?: number
+  xPercent?: number
+  yPercent?: number
+  widthPercent?: number
+  zIndex?: number
+  rotation?: number
 }
 
 export interface GallerySection {
@@ -56,6 +75,10 @@ export interface GallerySection {
   _key: string
   images?: (SanityImage & { _key: string })[]
   columns?: 2 | 3
+  gap?: number
+  aspectRatio?: string
+  borderRadius?: number
+  objectFit?: 'cover' | 'contain'
 }
 
 export interface VideoSection {
@@ -66,6 +89,8 @@ export interface VideoSection {
   autoplay?: boolean
   loop?: boolean
   poster?: SanityImage
+  aspectRatio?: string
+  borderRadius?: number
 }
 
 export interface SplitSection {
@@ -75,6 +100,11 @@ export interface SplitSection {
   imagePosition?: 'left' | 'right'
   content?: BlockContent[]
   caption?: string
+  imageAspectRatio?: string
+  verticalAlign?: 'start' | 'center' | 'end'
+  gap?: number
+  objectFit?: 'cover' | 'contain'
+  borderRadius?: number
 }
 
 export type Section =

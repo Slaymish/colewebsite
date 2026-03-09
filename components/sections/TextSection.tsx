@@ -4,11 +4,6 @@ interface TextSectionProps {
   section: TextSection;
 }
 
-/**
- * This is used to render a block of text.
- * @param block The block to render
- * @returns The rendered block
- */
 function renderBlock(block: BlockContent) {
   const text = block.children.map((child) => {
     let content: React.ReactNode = child.text;
@@ -17,7 +12,6 @@ function renderBlock(block: BlockContent) {
     if (child.marks.includes("em"))
       content = <em key={child._key}>{content}</em>;
 
-    // Handle link annotations
     const linkMark = block.markDefs.find(
       (def) => child.marks.includes(def._key) && def._type === "link",
     );
@@ -73,17 +67,33 @@ function renderBlock(block: BlockContent) {
   }
 }
 
-/**
- * This is used to display a section of text.
- * @param param0
- * @returns
- */
+const maxWidthMap: Record<string, string> = {
+  sm: "max-w-sm",
+  md: "max-w-2xl",
+  lg: "max-w-4xl",
+  xl: "max-w-6xl",
+  full: "max-w-none",
+};
+
+const fontSizeMap: Record<string, string> = {
+  sm: "text-sm",
+  base: "text-base",
+  lg: "text-lg",
+};
+
 export default function TextSectionComponent({ section }: TextSectionProps) {
   if (!section.content?.length) return null;
 
+  const maxWidth = maxWidthMap[section.maxWidth ?? "md"] ?? "max-w-2xl";
+  const fontSize = fontSizeMap[section.fontSize ?? "base"] ?? "text-base";
+  const textAlign = section.textAlign ?? "left";
+
   return (
     <section className="px-8 py-10">
-      <div className="prose prose-neutral mx-auto max-w-2xl space-y-4 text-base text-neutral-800">
+      <div
+        className={`prose prose-neutral mx-auto ${maxWidth} space-y-4 ${fontSize} text-neutral-800`}
+        style={{ textAlign }}
+      >
         {section.content.map((block) => renderBlock(block))}
       </div>
     </section>

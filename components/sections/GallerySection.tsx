@@ -6,25 +6,25 @@ interface GallerySectionProps {
   section: GallerySection;
 }
 
-/**
- * This is used to display a gallery of images.
- * It can be configured to show 2 or 3 columns.
- * @param param0
- * @returns
- */
 export default function GallerySectionComponent({
   section,
 }: GallerySectionProps) {
   if (!section.images?.length) return null;
 
   const cols = section.columns ?? 2;
+  const gap = section.gap ?? 12;
+  const aspectRatio = section.aspectRatio ?? "3/2";
+  const borderRadius = section.borderRadius ?? 2;
+  const objectFit = (section.objectFit as "cover" | "contain") ?? "cover";
+
   const gridClass =
     cols === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2";
 
   return (
     <section className="px-8 py-6">
       <div
-        className={`grid ${gridClass} gap-3`}
+        className={`grid ${gridClass}`}
+        style={{ gap }}
         role="list"
         aria-label="Image gallery"
       >
@@ -35,13 +35,17 @@ export default function GallerySectionComponent({
 
           return (
             <figure key={image._key} role="listitem">
-              <div className="overflow-hidden rounded-sm bg-neutral-100 aspect-[3/2]">
+              <div
+                className="overflow-hidden bg-neutral-100"
+                style={{ aspectRatio, borderRadius }}
+              >
                 <Image
                   src={src}
                   alt={image.alt ?? ""}
                   width={900}
                   height={600}
-                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+                  className="h-full w-full transition-transform duration-300 hover:scale-[1.02]"
+                  style={{ objectFit }}
                   placeholder={thumb ? "blur" : "empty"}
                   blurDataURL={thumb}
                   sizes="(max-width: 768px) 100vw, 50vw"
