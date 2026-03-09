@@ -1,0 +1,67 @@
+import { client, isSanityConfigured } from './sanity'
+import type { Project, ProjectSummary, SiteSettings } from '../types'
+
+// GROQ queries
+
+const PROJECT_SUMMARY_FIELDS = `
+  _id,
+  title,
+  slug,
+  status,
+  created_at,
+  tags,
+  cover_image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+`
+
+const PROJECT_FULL_FIELDS = `
+  ${PROJECT_SUMMARY_FIELDS},
+  meta_description,
+  og_image { ..., asset->{ _id, url, metadata { dimensions } } },
+  sections[] {
+    ...,
+    _type == 'imageSection' => {
+      image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    },
+    _type == 'gallerySection' => {
+      images[] { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    },
+    _type == 'splitSection' => {
+      image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    },
+    _type == 'heroSection' => {
+      backgroundImage { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    },
+    _type == 'videoSection' => {
+      poster { ..., asset->{ _id, url, metadata { dimensions } } }
+    }
+  }
+`
+
+export async function getAllPublishedProjects(): Promise<ProjectSummary[]> {
+  if (!isSanityConfigured()) return []
+  return client.fetch(
+    `*[_type == "project" && status == "published"] | order(created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
+  )
+}
+
+export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  if (!isSanityConfigured()) return null
+  const results = await client.fetch<Project[]>(
+    `*[_type == "project" && slug.current == $slug && status == "published"][0..0] { ${PROJECT_FULL_FIELDS} }`,
+    { slug },
+  )
+  return results[0] ?? null
+}
+
+export async function getAllProjectSlugs(): Promise<string[]> {
+  if (!isSanityConfigured()) return []
+  const results = await client.fetch<{ slug: { current: string } }[]>(
+    `*[_type == "project" && status == "published"] { slug }`,
+  )
+  return results.map((p) => p.slug.current)
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  if (!isSanityConfigured()) return null
+  return client.fetch(`*[_type == "siteSettings"][0]`)
+}
