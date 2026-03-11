@@ -7,10 +7,11 @@ interface ImageSectionProps {
 }
 
 export default function ImageSectionComponent({ section }: ImageSectionProps) {
-  if (!section.image?.asset) return null;
+  if (!section.image?.asset?._ref) return null;
 
   const aspectRatio = section.aspectRatio ?? "16/10";
-  const objectFit = (section.objectFit as "cover" | "contain" | "fill") ?? "cover";
+  const objectFit =
+    (section.objectFit as "cover" | "contain" | "fill") ?? "cover";
   const borderRadius = section.borderRadius ?? 2;
   const grayscale = section.grayscale ?? false;
   const opacity = section.opacity ?? 1;
@@ -30,7 +31,11 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
     return (
       <section
         className={section.fullWidth ? "" : "px-8 py-6"}
-        style={{ position: "relative", minHeight: sectionHeight, overflow: "hidden" }}
+        style={{
+          position: "relative",
+          minHeight: sectionHeight,
+          overflow: "hidden",
+        }}
       >
         <div
           style={{

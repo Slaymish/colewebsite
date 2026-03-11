@@ -1,7 +1,9 @@
-import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
-import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
+import Image from "next/image";
+import Link from "next/link";
 import Header from "../components/Header";
-import ProjectSidebar from "../components/ProjectSidebar";
+import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
+import { urlFor } from "../lib/sanity";
+import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
 
 export const revalidate = 60;
 
@@ -31,40 +33,63 @@ export default async function HomePage() {
         }}
       />
 
-      <Header settings={settings} />
+      <div className="site-shell">
+        <Header settings={settings} projects={projects} />
 
-      <div className="flex min-h-[calc(100vh-57px)] flex-col md:flex-row">
-        {/* Left: sticky project list */}
-        <ProjectSidebar projects={projects} />
+        <main id="main-content" className="site-main" aria-label="Home">
+          <div className="content-column">
+            <div className="content-stack">
+              <section aria-labelledby="hero-heading" className="home-intro">
+                <h1 id="hero-heading" className="home-intro-title">
+                  Selected Work
+                </h1>
+                <p className="home-intro-copy">{bio}</p>
+              </section>
 
-        {/* Right: hero / intro panel */}
-        <main
-          id="main-content"
-          className="flex flex-1 flex-col justify-center px-10 py-20 md:px-16"
-          aria-label="Home"
-        >
-          <section aria-labelledby="hero-heading">
-            <h1
-              id="hero-heading"
-              className="text-5xl font-semibold tracking-tight text-neutral-900 md:text-6xl lg:text-7xl"
-            >
-              {name}
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-neutral-500">
-              {bio}
-            </p>
+              <section
+                className="home-projects"
+                aria-label={`${name} projects`}
+              >
+                {projects.map((project) => {
+                  const cover = project.cover_image
+                    ? urlFor(project.cover_image)
+                        .width(1600)
+                        .auto("format")
+                        .url()
+                    : null;
 
-            {settings?.contact_email && (
-              <div className="mt-12">
-                <a
-                  href={`mailto:${settings.contact_email}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:text-neutral-900"
-                >
-                  Get in touch
-                </a>
-              </div>
-            )}
-          </section>
+                  return (
+                    <Link
+                      key={project._id}
+                      href={`/project/${project.slug.current}`}
+                      className="home-project-link"
+                    >
+                      {cover && (
+                        <div className="home-project-image">
+                          <Image
+                            src={cover}
+                            alt={project.cover_image?.alt ?? project.title}
+                            width={1600}
+                            height={1100}
+                            className="h-auto w-full"
+                            sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
+                          />
+                        </div>
+                      )}
+                      <div className="home-project-info">
+                        <h2 className="home-project-title">{project.title}</h2>
+                        {project.created_at && (
+                          <span className="home-project-meta">
+                            {new Date(project.created_at).getFullYear()}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </section>
+            </div>
+          </div>
         </main>
       </div>
     </>
