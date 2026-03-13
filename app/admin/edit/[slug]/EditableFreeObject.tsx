@@ -7,16 +7,184 @@ import type {
   FreeImageObject,
   FreeVideoObject,
   FreeTextObject,
+  BlockContent,
 } from "../../../../types";
 import { urlFor } from "../../../../lib/sanity";
 
-interface EditableFreeObjectProps {
-  obj: FreeObject;
-  isSelected: boolean;
-  onSelect: (e: React.MouseEvent) => void;
-  onDelete: () => void;
-  onChange: (patch: Partial<FreeObject>) => void;
+// --- Helpers matching public page rendering ---
+
+function getVimeoId(url: string): string | null {
+  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return match ? match[1] : null;
 }
+
+function renderBlock(block: BlockContent) {
+  const text = block.children.map((child) => {
+    let content: React.ReactNode = child.text;
+    if (child.marks.includes("strong"))
+      content = <strong key={child._key}>{content}</strong>;
+    if (child.marks.includes("em"))
+      content = <em key={child._key}>{content}</em>;
+
+    const linkMark = block.markDefs.find(
+      (def) => child.marks.includes(def._key) && def._type === "link",
+    );
+    if (linkMark?.href) {
+      content = (
+        <a
+          key={child._key}
+          href={linkMark.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+        >
+          {content}
+        </a>
+      );
+    }
+    return content;
+  });
+
+  switch (block.style) {
+    case "h2":
+      return (
+        <h2 key={block._key} className="text-2xl font-semibold tracking-tight">
+          {text}
+        </h2>
+      );
+    case "h3":
+      return (
+        <h3 key={block._key} className="text-xl font-medium">
+          {text}
+        </h3>
+      );
+    default:
+      return (
+        <p key={block._key} className="leading-relaxed">
+          {text}
+        </p>
+      );
+  }
+}
+
+const fontSizeMap: Record<string, string> = {
+  sm: "text-sm",
+  base: "text-base",
+  lg: "text-lg",
+  xl: "text-xl",
+};
+
+// --- Content renderers — no positioning wrapper, matches public page visuals ---
+
+function ImageContent({ obj }: { obj: FreeImageObject }) {
+  if (!obj.image?.asset?._ref) {
+    return (
+      <div className="w-full h-24 bg-neutral-200 flex items-center justify-center text-xs text-neutral-400">
+        No image
+      </div>
+    );
+  }
+  const imageUrl = urlFor(obj.image).width(1400).auto("format").url();
+  const thumbUrl = urlFor(obj.image).width(40).blur(10).url();
+  return (
+    <Image
+      src={imageUrl}
+      alt={obj.image.alt ?? ""}
+      width={1400}
+      height={875}
+      className="block h-auto w-full"
+      style={{
+        borderRadius: obj.borderRadius ?? 0,
+        filter: obj.grayscale ? "grayscale(1)" : undefined,
+      }}
+      placeholder={thumbUrl ? "blur" : "empty"}
+      blurDataURL={thumbUrl}
+      sizes="100vw"
+      draggable={false}
+    />
+  );
+}
+
+function VideoContent({ obj }: { obj: FreeVideoObject }) {
+  const aspectRatio = obj.aspectRatio ?? "16/9";
+  const borderRadius = obj.borderRadius ?? 0;
+
+  if (!obj.vimeoUrl) {
+    return (
+      <div
+        className="w-full bg-neutral-900 flex items-center justify-center text-neutral-400 text-xs"
+        style={{ aspectRatio, borderRadius }}
+      >
+        No URL
+      </div>
+    );
+  }
+
+  const videoId = getVimeoId(obj.vimeoUrl);
+  if (!videoId) {
+    return (
+      <div
+        className="w-full bg-neutral-900 flex items-center justify-center text-neutral-400 text-xs"
+        style={{ aspectRatio, borderRadius }}
+      >
+        Invalid Vimeo URL
+      </div>
+    );
+  }
+
+  const params = new URLSearchParams({
+    autoplay: obj.autoplay ? "1" : "0",
+    muted: "1",
+    loop: obj.loop ? "1" : "0",
+    title: "0",
+    byline: "0",
+    portrait: "0",
+    dnt: "1",
+  });
+
+  const embedUrl = `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
+
+  return (
+    <div
+      className="overflow-hidden bg-neutral-900"
+      style={{ aspectRatio, borderRadius }}
+    >
+      <iframe
+        src={embedUrl}
+        title="Video"
+        className="h-full w-full"
+        width="100%"
+        height="100%"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  );
+}
+
+function TextContent({ obj }: { obj: FreeTextObject }) {
+  if (!obj.content?.length) {
+    return (
+      <div className="text-neutral-400 text-sm italic">No text content</div>
+    );
+  }
+  const fontSize = fontSizeMap[obj.fontSize ?? "base"] ?? "text-base";
+  return (
+    <div
+      className={`${fontSize} space-y-2`}
+      style={{
+        color: obj.color ?? "#171717",
+        textAlign: (obj.textAlign as React.CSSProperties["textAlign"]) ?? "left",
+      }}
+    >
+      {obj.content.map((block) => renderBlock(block))}
+    </div>
+  );
+}
+
+// --- Drag types ---
+
+type DragType = "move" | "resize-br" | "resize-bl" | "resize-tr" | "resize-tl";
 
 function freeObjectLabel(type: string): string {
   const labels: Record<string, string> = {
@@ -27,19 +195,25 @@ function freeObjectLabel(type: string): string {
   return labels[type] ?? type;
 }
 
-type DragType = "move" | "resize-br" | "resize-bl" | "resize-tr" | "resize-tl";
+// --- Main component ---
 
-function DraggableOverlay({
-  obj,
-  onChange,
-  containerRef,
-  children,
-}: {
+interface EditableFreeObjectProps {
   obj: FreeObject;
+  isSelected: boolean;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
+  onSelect: (e: React.MouseEvent) => void;
+  onDelete: () => void;
   onChange: (patch: Partial<FreeObject>) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
-  children: React.ReactNode;
-}) {
+}
+
+export default function EditableFreeObject({
+  obj,
+  isSelected,
+  canvasRef,
+  onSelect,
+  onDelete,
+  onChange,
+}: EditableFreeObjectProps) {
   const xPercent = obj.xPercent ?? 10;
   const yPercent = obj.yPercent ?? 10;
   const widthPercent = obj.widthPercent ?? 40;
@@ -71,8 +245,8 @@ function DraggableOverlay({
       };
 
       const onMouseMove = (me: MouseEvent) => {
-        if (!dragState.current || !containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
+        if (!dragState.current || !canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
         const dx =
           ((me.clientX - dragState.current.startX) / rect.width) * 100;
         const dy =
@@ -99,7 +273,7 @@ function DraggableOverlay({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [xPercent, yPercent, widthPercent, onChange, containerRef],
+    [xPercent, yPercent, widthPercent, onChange, canvasRef],
   );
 
   const handleStyle: React.CSSProperties = {
@@ -109,6 +283,7 @@ function DraggableOverlay({
     background: "white",
     border: "2px solid #3b82f6",
     borderRadius: 3,
+    zIndex: 10,
   };
 
   return (
@@ -121,208 +296,99 @@ function DraggableOverlay({
         zIndex,
         transform: rotation ? `rotate(${rotation}deg)` : undefined,
         opacity,
-        cursor: "move",
+        cursor: isSelected ? "move" : "pointer",
         userSelect: "none",
       }}
-      onMouseDown={(e) => startInteraction(e, "move")}
-    >
-      {children}
-
-      {/* Resize handles */}
-      <div
-        style={{
-          ...handleStyle,
-          bottom: -6,
-          right: -6,
-          cursor: "se-resize",
-          zIndex: 10,
-        }}
-        onMouseDown={(e) => startInteraction(e, "resize-br")}
-      />
-      <div
-        style={{
-          ...handleStyle,
-          bottom: -6,
-          left: -6,
-          cursor: "sw-resize",
-          zIndex: 10,
-        }}
-        onMouseDown={(e) => startInteraction(e, "resize-bl")}
-      />
-      <div
-        style={{
-          ...handleStyle,
-          top: -6,
-          right: -6,
-          cursor: "ne-resize",
-          zIndex: 10,
-        }}
-        onMouseDown={(e) => startInteraction(e, "resize-tr")}
-      />
-      <div
-        style={{
-          ...handleStyle,
-          top: -6,
-          left: -6,
-          cursor: "nw-resize",
-          zIndex: 10,
-        }}
-        onMouseDown={(e) => startInteraction(e, "resize-tl")}
-      />
-
-      {/* Move hint */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          background: "rgba(59,130,246,0.85)",
-          color: "white",
-          fontSize: 11,
-          padding: "3px 8px",
-          borderRadius: 4,
-          pointerEvents: "none",
-          whiteSpace: "nowrap",
-        }}
-      >
-        drag to move
-      </div>
-
-      {/* Blue outline */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          outline: "2px solid #3b82f6",
-          outlineOffset: 2,
-          pointerEvents: "none",
-        }}
-      />
-    </div>
-  );
-}
-
-function FreeImagePreview({ obj }: { obj: FreeImageObject }) {
-  if (!obj.image?.asset?._ref) {
-    return (
-      <div className="w-full h-24 bg-neutral-200 flex items-center justify-center text-xs text-neutral-400">
-        No image
-      </div>
-    );
-  }
-  const imageUrl = urlFor(obj.image).width(800).auto("format").url();
-  const thumbUrl = urlFor(obj.image).width(40).blur(10).url();
-  return (
-    <Image
-      src={imageUrl}
-      alt={obj.image.alt ?? ""}
-      width={800}
-      height={500}
-      className="w-full h-auto block"
-      style={{
-        borderRadius: obj.borderRadius ?? 0,
-        filter: obj.grayscale ? "grayscale(1)" : undefined,
-      }}
-      placeholder={thumbUrl ? "blur" : "empty"}
-      blurDataURL={thumbUrl}
-      draggable={false}
-    />
-  );
-}
-
-function FreeVideoPreview({ obj }: { obj: FreeVideoObject }) {
-  return (
-    <div
-      className="w-full bg-neutral-900 flex items-center justify-center text-neutral-400 text-xs"
-      style={{
-        aspectRatio: obj.aspectRatio ?? "16/9",
-        borderRadius: obj.borderRadius ?? 0,
-      }}
-    >
-      Video: {obj.vimeoUrl || "No URL"}
-    </div>
-  );
-}
-
-function FreeTextPreview({ obj }: { obj: FreeTextObject }) {
-  const hasContent = obj.content && obj.content.length > 0;
-  const preview = hasContent
-    ? obj.content!
-        .map((b) => b.children.map((c) => c.text).join(""))
-        .join(" ")
-        .slice(0, 100)
-    : "No text content";
-
-  return (
-    <div
-      className="p-3 bg-white/80 border border-dashed border-neutral-300 rounded text-sm"
-      style={{
-        color: obj.color ?? "#171717",
-        textAlign: (obj.textAlign as React.CSSProperties["textAlign"]) ?? "left",
-      }}
-    >
-      {preview}
-    </div>
-  );
-}
-
-export default function EditableFreeObject({
-  obj,
-  isSelected,
-  onSelect,
-  onDelete,
-  onChange,
-}: EditableFreeObjectProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <div
-      ref={containerRef}
-      className={`relative ${isSelected ? "" : ""}`}
-      style={{ minHeight: 60 }}
       onClick={onSelect}
+      onMouseDown={
+        isSelected ? (e) => startInteraction(e, "move") : undefined
+      }
     >
-      {/* Type label + delete button */}
-      {isSelected && (
-        <div
-          className="absolute top-0 left-0 z-50 flex items-center gap-2 px-2 py-1"
-          style={{ background: "rgba(59,130,246,0.9)" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="text-white text-xs font-medium px-1">
-            {freeObjectLabel(obj._type)}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (confirm(`Delete this ${freeObjectLabel(obj._type)}?`)) {
-                onDelete();
-              }
-            }}
-            className="text-white/80 hover:text-red-200 text-sm px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
-            title="Delete"
-          >
-            x
-          </button>
-        </div>
+      {/* Actual content — identical rendering to the public page */}
+      {obj._type === "freeImageObject" && (
+        <ImageContent obj={obj as FreeImageObject} />
+      )}
+      {obj._type === "freeVideoObject" && (
+        <VideoContent obj={obj as FreeVideoObject} />
+      )}
+      {obj._type === "freeTextObject" && (
+        <TextContent obj={obj as FreeTextObject} />
       )}
 
-      <DraggableOverlay
-        obj={obj}
-        onChange={(patch) => onChange(patch as Partial<FreeObject>)}
-        containerRef={containerRef as React.RefObject<HTMLDivElement>}
-      >
-        {obj._type === "freeImageObject" && (
-          <FreeImagePreview obj={obj as FreeImageObject} />
-        )}
-        {obj._type === "freeVideoObject" && (
-          <FreeVideoPreview obj={obj as FreeVideoObject} />
-        )}
-        {obj._type === "freeTextObject" && (
-          <FreeTextPreview obj={obj as FreeTextObject} />
-        )}
-      </DraggableOverlay>
+      {/* Editor chrome — only visible when selected */}
+      {isSelected && (
+        <>
+          {/* Blue outline */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              outline: "2px solid #3b82f6",
+              outlineOffset: 2,
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Type label + delete button */}
+          <div
+            style={{
+              position: "absolute",
+              top: -26,
+              left: 0,
+              background: "rgba(59,130,246,0.9)",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "2px 8px",
+              borderRadius: "3px 3px 0 0",
+              whiteSpace: "nowrap",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span
+              style={{ color: "white", fontSize: 11, fontWeight: 600 }}
+            >
+              {freeObjectLabel(obj._type)}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`Delete this ${freeObjectLabel(obj._type)}?`)) {
+                  onDelete();
+                }
+              }}
+              style={{
+                color: "rgba(255,255,255,0.8)",
+                fontSize: 14,
+                padding: "0 4px",
+                cursor: "pointer",
+                lineHeight: 1,
+              }}
+              title="Delete"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Resize handles */}
+          <div
+            style={{ ...handleStyle, bottom: -6, right: -6, cursor: "se-resize" }}
+            onMouseDown={(e) => startInteraction(e, "resize-br")}
+          />
+          <div
+            style={{ ...handleStyle, bottom: -6, left: -6, cursor: "sw-resize" }}
+            onMouseDown={(e) => startInteraction(e, "resize-bl")}
+          />
+          <div
+            style={{ ...handleStyle, top: -6, right: -6, cursor: "ne-resize" }}
+            onMouseDown={(e) => startInteraction(e, "resize-tr")}
+          />
+          <div
+            style={{ ...handleStyle, top: -6, left: -6, cursor: "nw-resize" }}
+            onMouseDown={(e) => startInteraction(e, "resize-tl")}
+          />
+        </>
+      )}
     </div>
   );
 }
