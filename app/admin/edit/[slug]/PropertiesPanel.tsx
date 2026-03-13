@@ -8,13 +8,25 @@ import type {
   GallerySection,
   VideoSection,
   SplitSection,
+  FreeObject,
+  FreeImageObject,
+  FreeVideoObject,
+  FreeTextObject,
 } from '../../../../types'
 
-interface PropsPanelProps {
-  section: Section
-  onChange: (patch: Partial<Section>) => void
-  onClose: () => void
-}
+type PropsPanelProps =
+  | {
+      section: Section
+      freeObject?: undefined
+      onChange: (patch: Partial<Section>) => void
+      onClose: () => void
+    }
+  | {
+      section?: undefined
+      freeObject: FreeObject
+      onChange: (patch: Partial<FreeObject>) => void
+      onClose: () => void
+    }
 
 // Shared input components
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -144,7 +156,78 @@ function SectionDivider({ label }: { label: string }) {
   )
 }
 
-// === Per-type panels ===
+// === Shared free position controls ===
+
+function FreePositionControls({
+  obj,
+  onChange,
+}: {
+  obj: FreeObject
+  onChange: (patch: Partial<FreeObject>) => void
+}) {
+  return (
+    <>
+      <SectionDivider label="Position" />
+
+      <Field label={`X Position: ${obj.xPercent ?? 10}%`}>
+        <NumberInput
+          value={obj.xPercent ?? 10}
+          onChange={(v) => onChange({ xPercent: v })}
+          min={-50}
+          max={150}
+        />
+      </Field>
+
+      <Field label={`Y Position: ${obj.yPercent ?? 10}%`}>
+        <NumberInput
+          value={obj.yPercent ?? 10}
+          onChange={(v) => onChange({ yPercent: v })}
+          min={-50}
+          max={150}
+        />
+      </Field>
+
+      <Field label={`Width: ${obj.widthPercent ?? 40}%`}>
+        <NumberInput
+          value={obj.widthPercent ?? 40}
+          onChange={(v) => onChange({ widthPercent: v })}
+          min={5}
+          max={200}
+        />
+      </Field>
+
+      <Field label={`Z-Index: ${obj.zIndex ?? 10}`}>
+        <NumberInput
+          value={obj.zIndex ?? 10}
+          onChange={(v) => onChange({ zIndex: v })}
+          min={0}
+          max={50}
+        />
+      </Field>
+
+      <Field label={`Rotation: ${obj.rotation ?? 0}\u00B0`}>
+        <NumberInput
+          value={obj.rotation ?? 0}
+          onChange={(v) => onChange({ rotation: v })}
+          min={-180}
+          max={180}
+        />
+      </Field>
+
+      <Field label={`Opacity: ${Math.round((obj.opacity ?? 1) * 100)}%`}>
+        <NumberInput
+          value={obj.opacity ?? 1}
+          onChange={(v) => onChange({ opacity: v })}
+          min={0}
+          max={1}
+          step={0.05}
+        />
+      </Field>
+    </>
+  )
+}
+
+// === Per-type panels (sections) ===
 
 function HeroPanel({
   section,
@@ -159,7 +242,7 @@ function HeroPanel({
         <TextInput
           value={section.heading ?? ''}
           onChange={(v) => onChange({ heading: v })}
-          placeholder="Hero heading…"
+          placeholder="Hero heading\u2026"
         />
       </Field>
 
@@ -167,7 +250,7 @@ function HeroPanel({
         <TextInput
           value={section.subheading ?? ''}
           onChange={(v) => onChange({ subheading: v })}
-          placeholder="Subheading…"
+          placeholder="Subheading\u2026"
         />
       </Field>
 
@@ -298,7 +381,7 @@ function ImagePanel({
         <TextInput
           value={section.caption ?? ''}
           onChange={(v) => onChange({ caption: v })}
-          placeholder="Image caption…"
+          placeholder="Image caption\u2026"
         />
       </Field>
 
@@ -427,7 +510,7 @@ function ImagePanel({
             />
           </Field>
 
-          <Field label={`Rotation: ${section.rotation ?? 0}°`}>
+          <Field label={`Rotation: ${section.rotation ?? 0}\u00B0`}>
             <NumberInput
               value={section.rotation ?? 0}
               onChange={(v) => onChange({ rotation: v })}
@@ -527,7 +610,7 @@ function VideoPanel({
         <TextInput
           value={section.vimeoUrl ?? ''}
           onChange={(v) => onChange({ vimeoUrl: v })}
-          placeholder="https://vimeo.com/…"
+          placeholder="https://vimeo.com/\u2026"
         />
       </Field>
 
@@ -535,7 +618,7 @@ function VideoPanel({
         <TextInput
           value={section.caption ?? ''}
           onChange={(v) => onChange({ caption: v })}
-          placeholder="Video caption…"
+          placeholder="Video caption\u2026"
         />
       </Field>
 
@@ -593,7 +676,7 @@ function SplitPanel({
         <TextInput
           value={section.caption ?? ''}
           onChange={(v) => onChange({ caption: v })}
-          placeholder="Image caption…"
+          placeholder="Image caption\u2026"
         />
       </Field>
 
@@ -670,9 +753,165 @@ function SplitPanel({
   )
 }
 
+// === Free object panels ===
+
+function FreeImagePanel({
+  obj,
+  onChange,
+}: {
+  obj: FreeImageObject
+  onChange: (patch: Partial<FreeObject>) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
+        Change image in{' '}
+        <a href="/admin/cms" className="underline" target="_blank">
+          Sanity Studio
+        </a>
+        .
+      </p>
+
+      <Field label={`Border Radius: ${obj.borderRadius ?? 0}px`}>
+        <NumberInput
+          value={obj.borderRadius ?? 0}
+          onChange={(v) => onChange({ borderRadius: v })}
+          min={0}
+          max={48}
+        />
+      </Field>
+
+      <ToggleInput
+        value={obj.grayscale ?? false}
+        onChange={(v) => onChange({ grayscale: v })}
+        label="Grayscale"
+      />
+
+      <FreePositionControls obj={obj} onChange={onChange} />
+    </div>
+  )
+}
+
+function FreeVideoPanel({
+  obj,
+  onChange,
+}: {
+  obj: FreeVideoObject
+  onChange: (patch: Partial<FreeObject>) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <Field label="Vimeo URL">
+        <TextInput
+          value={obj.vimeoUrl ?? ''}
+          onChange={(v) => onChange({ vimeoUrl: v })}
+          placeholder="https://vimeo.com/\u2026"
+        />
+      </Field>
+
+      <SectionDivider label="Playback" />
+
+      <ToggleInput
+        value={obj.loop ?? false}
+        onChange={(v) => onChange({ loop: v })}
+        label="Loop"
+      />
+
+      <ToggleInput
+        value={obj.autoplay ?? false}
+        onChange={(v) => onChange({ autoplay: v })}
+        label="Autoplay (muted)"
+      />
+
+      <SectionDivider label="Display" />
+
+      <Field label="Aspect Ratio">
+        <SelectInput
+          value={obj.aspectRatio ?? '16/9'}
+          onChange={(v) => onChange({ aspectRatio: v })}
+          options={[
+            { label: '16:9', value: '16/9' },
+            { label: '4:3', value: '4/3' },
+            { label: '1:1', value: '1/1' },
+            { label: '9:16 (Vertical)', value: '9/16' },
+          ]}
+        />
+      </Field>
+
+      <Field label={`Border Radius: ${obj.borderRadius ?? 0}px`}>
+        <NumberInput
+          value={obj.borderRadius ?? 0}
+          onChange={(v) => onChange({ borderRadius: v })}
+          min={0}
+          max={48}
+        />
+      </Field>
+
+      <FreePositionControls obj={obj} onChange={onChange} />
+    </div>
+  )
+}
+
+function FreeTextPanel({
+  obj,
+  onChange,
+}: {
+  obj: FreeTextObject
+  onChange: (patch: Partial<FreeObject>) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
+        Edit text content in{' '}
+        <a href="/admin/cms" className="underline" target="_blank">
+          Sanity Studio
+        </a>
+        .
+      </p>
+
+      <Field label="Font Size">
+        <SelectInput
+          value={obj.fontSize ?? 'base'}
+          onChange={(v) => onChange({ fontSize: v as FreeTextObject['fontSize'] })}
+          options={[
+            { label: 'Small', value: 'sm' },
+            { label: 'Normal', value: 'base' },
+            { label: 'Large', value: 'lg' },
+            { label: 'XL', value: 'xl' },
+          ]}
+        />
+      </Field>
+
+      <Field label="Text Alignment">
+        <SelectInput
+          value={obj.textAlign ?? 'left'}
+          onChange={(v) => onChange({ textAlign: v as FreeTextObject['textAlign'] })}
+          options={[
+            { label: 'Left', value: 'left' },
+            { label: 'Center', value: 'center' },
+            { label: 'Right', value: 'right' },
+          ]}
+        />
+      </Field>
+
+      <Field label="Text Color">
+        <TextInput
+          value={obj.color ?? '#171717'}
+          onChange={(v) => onChange({ color: v })}
+          placeholder="#171717"
+        />
+      </Field>
+
+      <FreePositionControls obj={obj} onChange={onChange} />
+    </div>
+  )
+}
+
 // === Main panel ===
 
-export default function PropertiesPanel({ section, onChange, onClose }: PropsPanelProps) {
+export default function PropertiesPanel(props: PropsPanelProps) {
+  const { onClose, onChange } = props
+
   const typeLabels: Record<string, string> = {
     heroSection: 'Hero',
     textSection: 'Text',
@@ -680,55 +919,51 @@ export default function PropertiesPanel({ section, onChange, onClose }: PropsPan
     gallerySection: 'Gallery',
     videoSection: 'Video',
     splitSection: 'Split',
+    freeImageObject: 'Free Image',
+    freeVideoObject: 'Free Video',
+    freeTextObject: 'Free Text',
   }
 
+  const itemType = props.section?._type ?? props.freeObject?._type ?? ''
+
   function renderPanel() {
-    switch (section._type) {
-      case 'heroSection':
-        return (
-          <HeroPanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      case 'textSection':
-        return (
-          <TextPanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      case 'imageSection':
-        return (
-          <ImagePanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      case 'gallerySection':
-        return (
-          <GalleryPanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      case 'videoSection':
-        return (
-          <VideoPanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      case 'splitSection':
-        return (
-          <SplitPanel
-            section={section}
-            onChange={(p) => onChange(p as Partial<Section>)}
-          />
-        )
-      default:
-        return <p className="text-sm text-neutral-400">No properties available.</p>
+    if (props.section) {
+      const section = props.section
+      const sectionOnChange = onChange as (patch: Partial<Section>) => void
+      switch (section._type) {
+        case 'heroSection':
+          return <HeroPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'textSection':
+          return <TextPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'imageSection':
+          return <ImagePanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'gallerySection':
+          return <GalleryPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'videoSection':
+          return <VideoPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'splitSection':
+          return <SplitPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        default:
+          return <p className="text-sm text-neutral-400">No properties available.</p>
+      }
     }
+
+    if (props.freeObject) {
+      const obj = props.freeObject
+      const freeOnChange = onChange as (patch: Partial<FreeObject>) => void
+      switch (obj._type) {
+        case 'freeImageObject':
+          return <FreeImagePanel obj={obj} onChange={freeOnChange} />
+        case 'freeVideoObject':
+          return <FreeVideoPanel obj={obj} onChange={freeOnChange} />
+        case 'freeTextObject':
+          return <FreeTextPanel obj={obj} onChange={freeOnChange} />
+        default:
+          return <p className="text-sm text-neutral-400">No properties available.</p>
+      }
+    }
+
+    return null
   }
 
   return (
@@ -738,7 +973,7 @@ export default function PropertiesPanel({ section, onChange, onClose }: PropsPan
         <div>
           <span className="text-xs text-neutral-400 uppercase tracking-wide">Properties</span>
           <h3 className="text-sm font-semibold text-neutral-900">
-            {typeLabels[section._type] ?? section._type}
+            {typeLabels[itemType] ?? itemType}
           </h3>
         </div>
         <button
@@ -746,7 +981,7 @@ export default function PropertiesPanel({ section, onChange, onClose }: PropsPan
           className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
           aria-label="Close properties"
         >
-          ×
+          x
         </button>
       </div>
 

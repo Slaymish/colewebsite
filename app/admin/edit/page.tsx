@@ -4,9 +4,8 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { ADMIN_COOKIE, verifySessionToken } from "../../../lib/adminAuth";
-import { getAllProjectsForAdmin, getSiteSettings } from "../../../lib/queries";
+import { getAllProjectsForAdmin } from "../../../lib/queries";
 import { urlFor } from "../../../lib/sanity";
-import CategoriesManager from "./CategoriesManager";
 import LoginForm from "./LoginForm";
 import LogoutButton from "./LogoutButton";
 
@@ -119,8 +118,6 @@ export default async function AdminEditPage() {
     );
   }
 
-  const settings = await getSiteSettings();
-
   return (
     <div className="min-h-screen bg-neutral-50">
       <div className="mx-auto max-w-3xl px-6 py-12">
@@ -139,13 +136,6 @@ export default async function AdminEditPage() {
             </Button>
             <LogoutButton />
           </div>
-        </div>
-
-        <div className="mb-6">
-          <CategoriesManager
-            initialCategories={settings?.categories ?? []}
-            settingsId={settings?._id}
-          />
         </div>
 
         <div className="rounded-2xl border border-neutral-100 bg-white px-4 shadow-sm">

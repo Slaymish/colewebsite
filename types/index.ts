@@ -115,6 +115,46 @@ export type Section =
   | VideoSection
   | SplitSection;
 
+// Free object types (absolutely positioned)
+
+export interface FreePositionFields {
+  xPercent?: number;
+  yPercent?: number;
+  widthPercent?: number;
+  zIndex?: number;
+  rotation?: number;
+  opacity?: number;
+}
+
+export interface FreeImageObject extends FreePositionFields {
+  _type: "freeImageObject";
+  _key: string;
+  image?: SanityImage;
+  borderRadius?: number;
+  grayscale?: boolean;
+}
+
+export interface FreeVideoObject extends FreePositionFields {
+  _type: "freeVideoObject";
+  _key: string;
+  vimeoUrl?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  aspectRatio?: string;
+  borderRadius?: number;
+}
+
+export interface FreeTextObject extends FreePositionFields {
+  _type: "freeTextObject";
+  _key: string;
+  content?: BlockContent[];
+  fontSize?: "sm" | "base" | "lg" | "xl";
+  textAlign?: "left" | "center" | "right";
+  color?: string;
+}
+
+export type FreeObject = FreeImageObject | FreeVideoObject | FreeTextObject;
+
 // Document types
 
 export interface Project {
@@ -130,6 +170,7 @@ export interface Project {
   cover_image?: SanityImage;
   og_image?: SanityImage;
   sections?: Section[];
+  freeObjects?: FreeObject[];
 }
 
 export interface ProjectSummary {
@@ -154,7 +195,7 @@ export interface SiteSettings {
   _id: string;
   name: string;
   bio?: string;
-  categories?: string[];
+
   logo?: SanityImage;
   social_links?: SocialLink[];
   contact_email?: string;

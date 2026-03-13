@@ -35,6 +35,12 @@ const PROJECT_FULL_FIELDS = `
     _type == 'videoSection' => {
       poster { ..., asset->{ _id, url, metadata { dimensions } } }
     }
+  },
+  freeObjects[] {
+    ...,
+    _type == 'freeImageObject' => {
+      image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    }
   }
 `;
 

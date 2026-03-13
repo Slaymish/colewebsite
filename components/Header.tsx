@@ -99,7 +99,6 @@ export default function Header({
             <Separator className="hidden md:block" />
             <ProjectSidebar
               projects={projects}
-              categories={settings?.categories}
               activeSlug={activeSlug}
             />
           </>

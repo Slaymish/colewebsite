@@ -1,4 +1,47 @@
-import { defineType, defineArrayMember } from 'sanity'
+import { defineType, defineField, defineArrayMember } from 'sanity'
+
+// Shared positioning fields used by all free objects
+const freePositionFields = [
+  defineField({
+    name: 'xPercent',
+    title: 'X Position (%)',
+    type: 'number',
+    initialValue: 10,
+  }),
+  defineField({
+    name: 'yPercent',
+    title: 'Y Position (%)',
+    type: 'number',
+    initialValue: 10,
+  }),
+  defineField({
+    name: 'widthPercent',
+    title: 'Width (%)',
+    type: 'number',
+    initialValue: 40,
+    validation: (r) => r.min(5).max(200),
+  }),
+  defineField({
+    name: 'zIndex',
+    title: 'Z-Index (layer order)',
+    type: 'number',
+    initialValue: 10,
+  }),
+  defineField({
+    name: 'rotation',
+    title: 'Rotation (\u00B0)',
+    type: 'number',
+    initialValue: 0,
+    validation: (r) => r.min(-180).max(180),
+  }),
+  defineField({
+    name: 'opacity',
+    title: 'Opacity (0\u20131)',
+    type: 'number',
+    initialValue: 1,
+    validation: (r) => r.min(0).max(1),
+  }),
+]
 
 export const heroSection = defineType({
   name: 'heroSection',
@@ -605,5 +648,177 @@ export const splitSection = defineType({
       subtitle: `Image ${pos || 'left'}`,
       media,
     }),
+  },
+})
+
+// === Free Objects (absolutely positioned) ===
+
+export const freeImageObject = defineType({
+  name: 'freeImageObject',
+  title: 'Free Image',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: { hotspot: true },
+      validation: (r) => r.required(),
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt Text',
+          type: 'string',
+        },
+      ],
+    }),
+    defineField({
+      name: 'borderRadius',
+      title: 'Border Radius (px)',
+      type: 'number',
+      initialValue: 0,
+      validation: (r) => r.min(0).max(48),
+    }),
+    defineField({
+      name: 'grayscale',
+      title: 'Grayscale',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    ...freePositionFields,
+  ],
+  preview: {
+    select: { media: 'image' },
+    prepare: ({ media }) => ({ title: 'Free Image', subtitle: 'Positioned image', media }),
+  },
+})
+
+export const freeVideoObject = defineType({
+  name: 'freeVideoObject',
+  title: 'Free Video',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'vimeoUrl',
+      title: 'Vimeo URL',
+      type: 'url',
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'autoplay',
+      title: 'Autoplay (muted)',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'loop',
+      title: 'Loop',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'aspectRatio',
+      title: 'Aspect Ratio',
+      type: 'string',
+      initialValue: '16/9',
+      options: {
+        list: [
+          { title: '16:9', value: '16/9' },
+          { title: '4:3', value: '4/3' },
+          { title: '1:1', value: '1/1' },
+          { title: '9:16 (Vertical)', value: '9/16' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'borderRadius',
+      title: 'Border Radius (px)',
+      type: 'number',
+      initialValue: 0,
+      validation: (r) => r.min(0).max(48),
+    }),
+    ...freePositionFields,
+  ],
+  preview: {
+    select: { url: 'vimeoUrl' },
+    prepare: ({ url }) => ({ title: 'Free Video', subtitle: url || 'No URL set' }),
+  },
+})
+
+export const freeTextObject = defineType({
+  name: 'freeTextObject',
+  title: 'Free Text',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'content',
+      title: 'Content',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+          ],
+          marks: {
+            decorators: [
+              { title: 'Bold', value: 'strong' },
+              { title: 'Italic', value: 'em' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [{ name: 'href', type: 'url', title: 'URL' }],
+              },
+            ],
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'fontSize',
+      title: 'Font Size',
+      type: 'string',
+      initialValue: 'base',
+      options: {
+        list: [
+          { title: 'Small', value: 'sm' },
+          { title: 'Normal', value: 'base' },
+          { title: 'Large', value: 'lg' },
+          { title: 'XL', value: 'xl' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'textAlign',
+      title: 'Text Alignment',
+      type: 'string',
+      initialValue: 'left',
+      options: {
+        list: [
+          { title: 'Left', value: 'left' },
+          { title: 'Center', value: 'center' },
+          { title: 'Right', value: 'right' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'color',
+      title: 'Text Color',
+      type: 'string',
+      initialValue: '#171717',
+      description: 'Hex color value (e.g. #ffffff for white)',
+    }),
+    ...freePositionFields,
+  ],
+  preview: {
+    prepare: () => ({ title: 'Free Text', subtitle: 'Positioned text' }),
   },
 })

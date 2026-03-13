@@ -3,51 +3,30 @@ import ProjectCard from "./ProjectCard";
 
 interface ProjectSidebarProps {
   projects: ProjectSummary[];
-  categories?: string[];
   activeSlug?: string;
 }
 
-/**
- * This is used to display a list of projects in a sidebar.
- * @param param0
- * @returns
- */
 export default function ProjectSidebar({
   projects,
-  categories = [],
   activeSlug,
 }: ProjectSidebarProps) {
-  const normalizedCategories: string[] = categories
-    .map((category) => category.trim())
-    .filter((category) => category.length > 0);
-
   const uncategorized = projects.filter((project) => {
     const category = project.category?.trim();
     return !category;
   });
 
-  const orderedGroups = normalizedCategories
-    .map((category) => ({
-      category,
-      projects: projects.filter(
-        (project) => project.category?.trim() === category,
-      ),
-    }))
-    .filter((group) => group.projects.length > 0);
-
-  const remainingCategoryNames = Array.from(
+  // Derive unique categories from projects, sorted alphabetically
+  const categoryNames = Array.from(
     new Set(
       projects.reduce<string[]>((acc, project) => {
         const category = project.category?.trim();
-        if (category && !normalizedCategories.includes(category)) {
-          acc.push(category);
-        }
+        if (category) acc.push(category);
         return acc;
       }, []),
     ),
-  );
+  ).sort();
 
-  const remainingGroups = remainingCategoryNames.map((category) => ({
+  const groups = categoryNames.map((category) => ({
     category,
     projects: projects.filter(
       (project) => project.category?.trim() === category,
@@ -72,7 +51,7 @@ export default function ProjectSidebar({
                 ))}
               </div>
             )}
-            {[...orderedGroups, ...remainingGroups].map((group) => (
+            {groups.map((group) => (
               <div key={group.category} className="space-y-1">
                 <h3 className="pb-1 text-sm font-semibold text-neutral-900">
                   {group.category}
