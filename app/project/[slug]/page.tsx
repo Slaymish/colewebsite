@@ -11,6 +11,7 @@ import { urlFor } from "../../../lib/sanity";
 import { projectJsonLd } from "../../../lib/structured-data";
 import Header from "../../../components/Header";
 import SectionRenderer from "../../../components/SectionRenderer";
+import FreeObjectRenderer from "../../../components/FreeObjectRenderer";
 
 export const revalidate = 60;
 
@@ -105,7 +106,7 @@ export default async function ProjectPage({ params }: PageProps) {
           className="min-w-0 md:flex"
           aria-label={project.title}
         >
-          <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+          <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
             <div className="flex flex-col gap-6">
               {coverUrl && (
                 <figure className="w-full overflow-hidden rounded-2xl bg-black/5">
@@ -168,6 +169,10 @@ export default async function ProjectPage({ params }: PageProps) {
                 <SectionRenderer sections={project.sections} />
               )}
             </div>
+
+            {project.freeObjects && project.freeObjects.length > 0 && (
+              <FreeObjectRenderer freeObjects={project.freeObjects} />
+            )}
           </div>
         </main>
       </div>

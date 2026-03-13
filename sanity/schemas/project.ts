@@ -38,6 +38,12 @@ export const project = defineType({
       type: 'date',
     },
     {
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      description: 'Group projects in the sidebar navigation (e.g. "Film", "Photography")',
+    },
+    {
       name: 'tags',
       title: 'Tags',
       type: 'array',
@@ -81,7 +87,8 @@ export const project = defineType({
     },
     {
       name: 'sections',
-      title: 'Sections',
+      title: 'Predefined Sections',
+      description: 'Structured layout sections that flow in order.',
       type: 'array',
       of: [
         defineArrayMember({ type: 'heroSection', title: 'Hero' }),
@@ -90,6 +97,17 @@ export const project = defineType({
         defineArrayMember({ type: 'gallerySection', title: 'Gallery' }),
         defineArrayMember({ type: 'videoSection', title: 'Video' }),
         defineArrayMember({ type: 'splitSection', title: 'Split (Image + Text)' }),
+      ],
+    },
+    {
+      name: 'freeObjects',
+      title: 'Free Objects',
+      description: 'Absolutely positioned elements that can be placed anywhere on the page.',
+      type: 'array',
+      of: [
+        defineArrayMember({ type: 'freeImageObject', title: 'Free Image' }),
+        defineArrayMember({ type: 'freeVideoObject', title: 'Free Video' }),
+        defineArrayMember({ type: 'freeTextObject', title: 'Free Text' }),
       ],
     },
   ],

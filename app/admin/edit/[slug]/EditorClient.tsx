@@ -3,33 +3,44 @@
 import Link from "next/link";
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Project, Section } from "../../../../types";
+import type { Project, Section, FreeObject } from "../../../../types";
 import EditToolbar from "./EditToolbar";
 import EditableSection from "./EditableSection";
+import EditableFreeObject from "./EditableFreeObject";
 import PropertiesPanel from "./PropertiesPanel";
 
 interface EditorClientProps {
   initialProject: Project;
-  availableCategories: string[];
 }
+
+type SelectedItem =
+  | { kind: "section"; key: string }
+  | { kind: "freeObject"; key: string }
+  | null;
 
 export default function EditorClient({
   initialProject,
-  availableCategories,
 }: EditorClientProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project>(initialProject);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selected, setSelected] = useState<SelectedItem>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const sections = project.sections ?? [];
+  const freeObjects = project.freeObjects ?? [];
 
-  const selectedSection = selectedKey
-    ? (sections.find((s) => s._key === selectedKey) ?? null)
-    : null;
+  const selectedSection =
+    selected?.kind === "section"
+      ? (sections.find((s) => s._key === selected.key) ?? null)
+      : null;
+
+  const selectedFreeObject =
+    selected?.kind === "freeObject"
+      ? (freeObjects.find((o) => o._key === selected.key) ?? null)
+      : null;
 
   // Update a section by key
   const updateSection = useCallback((key: string, patch: Partial<Section>) => {
@@ -42,6 +53,21 @@ export default function EditorClient({
     setIsDirty(true);
     setSaveSuccess(false);
   }, []);
+
+  // Update a free object by key
+  const updateFreeObject = useCallback(
+    (key: string, patch: Partial<FreeObject>) => {
+      setProject((prev) => ({
+        ...prev,
+        freeObjects: (prev.freeObjects ?? []).map((o) =>
+          o._key === key ? ({ ...o, ...patch } as FreeObject) : o,
+        ),
+      }));
+      setIsDirty(true);
+      setSaveSuccess(false);
+    },
+    [],
+  );
 
   // Move section up or down
   const moveSection = useCallback((key: string, direction: "up" | "down") => {
@@ -64,10 +90,23 @@ export default function EditorClient({
         ...prev,
         sections: (prev.sections ?? []).filter((s) => s._key !== key),
       }));
-      if (selectedKey === key) setSelectedKey(null);
+      if (selected?.kind === "section" && selected.key === key) setSelected(null);
       setIsDirty(true);
     },
-    [selectedKey],
+    [selected],
+  );
+
+  // Delete a free object
+  const deleteFreeObject = useCallback(
+    (key: string) => {
+      setProject((prev) => ({
+        ...prev,
+        freeObjects: (prev.freeObjects ?? []).filter((o) => o._key !== key),
+      }));
+      if (selected?.kind === "freeObject" && selected.key === key) setSelected(null);
+      setIsDirty(true);
+    },
+    [selected],
   );
 
   // Save to Sanity (draft)
@@ -84,6 +123,7 @@ export default function EditorClient({
             projectId: project._id,
             slug: project.slug.current,
             sections: project.sections ?? [],
+            freeObjects: project.freeObjects ?? [],
             status: newStatus ?? project.status,
             title: project.title,
             meta_description: project.meta_description,
@@ -138,7 +178,7 @@ export default function EditorClient({
         {/* Canvas */}
         <div
           className="flex-1 overflow-y-auto"
-          onClick={() => setSelectedKey(null)}
+          onClick={() => setSelected(null)}
         >
           <div className="max-w-5xl mx-auto my-6 bg-white shadow-lg rounded-xl overflow-hidden">
             {/* Project header preview */}
@@ -146,30 +186,9 @@ export default function EditorClient({
               <h1 className="text-2xl font-semibold text-neutral-900">
                 {project.title}
               </h1>
-              <div className="mt-4 max-w-xs">
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-neutral-500">
-                  Category
-                </label>
-                <select
-                  value={project.category ?? ""}
-                  onChange={(e) => {
-                    setProject((prev) => ({
-                      ...prev,
-                      category: e.target.value || undefined,
-                    }));
-                    setIsDirty(true);
-                    setSaveSuccess(false);
-                  }}
-                  className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-400 focus:outline-none"
-                >
-                  <option value="">No category</option>
-                  {availableCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {project.category && (
+                <p className="mt-1 text-sm text-neutral-500">{project.category}</p>
+              )}
               {project.tags && project.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
@@ -184,8 +203,8 @@ export default function EditorClient({
               )}
             </div>
 
-            {/* Sections */}
-            {sections.length === 0 ? (
+            {/* Predefined Sections */}
+            {sections.length === 0 && freeObjects.length === 0 ? (
               <div className="py-16 text-center text-neutral-400">
                 <p className="text-sm">No sections yet.</p>
                 <p className="text-xs mt-1">
@@ -197,23 +216,73 @@ export default function EditorClient({
                 </p>
               </div>
             ) : (
-              sections.map((section, index) => (
-                <EditableSection
-                  key={section._key}
-                  section={section}
-                  index={index}
-                  total={sections.length}
-                  isSelected={selectedKey === section._key}
-                  onSelect={(e) => {
-                    e.stopPropagation();
-                    setSelectedKey(section._key);
-                  }}
-                  onMoveUp={() => moveSection(section._key, "up")}
-                  onMoveDown={() => moveSection(section._key, "down")}
-                  onDelete={() => deleteSection(section._key)}
-                  onChange={(patch) => updateSection(section._key, patch)}
-                />
-              ))
+              <>
+                {sections.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-4 pb-1">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+                        Predefined Sections
+                      </span>
+                    </div>
+                    {sections.map((section, index) => (
+                      <EditableSection
+                        key={section._key}
+                        section={section}
+                        index={index}
+                        total={sections.length}
+                        isSelected={
+                          selected?.kind === "section" &&
+                          selected.key === section._key
+                        }
+                        onSelect={(e) => {
+                          e.stopPropagation();
+                          setSelected({ kind: "section", key: section._key });
+                        }}
+                        onMoveUp={() => moveSection(section._key, "up")}
+                        onMoveDown={() => moveSection(section._key, "down")}
+                        onDelete={() => deleteSection(section._key)}
+                        onChange={(patch) =>
+                          updateSection(section._key, patch)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Free Objects */}
+                {freeObjects.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-6 pb-1">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+                        Free Objects
+                      </span>
+                    </div>
+                    <div className="relative" style={{ minHeight: 400 }}>
+                      {freeObjects.map((obj) => (
+                        <EditableFreeObject
+                          key={obj._key}
+                          obj={obj}
+                          isSelected={
+                            selected?.kind === "freeObject" &&
+                            selected.key === obj._key
+                          }
+                          onSelect={(e) => {
+                            e.stopPropagation();
+                            setSelected({
+                              kind: "freeObject",
+                              key: obj._key,
+                            });
+                          }}
+                          onDelete={() => deleteFreeObject(obj._key)}
+                          onChange={(patch) =>
+                            updateFreeObject(obj._key, patch)
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="h-16" />
@@ -225,7 +294,19 @@ export default function EditorClient({
           <PropertiesPanel
             section={selectedSection}
             onChange={(patch) => updateSection(selectedSection._key, patch)}
-            onClose={() => setSelectedKey(null)}
+            onClose={() => setSelected(null)}
+          />
+        )}
+        {selectedFreeObject && (
+          <PropertiesPanel
+            freeObject={selectedFreeObject}
+            onChange={(patch) =>
+              updateFreeObject(
+                selectedFreeObject._key,
+                patch as Partial<FreeObject>,
+              )
+            }
+            onClose={() => setSelected(null)}
           />
         )}
       </div>

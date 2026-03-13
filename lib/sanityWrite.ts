@@ -1,5 +1,5 @@
 import { createClient } from "next-sanity";
-import type { Section } from "../types";
+import type { Section, FreeObject } from "../types";
 
 export function getWriteClient() {
   const token = process.env.SANITY_API_TOKEN;
@@ -50,6 +50,7 @@ function stripExpandedAssets(value: unknown): unknown {
 export interface SaveProjectPayload {
   projectId: string;
   sections: Section[];
+  freeObjects?: FreeObject[];
   status?: "draft" | "published";
   title?: string;
   meta_description?: string;
@@ -63,8 +64,13 @@ export async function saveProject(payload: SaveProjectPayload): Promise<void> {
   // Strip expanded asset data before writing — Sanity only accepts plain references
   const cleanSections = stripExpandedAssets(payload.sections) as Section[];
 
+  const cleanFreeObjects = stripExpandedAssets(
+    payload.freeObjects ?? [],
+  ) as FreeObject[];
+
   const patch: Record<string, unknown> = {
     sections: cleanSections,
+    freeObjects: cleanFreeObjects,
   };
 
   if (payload.status !== undefined) patch.status = payload.status;
@@ -75,29 +81,4 @@ export async function saveProject(payload: SaveProjectPayload): Promise<void> {
   if (payload.tags !== undefined) patch.tags = payload.tags;
 
   await client.patch(payload.projectId).set(patch).commit();
-}
-
-export interface SaveSiteCategoriesPayload {
-  settingsId?: string;
-  categories: string[];
-}
-
-export async function saveSiteCategories(
-  payload: SaveSiteCategoriesPayload,
-): Promise<void> {
-  const client = getWriteClient();
-  const categories = payload.categories
-    .map((value) => value.trim())
-    .filter(Boolean);
-
-  if (payload.settingsId) {
-    await client.patch(payload.settingsId).set({ categories }).commit();
-    return;
-  }
-
-  await client.create({
-    _type: "siteSettings",
-    name: "Cole Anderson",
-    categories,
-  });
 }
