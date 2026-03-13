@@ -30,18 +30,18 @@ function stripExpandedAssets(value: unknown): unknown {
   const result: Record<string, unknown> = {};
 
   for (const key of Object.keys(obj)) {
-    if (
-      key === "asset" &&
-      obj[key] &&
-      typeof obj[key] === "object" &&
-      "_ref" in (obj[key] as object)
-    ) {
-      // Keep only the reference fields — discard _id, url, metadata, etc.
+    if (key === "asset" && obj[key] && typeof obj[key] === "object") {
       const ref = obj[key] as Record<string, unknown>;
-      result[key] = { _type: ref._type ?? "reference", _ref: ref._ref };
-    } else {
-      result[key] = stripExpandedAssets(obj[key]);
+      const refValue = ref._ref ?? ref._id;
+
+      if (refValue) {
+        // Normalize any expanded asset objects (with _id or _ref) to a plain reference
+        result[key] = { _type: ref._type ?? "reference", _ref: refValue };
+        continue;
+      }
     }
+
+    result[key] = stripExpandedAssets(obj[key]);
   }
 
   return result;
