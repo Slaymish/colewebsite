@@ -97,18 +97,18 @@ export default async function ProjectPage({ params }: PageProps) {
         }}
       />
 
-      <div className="site-shell">
+      <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
         <Header settings={settings} projects={projects} activeSlug={slug} />
 
         <main
           id="main-content"
-          className="site-main"
+          className="min-w-0 md:flex"
           aria-label={project.title}
         >
-          <div className="content-column">
-            <div className="project-page">
+          <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+            <div className="flex flex-col gap-6">
               {coverUrl && (
-                <figure className="home-project-image">
+                <figure className="w-full overflow-hidden rounded-2xl bg-black/5">
                   <Image
                     src={coverUrl}
                     alt={project.cover_image?.alt ?? project.title}
@@ -123,10 +123,12 @@ export default async function ProjectPage({ params }: PageProps) {
                 </figure>
               )}
 
-              <div className="project-header">
-                <h1 className="project-title">{project.title}</h1>
+              <div className="flex flex-col gap-3 pb-1">
+                <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+                  {project.title}
+                </h1>
 
-                <div className="project-meta-row">
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-[0.82rem] text-black/50">
                   {project.created_at && (
                     <time dateTime={project.created_at}>
                       {new Date(project.created_at).toLocaleDateString(
@@ -139,9 +141,15 @@ export default async function ProjectPage({ params }: PageProps) {
                     </time>
                   )}
                   {project.tags && project.tags.length > 0 && (
-                    <div className="project-tags" aria-label="Tags">
+                    <div
+                      className="flex flex-wrap gap-x-3 gap-y-1"
+                      aria-label="Tags"
+                    >
                       {project.tags.map((tag) => (
-                        <span key={tag} className="project-tag">
+                        <span
+                          key={tag}
+                          className="text-[0.82rem] text-black/50"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -150,7 +158,7 @@ export default async function ProjectPage({ params }: PageProps) {
                 </div>
 
                 {project.meta_description && (
-                  <p className="project-description">
+                  <p className="max-w-[42rem] text-[0.96rem] leading-[1.6] text-black/65">
                     {project.meta_description}
                   </p>
                 )}

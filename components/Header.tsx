@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { ProjectSummary, SiteSettings } from "../types";
 import ProjectSidebar from "./ProjectSidebar";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "./ui/navigation-menu";
+import { Separator } from "./ui/separator";
 
 interface HeaderProps {
   settings: SiteSettings | null;
@@ -28,56 +35,73 @@ export default function Header({
     `© ${new Date().getFullYear()} ${name}. All rights reserved.`;
 
   return (
-    <header className="site-sidebar">
-      <div className="site-sidebar-inner">
-        <Link href="/" className="site-title" aria-label={`${name} — home`}>
+    <header className="border-b border-black/10 px-5 py-6 md:sticky md:top-0 md:h-screen md:border-r md:border-b-0 md:px-7 md:py-8">
+      <div className="flex h-full flex-col gap-6">
+        <Link
+          href="/"
+          className="text-[clamp(2.5rem,5vw,3.7rem)] font-semibold leading-[0.92] tracking-[-0.05em]"
+          aria-label={`${name} — home`}
+        >
           {name}
         </Link>
 
-        {settings?.bio && <p className="site-meta">{settings.bio}</p>}
-
-        <nav aria-label="Main navigation" className="site-nav">
-          <Link href="/" className="site-nav-link">
-            Home
-          </Link>
-          {settings?.contact_email && (
-            <a
-              href={`mailto:${settings.contact_email}`}
-              className="site-nav-link"
-            >
-              Contact
-            </a>
-          )}
-          {cvUrl && (
-            <a
-              href={cvUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-nav-link"
-              data-plausible-event="cv-download"
-            >
-              Info / CV
-            </a>
-          )}
-          {settings?.social_links?.map((link) => (
-            <a
-              key={link._key}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-nav-link"
-              data-plausible-event={`social-link-click-${link.platform}`}
-            >
-              {link.label || link.platform}
-            </a>
-          ))}
-        </nav>
-
-        {projects.length > 0 && (
-          <ProjectSidebar projects={projects} activeSlug={activeSlug} />
+        {settings?.bio && (
+          <p className="max-w-sm text-[0.92rem] leading-[1.45] text-black/70">
+            {settings.bio}
+          </p>
         )}
 
-        <div className="site-sidebar-footer">
+        <NavigationMenu orientation="vertical">
+          <NavigationMenuList aria-label="Main navigation">
+            <NavigationMenuItem>
+              <Link href="/" legacyBehavior passHref>
+                <NavigationMenuLink active={!activeSlug}>
+                  Home
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            {settings?.contact_email && (
+              <NavigationMenuItem>
+                <NavigationMenuLink href={`mailto:${settings.contact_email}`}>
+                  Contact
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )}
+            {cvUrl && (
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  href={cvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-plausible-event="cv-download"
+                >
+                  Info / CV
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )}
+            {settings?.social_links?.map((link) => (
+              <NavigationMenuItem key={link._key}>
+                <NavigationMenuLink
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-plausible-event={`social-link-click-${link.platform}`}
+                >
+                  {link.label || link.platform}
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        {projects.length > 0 && (
+          <>
+            <Separator className="hidden md:block" />
+            <ProjectSidebar projects={projects} activeSlug={activeSlug} />
+          </>
+        )}
+
+        <div className="mt-auto flex flex-col gap-1 text-[0.8rem] leading-[1.45] text-black/60">
           <span>{copyright}</span>
         </div>
       </div>

@@ -30,7 +30,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
 
     return (
       <section
-        className={section.fullWidth ? "" : "px-8 py-6"}
+        className="py-3"
         style={{
           position: "relative",
           minHeight: sectionHeight,
@@ -53,7 +53,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
             alt={section.image.alt ?? ""}
             width={1400}
             height={875}
-            className="w-full h-auto block"
+            className="block h-auto w-full"
             style={{
               objectFit,
               filter: grayscale ? "grayscale(1)" : undefined,
@@ -67,7 +67,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
         </div>
         {section.caption && (
           <figcaption
-            className="absolute bottom-2 px-8 text-xs text-neutral-400"
+            className="absolute bottom-2 text-xs text-neutral-400"
             style={{ zIndex: zIndex + 1 }}
           >
             {section.caption}
@@ -78,10 +78,10 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
   }
 
   return (
-    <section className={`py-6 ${section.fullWidth ? "" : "px-8"}`}>
+    <section className="py-3">
       <figure>
         <div
-          className="overflow-hidden bg-neutral-100"
+          className="overflow-hidden rounded-2xl bg-neutral-100"
           style={{
             aspectRatio,
             borderRadius,
@@ -107,7 +107,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
           />
         </div>
         {section.caption && (
-          <figcaption className="mt-2 px-8 text-xs text-neutral-400">
+          <figcaption className="mt-2 text-xs text-neutral-400">
             {section.caption}
           </figcaption>
         )}

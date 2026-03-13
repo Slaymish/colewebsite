@@ -1,30 +1,31 @@
-'use client'
+"use client";
 
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import type { Project, Section } from '../../../../types'
-import EditToolbar from './EditToolbar'
-import EditableSection from './EditableSection'
-import PropertiesPanel from './PropertiesPanel'
+import Link from "next/link";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import type { Project, Section } from "../../../../types";
+import EditToolbar from "./EditToolbar";
+import EditableSection from "./EditableSection";
+import PropertiesPanel from "./PropertiesPanel";
 
 interface EditorClientProps {
-  initialProject: Project
+  initialProject: Project;
 }
 
 export default function EditorClient({ initialProject }: EditorClientProps) {
-  const router = useRouter()
-  const [project, setProject] = useState<Project>(initialProject)
-  const [selectedKey, setSelectedKey] = useState<string | null>(null)
-  const [isDirty, setIsDirty] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
-  const [saveSuccess, setSaveSuccess] = useState(false)
+  const router = useRouter();
+  const [project, setProject] = useState<Project>(initialProject);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const sections = project.sections ?? []
+  const sections = project.sections ?? [];
 
   const selectedSection = selectedKey
-    ? sections.find((s) => s._key === selectedKey) ?? null
-    : null
+    ? (sections.find((s) => s._key === selectedKey) ?? null)
+    : null;
 
   // Update a section by key
   const updateSection = useCallback((key: string, patch: Partial<Section>) => {
@@ -33,24 +34,24 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
       sections: (prev.sections ?? []).map((s) =>
         s._key === key ? ({ ...s, ...patch } as Section) : s,
       ),
-    }))
-    setIsDirty(true)
-    setSaveSuccess(false)
-  }, [])
+    }));
+    setIsDirty(true);
+    setSaveSuccess(false);
+  }, []);
 
   // Move section up or down
-  const moveSection = useCallback((key: string, direction: 'up' | 'down') => {
+  const moveSection = useCallback((key: string, direction: "up" | "down") => {
     setProject((prev) => {
-      const secs = [...(prev.sections ?? [])]
-      const idx = secs.findIndex((s) => s._key === key)
-      if (idx === -1) return prev
-      const newIdx = direction === 'up' ? idx - 1 : idx + 1
-      if (newIdx < 0 || newIdx >= secs.length) return prev
-      ;[secs[idx], secs[newIdx]] = [secs[newIdx], secs[idx]]
-      return { ...prev, sections: secs }
-    })
-    setIsDirty(true)
-  }, [])
+      const secs = [...(prev.sections ?? [])];
+      const idx = secs.findIndex((s) => s._key === key);
+      if (idx === -1) return prev;
+      const newIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (newIdx < 0 || newIdx >= secs.length) return prev;
+      [secs[idx], secs[newIdx]] = [secs[newIdx], secs[idx]];
+      return { ...prev, sections: secs };
+    });
+    setIsDirty(true);
+  }, []);
 
   // Delete a section
   const deleteSection = useCallback(
@@ -58,23 +59,23 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
       setProject((prev) => ({
         ...prev,
         sections: (prev.sections ?? []).filter((s) => s._key !== key),
-      }))
-      if (selectedKey === key) setSelectedKey(null)
-      setIsDirty(true)
+      }));
+      if (selectedKey === key) setSelectedKey(null);
+      setIsDirty(true);
     },
     [selectedKey],
-  )
+  );
 
   // Save to Sanity (draft)
   const save = useCallback(
-    async (newStatus?: 'draft' | 'published') => {
-      setIsSaving(true)
-      setSaveError(null)
+    async (newStatus?: "draft" | "published") => {
+      setIsSaving(true);
+      setSaveError(null);
 
       try {
-        const res = await fetch('/api/admin/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/admin/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             projectId: project._id,
             slug: project.slug.current,
@@ -84,34 +85,34 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
             meta_description: project.meta_description,
             tags: project.tags,
           }),
-        })
+        });
 
         if (!res.ok) {
-          const data = await res.json()
-          throw new Error(data.error || 'Save failed')
+          const data = await res.json();
+          throw new Error(data.error || "Save failed");
         }
 
-        setIsDirty(false)
-        setSaveSuccess(true)
+        setIsDirty(false);
+        setSaveSuccess(true);
         if (newStatus) {
-          setProject((prev) => ({ ...prev, status: newStatus }))
+          setProject((prev) => ({ ...prev, status: newStatus }));
         }
-        setTimeout(() => setSaveSuccess(false), 3000)
+        setTimeout(() => setSaveSuccess(false), 3000);
       } catch (err) {
-        setSaveError(err instanceof Error ? err.message : 'Save failed')
+        setSaveError(err instanceof Error ? err.message : "Save failed");
       } finally {
-        setIsSaving(false)
+        setIsSaving(false);
       }
     },
     [project],
-  )
+  );
 
   const handleCancel = useCallback(() => {
     if (isDirty) {
-      if (!confirm('Discard unsaved changes?')) return
+      if (!confirm("Discard unsaved changes?")) return;
     }
-    router.push('/admin/edit')
-  }, [isDirty, router])
+    router.push("/admin/edit");
+  }, [isDirty, router]);
 
   return (
     <div className="min-h-screen bg-neutral-100 flex flex-col">
@@ -122,9 +123,9 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
         isSaving={isSaving}
         saveSuccess={saveSuccess}
         saveError={saveError}
-        onSaveDraft={() => save('draft')}
-        onPublish={() => save('published')}
-        onUnpublish={() => save('draft')}
+        onSaveDraft={() => save("draft")}
+        onPublish={() => save("published")}
+        onUnpublish={() => save("draft")}
         onCancel={handleCancel}
       />
 
@@ -137,7 +138,9 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
           <div className="max-w-5xl mx-auto my-6 bg-white shadow-lg rounded-xl overflow-hidden">
             {/* Project header preview */}
             <div className="px-8 py-6 border-b border-neutral-100">
-              <h1 className="text-2xl font-semibold text-neutral-900">{project.title}</h1>
+              <h1 className="text-2xl font-semibold text-neutral-900">
+                {project.title}
+              </h1>
               {project.tags && project.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
@@ -156,8 +159,12 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
             {sections.length === 0 ? (
               <div className="py-16 text-center text-neutral-400">
                 <p className="text-sm">No sections yet.</p>
-                <p className="text-xs mt-1">Add sections in{' '}
-                  <a href="/admin/cms" className="underline">Sanity Studio</a>.
+                <p className="text-xs mt-1">
+                  Add sections in{" "}
+                  <Link href="/admin/cms" className="underline">
+                    Sanity Studio
+                  </Link>
+                  .
                 </p>
               </div>
             ) : (
@@ -169,11 +176,11 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
                   total={sections.length}
                   isSelected={selectedKey === section._key}
                   onSelect={(e) => {
-                    e.stopPropagation()
-                    setSelectedKey(section._key)
+                    e.stopPropagation();
+                    setSelectedKey(section._key);
                   }}
-                  onMoveUp={() => moveSection(section._key, 'up')}
-                  onMoveDown={() => moveSection(section._key, 'down')}
+                  onMoveUp={() => moveSection(section._key, "up")}
+                  onMoveDown={() => moveSection(section._key, "down")}
                   onDelete={() => deleteSection(section._key)}
                   onChange={(patch) => updateSection(section._key, patch)}
                 />
@@ -194,5 +201,5 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

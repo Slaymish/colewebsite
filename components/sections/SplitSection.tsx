@@ -44,9 +44,9 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   const imageLeft = section.imagePosition !== "right";
 
   const imageEl = (
-    <div>
+    <div className="space-y-2">
       <div
-        className="overflow-hidden bg-neutral-100"
+        className="overflow-hidden rounded-2xl bg-neutral-100"
         style={{ aspectRatio: imageAspectRatio, borderRadius }}
       >
         <Image
@@ -84,7 +84,7 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   };
 
   return (
-    <section className="px-8 py-6">
+    <section className="py-3">
       <div
         className={`grid grid-cols-1 md:grid-cols-2 ${alignClass[verticalAlign] ?? "items-center"}`}
         style={{ gap }}

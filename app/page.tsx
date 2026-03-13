@@ -33,21 +33,26 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="site-shell">
+      <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
         <Header settings={settings} projects={projects} />
 
-        <main id="main-content" className="site-main" aria-label="Home">
-          <div className="content-column">
-            <div className="content-stack">
-              <section aria-labelledby="hero-heading" className="home-intro">
-                <h1 id="hero-heading" className="home-intro-title">
+        <main id="main-content" className="min-w-0 md:flex" aria-label="Home">
+          <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+            <div className="flex flex-col gap-6">
+              <section aria-labelledby="hero-heading" className="pb-3">
+                <h1
+                  id="hero-heading"
+                  className="text-base font-medium leading-[1.45]"
+                >
                   Selected Work
                 </h1>
-                <p className="home-intro-copy">{bio}</p>
+                <p className="mt-2 max-w-[34rem] text-[0.96rem] leading-[1.55] text-black/65">
+                  {bio}
+                </p>
               </section>
 
               <section
-                className="home-projects"
+                className="flex flex-col gap-10"
                 aria-label={`${name} projects`}
               >
                 {projects.map((project) => {
@@ -62,10 +67,10 @@ export default async function HomePage() {
                     <Link
                       key={project._id}
                       href={`/project/${project.slug.current}`}
-                      className="home-project-link"
+                      className="flex flex-col gap-3.5"
                     >
                       {cover && (
-                        <div className="home-project-image">
+                        <div className="w-full overflow-hidden rounded-2xl bg-black/5">
                           <Image
                             src={cover}
                             alt={project.cover_image?.alt ?? project.title}
@@ -76,10 +81,12 @@ export default async function HomePage() {
                           />
                         </div>
                       )}
-                      <div className="home-project-info">
-                        <h2 className="home-project-title">{project.title}</h2>
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h2 className="text-base font-medium leading-[1.35]">
+                          {project.title}
+                        </h2>
                         {project.created_at && (
-                          <span className="home-project-meta">
+                          <span className="whitespace-nowrap text-[0.85rem] text-black/50">
                             {new Date(project.created_at).getFullYear()}
                           </span>
                         )}

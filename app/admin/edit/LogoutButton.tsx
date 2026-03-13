@@ -1,22 +1,20 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function LogoutButton() {
-  const router = useRouter()
+  const router = useRouter();
 
   async function handleLogout() {
-    await fetch('/api/admin/logout', { method: 'POST' })
-    router.push('/admin/edit')
-    router.refresh()
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.push("/admin/edit");
+    router.refresh();
   }
 
   return (
-    <button
-      onClick={handleLogout}
-      className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-    >
+    <Button onClick={handleLogout} variant="ghost" className="text-sm">
       Sign out
-    </button>
-  )
+    </Button>
+  );
 }
