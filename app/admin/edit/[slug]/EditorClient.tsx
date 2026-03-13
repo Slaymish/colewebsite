@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { Project, Section, FreeObject } from "../../../../types";
 import EditToolbar from "./EditToolbar";
@@ -24,6 +24,7 @@ export default function EditorClient({
   const router = useRouter();
   const [project, setProject] = useState<Project>(initialProject);
   const [selected, setSelected] = useState<SelectedItem>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -257,7 +258,7 @@ export default function EditorClient({
                         Free Objects
                       </span>
                     </div>
-                    <div className="relative" style={{ minHeight: 400 }}>
+                    <div ref={canvasRef} className="relative" style={{ minHeight: 400 }}>
                       {freeObjects.map((obj) => (
                         <EditableFreeObject
                           key={obj._key}
@@ -266,6 +267,7 @@ export default function EditorClient({
                             selected?.kind === "freeObject" &&
                             selected.key === obj._key
                           }
+                          canvasRef={canvasRef}
                           onSelect={(e) => {
                             e.stopPropagation();
                             setSelected({
