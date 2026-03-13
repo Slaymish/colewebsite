@@ -10,9 +10,13 @@ import PropertiesPanel from "./PropertiesPanel";
 
 interface EditorClientProps {
   initialProject: Project;
+  availableCategories: string[];
 }
 
-export default function EditorClient({ initialProject }: EditorClientProps) {
+export default function EditorClient({
+  initialProject,
+  availableCategories,
+}: EditorClientProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project>(initialProject);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -83,6 +87,7 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
             status: newStatus ?? project.status,
             title: project.title,
             meta_description: project.meta_description,
+            category: project.category ?? "",
             tags: project.tags,
           }),
         });
@@ -141,6 +146,30 @@ export default function EditorClient({ initialProject }: EditorClientProps) {
               <h1 className="text-2xl font-semibold text-neutral-900">
                 {project.title}
               </h1>
+              <div className="mt-4 max-w-xs">
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-neutral-500">
+                  Category
+                </label>
+                <select
+                  value={project.category ?? ""}
+                  onChange={(e) => {
+                    setProject((prev) => ({
+                      ...prev,
+                      category: e.target.value || undefined,
+                    }));
+                    setIsDirty(true);
+                    setSaveSuccess(false);
+                  }}
+                  className="w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-400 focus:outline-none"
+                >
+                  <option value="">No category</option>
+                  {availableCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
               {project.tags && project.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (

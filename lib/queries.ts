@@ -1,5 +1,5 @@
-import { getClient, isSanityConfigured } from './sanity'
-import type { Project, ProjectSummary, SiteSettings } from '../types'
+import { getClient, isSanityConfigured } from "./sanity";
+import type { Project, ProjectSummary, SiteSettings } from "../types";
 
 // GROQ queries
 
@@ -9,9 +9,10 @@ const PROJECT_SUMMARY_FIELDS = `
   slug,
   status,
   created_at,
+  category,
   tags,
   cover_image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
-`
+`;
 
 const PROJECT_FULL_FIELDS = `
   ${PROJECT_SUMMARY_FIELDS},
@@ -35,50 +36,52 @@ const PROJECT_FULL_FIELDS = `
       poster { ..., asset->{ _id, url, metadata { dimensions } } }
     }
   }
-`
+`;
 
 export async function getAllPublishedProjects(): Promise<ProjectSummary[]> {
-  if (!isSanityConfigured()) return []
+  if (!isSanityConfigured()) return [];
   return getClient().fetch(
     `*[_type == "project" && status == "published"] | order(created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
-  )
+  );
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
-  if (!isSanityConfigured()) return null
+  if (!isSanityConfigured()) return null;
   const results = await getClient().fetch<Project[]>(
     `*[_type == "project" && slug.current == $slug && status == "published"][0..0] { ${PROJECT_FULL_FIELDS} }`,
     { slug },
-  )
-  return results[0] ?? null
+  );
+  return results[0] ?? null;
 }
 
 export async function getAllProjectSlugs(): Promise<string[]> {
-  if (!isSanityConfigured()) return []
+  if (!isSanityConfigured()) return [];
   const results = await getClient().fetch<{ slug: { current: string } }[]>(
     `*[_type == "project" && status == "published"] { slug }`,
-  )
-  return results.map((p) => p.slug.current)
+  );
+  return results.map((p) => p.slug.current);
 }
 
 export async function getSiteSettings(): Promise<SiteSettings | null> {
-  if (!isSanityConfigured()) return null
-  return getClient().fetch(`*[_type == "siteSettings"][0]`)
+  if (!isSanityConfigured()) return null;
+  return getClient().fetch(`*[_type == "siteSettings"][0]`);
 }
 
 // Admin queries — fetch all projects regardless of status
 export async function getAllProjectsForAdmin(): Promise<ProjectSummary[]> {
-  if (!isSanityConfigured()) return []
+  if (!isSanityConfigured()) return [];
   return getClient().fetch(
     `*[_type == "project"] | order(created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
-  )
+  );
 }
 
-export async function getProjectBySlugForAdmin(slug: string): Promise<Project | null> {
-  if (!isSanityConfigured()) return null
+export async function getProjectBySlugForAdmin(
+  slug: string,
+): Promise<Project | null> {
+  if (!isSanityConfigured()) return null;
   const results = await getClient().fetch<Project[]>(
     `*[_type == "project" && slug.current == $slug] | order(_updatedAt desc) [0..0] { ${PROJECT_FULL_FIELDS} }`,
     { slug },
-  )
-  return results[0] ?? null
+  );
+  return results[0] ?? null;
 }

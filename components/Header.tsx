@@ -97,7 +97,11 @@ export default function Header({
         {projects.length > 0 && (
           <>
             <Separator className="hidden md:block" />
-            <ProjectSidebar projects={projects} activeSlug={activeSlug} />
+            <ProjectSidebar
+              projects={projects}
+              categories={settings?.categories}
+              activeSlug={activeSlug}
+            />
           </>
         )}
 

@@ -1,18 +1,20 @@
-import { createClient } from 'next-sanity'
-import type { Section } from '../types'
+import { createClient } from "next-sanity";
+import type { Section } from "../types";
 
 export function getWriteClient() {
-  const token = process.env.SANITY_API_TOKEN
+  const token = process.env.SANITY_API_TOKEN;
   if (!token) {
-    throw new Error('SANITY_API_TOKEN is not set. Add it to your .env.local file.')
+    throw new Error(
+      "SANITY_API_TOKEN is not set. Add it to your .env.local file.",
+    );
   }
   return createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-01-01',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2025-01-01",
     useCdn: false,
     token,
-  })
+  });
 }
 
 /**
@@ -21,48 +23,81 @@ export function getWriteClient() {
  * This recursively strips the extra fields so the patch is clean.
  */
 function stripExpandedAssets(value: unknown): unknown {
-  if (!value || typeof value !== 'object') return value
-  if (Array.isArray(value)) return value.map(stripExpandedAssets)
+  if (!value || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(stripExpandedAssets);
 
-  const obj = value as Record<string, unknown>
-  const result: Record<string, unknown> = {}
+  const obj = value as Record<string, unknown>;
+  const result: Record<string, unknown> = {};
 
   for (const key of Object.keys(obj)) {
-    if (key === 'asset' && obj[key] && typeof obj[key] === 'object' && '_ref' in (obj[key] as object)) {
+    if (
+      key === "asset" &&
+      obj[key] &&
+      typeof obj[key] === "object" &&
+      "_ref" in (obj[key] as object)
+    ) {
       // Keep only the reference fields — discard _id, url, metadata, etc.
-      const ref = obj[key] as Record<string, unknown>
-      result[key] = { _type: ref._type ?? 'reference', _ref: ref._ref }
+      const ref = obj[key] as Record<string, unknown>;
+      result[key] = { _type: ref._type ?? "reference", _ref: ref._ref };
     } else {
-      result[key] = stripExpandedAssets(obj[key])
+      result[key] = stripExpandedAssets(obj[key]);
     }
   }
 
-  return result
+  return result;
 }
 
 export interface SaveProjectPayload {
-  projectId: string
-  sections: Section[]
-  status?: 'draft' | 'published'
-  title?: string
-  meta_description?: string
-  tags?: string[]
+  projectId: string;
+  sections: Section[];
+  status?: "draft" | "published";
+  title?: string;
+  meta_description?: string;
+  category?: string;
+  tags?: string[];
 }
 
 export async function saveProject(payload: SaveProjectPayload): Promise<void> {
-  const client = getWriteClient()
+  const client = getWriteClient();
 
   // Strip expanded asset data before writing — Sanity only accepts plain references
-  const cleanSections = stripExpandedAssets(payload.sections) as Section[]
+  const cleanSections = stripExpandedAssets(payload.sections) as Section[];
 
   const patch: Record<string, unknown> = {
     sections: cleanSections,
+  };
+
+  if (payload.status !== undefined) patch.status = payload.status;
+  if (payload.title !== undefined) patch.title = payload.title;
+  if (payload.meta_description !== undefined)
+    patch.meta_description = payload.meta_description;
+  if (payload.category !== undefined) patch.category = payload.category || null;
+  if (payload.tags !== undefined) patch.tags = payload.tags;
+
+  await client.patch(payload.projectId).set(patch).commit();
+}
+
+export interface SaveSiteCategoriesPayload {
+  settingsId?: string;
+  categories: string[];
+}
+
+export async function saveSiteCategories(
+  payload: SaveSiteCategoriesPayload,
+): Promise<void> {
+  const client = getWriteClient();
+  const categories = payload.categories
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (payload.settingsId) {
+    await client.patch(payload.settingsId).set({ categories }).commit();
+    return;
   }
 
-  if (payload.status !== undefined) patch.status = payload.status
-  if (payload.title !== undefined) patch.title = payload.title
-  if (payload.meta_description !== undefined) patch.meta_description = payload.meta_description
-  if (payload.tags !== undefined) patch.tags = payload.tags
-
-  await client.patch(payload.projectId).set(patch).commit()
+  await client.create({
+    _type: "siteSettings",
+    name: "Cole Anderson",
+    categories,
+  });
 }
