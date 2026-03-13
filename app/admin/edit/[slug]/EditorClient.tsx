@@ -204,7 +204,7 @@ export default function EditorClient({
               )}
             </div>
 
-            {/* Predefined Sections */}
+            {/* Shared canvas: sections in flow, free objects as absolute overlays */}
             {sections.length === 0 && freeObjects.length === 0 ? (
               <div className="py-16 text-center text-neutral-400">
                 <p className="text-sm">No sections yet.</p>
@@ -217,74 +217,49 @@ export default function EditorClient({
                 </p>
               </div>
             ) : (
-              <>
-                {sections.length > 0 && (
-                  <div>
-                    <div className="px-4 pt-4 pb-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
-                        Predefined Sections
-                      </span>
-                    </div>
-                    {sections.map((section, index) => (
-                      <EditableSection
-                        key={section._key}
-                        section={section}
-                        index={index}
-                        total={sections.length}
-                        isSelected={
-                          selected?.kind === "section" &&
-                          selected.key === section._key
-                        }
-                        onSelect={(e) => {
-                          e.stopPropagation();
-                          setSelected({ kind: "section", key: section._key });
-                        }}
-                        onMoveUp={() => moveSection(section._key, "up")}
-                        onMoveDown={() => moveSection(section._key, "down")}
-                        onDelete={() => deleteSection(section._key)}
-                        onChange={(patch) =>
-                          updateSection(section._key, patch)
-                        }
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Free Objects */}
-                {freeObjects.length > 0 && (
-                  <div>
-                    <div className="px-4 pt-6 pb-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
-                        Free Objects
-                      </span>
-                    </div>
-                    <div ref={canvasRef} className="relative" style={{ minHeight: 400 }}>
-                      {freeObjects.map((obj) => (
-                        <EditableFreeObject
-                          key={obj._key}
-                          obj={obj}
-                          isSelected={
-                            selected?.kind === "freeObject" &&
-                            selected.key === obj._key
-                          }
-                          canvasRef={canvasRef}
-                          onSelect={(e) => {
-                            e.stopPropagation();
-                            setSelected({
-                              kind: "freeObject",
-                              key: obj._key,
-                            });
-                          }}
-                          onDelete={() => deleteFreeObject(obj._key)}
-                          onChange={(patch) =>
-                            updateFreeObject(obj._key, patch)
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
+              <div
+                ref={canvasRef}
+                className="relative"
+                style={{ minHeight: freeObjects.length > 0 ? 500 : undefined }}
+              >
+                {sections.map((section, index) => (
+                  <EditableSection
+                    key={section._key}
+                    section={section}
+                    index={index}
+                    total={sections.length}
+                    isSelected={
+                      selected?.kind === "section" &&
+                      selected.key === section._key
+                    }
+                    onSelect={(e) => {
+                      e.stopPropagation();
+                      setSelected({ kind: "section", key: section._key });
+                    }}
+                    onMoveUp={() => moveSection(section._key, "up")}
+                    onMoveDown={() => moveSection(section._key, "down")}
+                    onDelete={() => deleteSection(section._key)}
+                    onChange={(patch) => updateSection(section._key, patch)}
+                  />
+                ))}
+                {freeObjects.map((obj) => (
+                  <EditableFreeObject
+                    key={obj._key}
+                    obj={obj}
+                    isSelected={
+                      selected?.kind === "freeObject" &&
+                      selected.key === obj._key
+                    }
+                    canvasRef={canvasRef}
+                    onSelect={(e) => {
+                      e.stopPropagation();
+                      setSelected({ kind: "freeObject", key: obj._key });
+                    }}
+                    onDelete={() => deleteFreeObject(obj._key)}
+                    onChange={(patch) => updateFreeObject(obj._key, patch)}
+                  />
+                ))}
+              </div>
             )}
 
             <div className="h-16" />

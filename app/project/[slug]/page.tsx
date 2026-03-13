@@ -165,14 +165,24 @@ export default async function ProjectPage({ params }: PageProps) {
                 )}
               </div>
 
-              {project.sections && project.sections.length > 0 && (
-                <SectionRenderer sections={project.sections} />
-              )}
+              {(project.sections?.length || project.freeObjects?.length) ? (
+                <div
+                  className="relative"
+                  style={
+                    project.freeObjects?.length && !project.sections?.length
+                      ? { minHeight: "60vh" }
+                      : undefined
+                  }
+                >
+                  {project.sections && project.sections.length > 0 && (
+                    <SectionRenderer sections={project.sections} />
+                  )}
+                  {project.freeObjects && project.freeObjects.length > 0 && (
+                    <FreeObjectRenderer freeObjects={project.freeObjects} />
+                  )}
+                </div>
+              ) : null}
             </div>
-
-            {project.freeObjects && project.freeObjects.length > 0 && (
-              <FreeObjectRenderer freeObjects={project.freeObjects} />
-            )}
           </div>
         </main>
       </div>
