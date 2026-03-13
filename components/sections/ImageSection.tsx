@@ -7,7 +7,7 @@ interface ImageSectionProps {
 }
 
 export default function ImageSectionComponent({ section }: ImageSectionProps) {
-  if (!section.image?.asset?._ref) return null;
+  if (!section.image?.asset) return null;
 
   const aspectRatio = section.aspectRatio ?? "16/10";
   const objectFit =
@@ -15,67 +15,9 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
   const borderRadius = section.borderRadius ?? 2;
   const grayscale = section.grayscale ?? false;
   const opacity = section.opacity ?? 1;
-  const isFree = section.positionMode === "free";
 
   const imageUrl = urlFor(section.image).width(1400).auto("format").url();
   const thumbUrl = urlFor(section.image).width(40).blur(10).url();
-
-  if (isFree) {
-    const sectionHeight = section.sectionHeight ?? 500;
-    const x = section.xPercent ?? 0;
-    const y = section.yPercent ?? 0;
-    const width = section.widthPercent ?? 100;
-    const zIndex = section.zIndex ?? 0;
-    const rotation = section.rotation ?? 0;
-
-    return (
-      <section
-        className="py-3"
-        style={{
-          position: "relative",
-          minHeight: sectionHeight,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            left: `${x}%`,
-            top: `${y}%`,
-            width: `${width}%`,
-            zIndex,
-            transform: rotation ? `rotate(${rotation}deg)` : undefined,
-            opacity,
-          }}
-        >
-          <Image
-            src={imageUrl}
-            alt={section.image.alt ?? ""}
-            width={1400}
-            height={875}
-            className="block h-auto w-full"
-            style={{
-              objectFit,
-              filter: grayscale ? "grayscale(1)" : undefined,
-              borderRadius,
-            }}
-            placeholder={thumbUrl ? "blur" : "empty"}
-            blurDataURL={thumbUrl}
-            sizes="100vw"
-            loading="lazy"
-          />
-        </div>
-        {section.caption && (
-          <figcaption
-            className="absolute bottom-2 text-xs text-neutral-400"
-            style={{ zIndex: zIndex + 1 }}
-          >
-            {section.caption}
-          </figcaption>
-        )}
-      </section>
-    );
-  }
 
   return (
     <section className="py-3">

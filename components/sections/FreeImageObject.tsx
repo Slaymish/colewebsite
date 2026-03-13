@@ -9,7 +9,7 @@ interface FreeImageObjectProps {
 export default function FreeImageObjectComponent({
   obj,
 }: FreeImageObjectProps) {
-  if (!obj.image?.asset?._ref) return null;
+  if (!obj.image?.asset) return null;
 
   const x = obj.xPercent ?? 10;
   const y = obj.yPercent ?? 10;

@@ -77,7 +77,7 @@ const fontSizeMap: Record<string, string> = {
 // --- Content renderers — no positioning wrapper, matches public page visuals ---
 
 function ImageContent({ obj }: { obj: FreeImageObject }) {
-  if (!obj.image?.asset?._ref) {
+  if (!obj.image?.asset) {
     return (
       <div className="w-full h-24 bg-neutral-200 flex items-center justify-center text-xs text-neutral-400">
         No image

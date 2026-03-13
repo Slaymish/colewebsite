@@ -373,8 +373,6 @@ function ImagePanel({
   section: ImageSection
   onChange: (patch: Partial<ImageSection>) => void
 }) {
-  const isFree = section.positionMode === 'free'
-
   return (
     <div className="space-y-4">
       <Field label="Caption">
@@ -446,80 +444,6 @@ function ImagePanel({
           step={0.05}
         />
       </Field>
-
-      <SectionDivider label="Position Mode" />
-
-      <Field label="Mode">
-        <SelectInput
-          value={section.positionMode ?? 'flow'}
-          onChange={(v) => onChange({ positionMode: v as ImageSection['positionMode'] })}
-          options={[
-            { label: 'Normal (flow layout)', value: 'flow' },
-            { label: 'Free (drag anywhere)', value: 'free' },
-          ]}
-        />
-      </Field>
-
-      {isFree && (
-        <>
-          <Field label={`Canvas Height: ${section.sectionHeight ?? 500}px`}>
-            <NumberInput
-              value={section.sectionHeight ?? 500}
-              onChange={(v) => onChange({ sectionHeight: v })}
-              min={100}
-              max={2000}
-              step={50}
-            />
-          </Field>
-
-          <SectionDivider label="Free Position" />
-
-          <Field label={`X Position: ${section.xPercent ?? 0}%`}>
-            <NumberInput
-              value={section.xPercent ?? 0}
-              onChange={(v) => onChange({ xPercent: v })}
-              min={-50}
-              max={150}
-            />
-          </Field>
-
-          <Field label={`Y Position: ${section.yPercent ?? 0}%`}>
-            <NumberInput
-              value={section.yPercent ?? 0}
-              onChange={(v) => onChange({ yPercent: v })}
-              min={-50}
-              max={150}
-            />
-          </Field>
-
-          <Field label={`Width: ${section.widthPercent ?? 100}%`}>
-            <NumberInput
-              value={section.widthPercent ?? 100}
-              onChange={(v) => onChange({ widthPercent: v })}
-              min={5}
-              max={200}
-            />
-          </Field>
-
-          <Field label={`Z-Index: ${section.zIndex ?? 0}`}>
-            <NumberInput
-              value={section.zIndex ?? 0}
-              onChange={(v) => onChange({ zIndex: v })}
-              min={0}
-              max={20}
-            />
-          </Field>
-
-          <Field label={`Rotation: ${section.rotation ?? 0}\u00B0`}>
-            <NumberInput
-              value={section.rotation ?? 0}
-              onChange={(v) => onChange({ rotation: v })}
-              min={-180}
-              max={180}
-            />
-          </Field>
-        </>
-      )}
     </div>
   )
 }
