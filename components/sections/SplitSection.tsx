@@ -27,7 +27,7 @@ function renderContent(content: BlockContent[]) {
 }
 
 export default function SplitSectionComponent({ section }: SplitSectionProps) {
-  if (!section.image?.asset?._ref) return null;
+  if (!section.image?.asset) return null;
 
   const imageAspectRatio = section.imageAspectRatio ?? "4/3";
   const verticalAlign = section.verticalAlign ?? "center";
