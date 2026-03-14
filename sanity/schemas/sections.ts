@@ -409,10 +409,17 @@ export const videoSection = defineType({
   type: 'object',
   fields: [
     {
+      name: 'videoFile',
+      title: 'Video File',
+      type: 'file',
+      description: 'Upload an MP4/WebM directly. Takes priority over Vimeo URL.',
+      options: { accept: 'video/*' },
+    },
+    {
       name: 'vimeoUrl',
       title: 'Vimeo URL',
       type: 'url',
-      validation: (r) => r.required(),
+      description: 'Used as fallback when no video file is uploaded.',
     },
     {
       name: 'caption',
@@ -468,8 +475,11 @@ export const videoSection = defineType({
     },
   ],
   preview: {
-    select: { title: 'caption', url: 'vimeoUrl' },
-    prepare: ({ title, url }) => ({ title: title || 'Video Section', subtitle: url }),
+    select: { title: 'caption', url: 'vimeoUrl', file: 'videoFile' },
+    prepare: ({ title, url, file }) => ({
+      title: title || 'Video Section',
+      subtitle: file?.asset ? 'Uploaded file' : url || 'No video set',
+    }),
   },
 })
 
@@ -647,10 +657,17 @@ export const freeVideoObject = defineType({
   type: 'object',
   fields: [
     defineField({
+      name: 'videoFile',
+      title: 'Video File',
+      type: 'file',
+      description: 'Upload an MP4/WebM directly. Takes priority over Vimeo URL.',
+      options: { accept: 'video/*' },
+    }),
+    defineField({
       name: 'vimeoUrl',
       title: 'Vimeo URL',
       type: 'url',
-      validation: (r) => r.required(),
+      description: 'Used as fallback when no video file is uploaded.',
     }),
     defineField({
       name: 'autoplay',
@@ -689,8 +706,11 @@ export const freeVideoObject = defineType({
     ...freePositionFields,
   ],
   preview: {
-    select: { url: 'vimeoUrl' },
-    prepare: ({ url }) => ({ title: 'Free Video', subtitle: url || 'No URL set' }),
+    select: { url: 'vimeoUrl', file: 'videoFile' },
+    prepare: ({ url, file }) => ({
+      title: 'Free Video',
+      subtitle: file?.asset ? 'Uploaded file' : url || 'No video set',
+    }),
   },
 })
 

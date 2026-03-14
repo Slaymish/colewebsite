@@ -76,6 +76,7 @@ export interface GallerySection {
 export interface VideoSection {
   _type: "videoSection";
   _key: string;
+  videoFile?: { asset: { url: string } };
   vimeoUrl?: string;
   caption?: string;
   autoplay?: boolean;
@@ -129,6 +130,7 @@ export interface FreeImageObject extends FreePositionFields {
 export interface FreeVideoObject extends FreePositionFields {
   _type: "freeVideoObject";
   _key: string;
+  videoFile?: { asset: { url: string } };
   vimeoUrl?: string;
   autoplay?: boolean;
   loop?: boolean;

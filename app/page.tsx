@@ -5,7 +5,7 @@ import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
 
-export const revalidate = 60;
+export const revalidate = false;
 
 /**
  * This is used to display the home page.
@@ -55,13 +55,18 @@ export default async function HomePage() {
                 className="flex flex-col gap-10"
                 aria-label={`${name} projects`}
               >
-                {projects.map((project) => {
+                {projects.map((project, index) => {
                   const cover = project.cover_image
                     ? urlFor(project.cover_image)
                         .width(1600)
                         .auto("format")
                         .url()
                     : null;
+
+                  const asset = project.cover_image?.asset;
+                  const resolvedAsset =
+                    asset && "_id" in asset ? asset : null;
+                  const blurUrl = resolvedAsset?.metadata?.lqip ?? null;
 
                   return (
                     <Link
@@ -78,6 +83,9 @@ export default async function HomePage() {
                             height={1100}
                             className="h-auto w-full"
                             sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
+                            priority={index === 0}
+                            placeholder={blurUrl ? "blur" : "empty"}
+                            blurDataURL={blurUrl ?? undefined}
                           />
                         </div>
                       )}

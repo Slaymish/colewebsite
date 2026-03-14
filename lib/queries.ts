@@ -33,13 +33,17 @@ const PROJECT_FULL_FIELDS = `
       backgroundImage { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
     },
     _type == 'videoSection' => {
-      poster { ..., asset->{ _id, url, metadata { dimensions } } }
+      poster { ..., asset->{ _id, url, metadata { dimensions } } },
+      videoFile { asset->{ url } }
     }
   },
   freeObjects[] {
     ...,
     _type == 'freeImageObject' => {
       image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
+    },
+    _type == 'freeVideoObject' => {
+      videoFile { asset->{ url } }
     }
   }
 `;

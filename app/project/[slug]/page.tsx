@@ -13,7 +13,7 @@ import Header from "../../../components/Header";
 import SectionRenderer from "../../../components/SectionRenderer";
 import FreeObjectRenderer from "../../../components/FreeObjectRenderer";
 
-export const revalidate = 60;
+export const revalidate = false;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
