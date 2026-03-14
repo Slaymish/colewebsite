@@ -302,58 +302,6 @@ export const imageSection = defineType({
       initialValue: 1,
       validation: (r) => r.min(0).max(1),
     },
-    {
-      name: 'positionMode',
-      title: 'Position Mode',
-      type: 'string',
-      initialValue: 'flow',
-      options: {
-        list: [
-          { title: 'Normal (flow layout)', value: 'flow' },
-          { title: 'Free (drag anywhere)', value: 'free' },
-        ],
-        layout: 'radio',
-      },
-    },
-    {
-      name: 'sectionHeight',
-      title: 'Canvas Height (px) — Free mode only',
-      type: 'number',
-      initialValue: 500,
-      validation: (r) => r.min(100).max(2000),
-    },
-    {
-      name: 'xPercent',
-      title: 'X Position (%)',
-      type: 'number',
-      initialValue: 0,
-    },
-    {
-      name: 'yPercent',
-      title: 'Y Position (%)',
-      type: 'number',
-      initialValue: 0,
-    },
-    {
-      name: 'widthPercent',
-      title: 'Width (%)',
-      type: 'number',
-      initialValue: 100,
-      validation: (r) => r.min(5).max(200),
-    },
-    {
-      name: 'zIndex',
-      title: 'Z-Index (layer order)',
-      type: 'number',
-      initialValue: 0,
-    },
-    {
-      name: 'rotation',
-      title: 'Rotation (°)',
-      type: 'number',
-      initialValue: 0,
-      validation: (r) => r.min(-180).max(180),
-    },
   ],
   preview: {
     select: { title: 'caption', media: 'image' },

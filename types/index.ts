@@ -1,9 +1,8 @@
 export interface SanityImage {
   _type: "image";
-  asset: {
-    _ref: string;
-    _type: "reference";
-  };
+  asset:
+    | { _ref: string; _type: "reference" }
+    | { _id: string; url: string; metadata?: { dimensions?: { width: number; height: number }; lqip?: string } };
   hotspot?: {
     x: number;
     y: number;
@@ -61,13 +60,6 @@ export interface ImageSection {
   borderRadius?: number;
   grayscale?: boolean;
   opacity?: number;
-  positionMode?: "flow" | "free";
-  sectionHeight?: number;
-  xPercent?: number;
-  yPercent?: number;
-  widthPercent?: number;
-  zIndex?: number;
-  rotation?: number;
 }
 
 export interface GallerySection {
