@@ -211,6 +211,7 @@ export interface SiteSettings {
   logo?: SanityImage;
   social_links?: SocialLink[];
   contact_email?: string;
+  contact_phone?: string;
   copyright?: string;
   cv?: {
     file?: { asset: { url: string } };

@@ -1,3 +1,5 @@
+import AboutContent from "../components/AboutContent";
+import ContactContent from "../components/ContactContent";
 import Image from "next/image";
 import Link from "next/link";
 import BackToTopButton from "../components/BackToTopButton";
@@ -6,14 +8,12 @@ import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
 
-export const revalidate = false;
-
-/**
- * This is used to display the home page.
- * It fetches the projects and settings from the database and displays them.
- * @returns
- */
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
   const [projects, settings] = await Promise.all([
     getAllPublishedProjects(),
     getSiteSettings(),
@@ -21,6 +21,44 @@ export default async function HomePage() {
 
   const name = settings?.name ?? "Cole Anderson";
   const bio = settings?.bio ?? "Designer and creative.";
+  const cvUrl =
+    settings?.cv?.url ||
+    (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
+
+  if (page === "about" || page === "contact") {
+    return (
+      <div className="min-h-screen bg-white">
+        <nav className="flex items-center justify-between px-6 py-5 sm:px-10 md:px-14 border-b border-black/8">
+          <Link
+            href="/"
+            className="text-[0.85rem] text-black/50 transition hover:text-black/80"
+          >
+            ← {name}
+          </Link>
+          {cvUrl && (
+            <a
+              href={cvUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[0.85rem] text-black/50 transition hover:text-black/80"
+            >
+              CV / Info
+            </a>
+          )}
+        </nav>
+
+        <main
+          id="main-content"
+          className="mx-auto max-w-2xl px-6 py-12 sm:px-10 sm:py-16 md:py-20"
+          aria-label={page === "about" ? "About" : "Contact"}
+        >
+          {page === "about"
+            ? <AboutContent settings={settings} />
+            : <ContactContent settings={settings} />}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -29,7 +67,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             personJsonLd(settings),
-            websiteJsonLd(settings),
+            websiteJsonlamLd(settings),
           ]),
         }}
       />
@@ -85,7 +123,8 @@ export default async function HomePage() {
                             className="h-auto w-full"
                             sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
                             priority={index === 0}
-                            placeholder={blurUrl ? "blur" : "empty"}
+                            placeholder={blurUrl ? "blur"
+                              : "empty"}
                             blurDataURL={blurUrl ?? undefined}
                           />
                         </div>

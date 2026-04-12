@@ -16,8 +16,8 @@ interface HeaderProps {
   settings: SiteSettings | null;
   projects?: ProjectSummary[];
   activeSlug?: string;
-  /** When not on a project page, distinguishes Home vs About. */
-  currentPage?: "home" | "about";
+  /** When not on a project page, distinguishes Home vs About vs Contact. */
+  currentPage?: "home" | "about" | "contact";
 }
 
 /**
@@ -124,13 +124,13 @@ export default function Header({
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
-            {settings?.contact_email && (
-              <NavigationMenuItem>
-                <NavigationMenuLink href={`mailto:${settings.contact_email}`}>
+            <NavigationMenuItem>
+              <Link href="/?page=contact" legacyBehavior passHref>
+                <NavigationMenuLink active={nav === "contact"}>
                   Contact
                 </NavigationMenuLink>
-              </NavigationMenuItem>
-            )}
+              </Link>
+            </NavigationMenuItem>
             {cvUrl && (
               <NavigationMenuItem>
                 <NavigationMenuLink

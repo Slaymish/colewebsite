@@ -78,6 +78,11 @@ export const siteSettings = defineType({
       type: 'string',
     },
     {
+      name: 'contact_phone',
+      title: 'Contact Phone',
+      type: 'string',
+    },
+    {
       name: 'copyright',
       title: 'Copyright Text',
       type: 'string',
