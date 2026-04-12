@@ -23,8 +23,9 @@ export default function ProjectShell({
 
   return (
     <div
+      data-scrolled={scrolled ? "" : undefined}
       className={cn(
-        "min-h-screen transition-[grid-template-columns] duration-300 ease-out md:grid",
+        "group/shell min-h-screen transition-[grid-template-columns] duration-300 ease-out md:grid",
         scrolled
           ? "md:grid-cols-[minmax(200px,17vw)_minmax(0,1fr)]"
           : "md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]",

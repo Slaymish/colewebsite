@@ -75,7 +75,7 @@ export default function Header({
           aria-label={`${name} — home`}
         >
           {logoUrl ? (
-            <span className="relative mt-1 h-11 w-11 shrink-0 overflow-hidden rounded-full border border-black/10 bg-white">
+            <span className="relative mt-1 h-11 w-11 shrink-0 overflow-hidden rounded-full border border-black/10 bg-white md:hidden md:group-data-[scrolled]/shell:flex">
               <Image
                 src={logoUrl}
                 alt={settings?.logo?.alt ?? name}
@@ -86,13 +86,13 @@ export default function Header({
             </span>
           ) : (
             <span
-              className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-sm font-semibold tracking-tight text-neutral-800"
+              className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-sm font-semibold tracking-tight text-neutral-800 md:hidden md:group-data-[scrolled]/shell:flex"
               aria-hidden
             >
               {initials || "—"}
             </span>
           )}
-          <span className="text-[clamp(2.5rem,5vw,3.7rem)] font-semibold leading-[0.92] tracking-[-0.05em]">
+          <span className="text-[clamp(2.5rem,5vw,3.7rem)] font-semibold leading-[0.92] tracking-[-0.05em] md:group-data-[scrolled]/shell:hidden">
             {name}
           </span>
         </Link>
