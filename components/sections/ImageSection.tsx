@@ -1,6 +1,6 @@
-import Image from "next/image";
 import type { ImageSection } from "../../types";
 import { urlFor } from "../../lib/sanity";
+import ExpandableImage from "../ExpandableImage";
 
 interface ImageSectionProps {
   section: ImageSection;
@@ -29,7 +29,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
             borderRadius,
           }}
         >
-          <Image
+          <ExpandableImage
             src={imageUrl}
             alt={section.image.alt ?? ""}
             width={1400}

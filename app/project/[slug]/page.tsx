@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import {
@@ -9,7 +10,10 @@ import {
 } from "../../../lib/queries";
 import { urlFor } from "../../../lib/sanity";
 import { projectJsonLd } from "../../../lib/structured-data";
+import BackToTopButton from "../../../components/BackToTopButton";
 import Header from "../../../components/Header";
+import ProjectFooterNav from "../../../components/ProjectFooterNav";
+import ProjectShell from "../../../components/ProjectShell";
 import SectionRenderer from "../../../components/SectionRenderer";
 import FreeObjectRenderer from "../../../components/FreeObjectRenderer";
 
@@ -89,6 +93,10 @@ export default async function ProjectPage({ params }: PageProps) {
     ? urlFor(project.cover_image).width(40).blur(10).url()
     : null;
 
+  const hasBody =
+    (project.sections?.length ?? 0) > 0 ||
+    (project.freeObjects?.length ?? 0) > 0;
+
   return (
     <>
       <script
@@ -98,7 +106,7 @@ export default async function ProjectPage({ params }: PageProps) {
         }}
       />
 
-      <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
+      <ProjectShell>
         <Header
           settings={settings}
           projects={projects}
@@ -112,6 +120,13 @@ export default async function ProjectPage({ params }: PageProps) {
         >
           <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
             <div className="flex flex-col gap-6">
+              <Link
+                href="/"
+                className="w-fit text-[0.9rem] text-black/45 transition hover:text-black/80"
+              >
+                ← Back to home
+              </Link>
+
               {coverUrl && (
                 <figure
                   className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]"
@@ -134,29 +149,9 @@ export default async function ProjectPage({ params }: PageProps) {
                 <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
                   {project.title}
                 </h1>
-
-                {project.created_at && (
-                  <div className="text-[0.82rem] text-black/50">
-                    <time dateTime={project.created_at}>
-                      {new Date(project.created_at).toLocaleDateString(
-                        "en-NZ",
-                        {
-                          year: "numeric",
-                          month: "long",
-                        },
-                      )}
-                    </time>
-                  </div>
-                )}
-
-                {project.meta_description && (
-                  <p className="max-w-[42rem] text-[0.96rem] leading-[1.6] text-black/65">
-                    {project.meta_description}
-                  </p>
-                )}
               </div>
 
-              {(project.sections?.length || project.freeObjects?.length) ? (
+              {hasBody ? (
                 <div
                   className="relative"
                   style={
@@ -171,10 +166,17 @@ export default async function ProjectPage({ params }: PageProps) {
                   )}
                 </div>
               ) : null}
+
+              <ProjectFooterNav
+                projects={projects}
+                currentSlug={slug}
+                createdAt={project.created_at}
+              />
             </div>
+            <BackToTopButton />
           </div>
         </main>
-      </div>
+      </ProjectShell>
     </>
   );
 }

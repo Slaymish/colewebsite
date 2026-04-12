@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ProjectSummary, SiteSettings } from "../types";
+import { cn } from "@/lib/utils";
 import ProjectSidebar from "./ProjectSidebar";
 import { urlFor } from "../lib/sanity";
 import {
@@ -53,9 +54,21 @@ export default function Header({
   const nav =
     activeSlug !== undefined ? "project" : currentPage;
 
+  const onProjectPage = activeSlug !== undefined;
+
   return (
-    <header className="border-b border-black/10 px-5 py-6 md:sticky md:top-0 md:h-screen md:border-r md:border-b-0 md:px-7 md:py-8">
-      <div className="flex h-full flex-col gap-6">
+    <header
+      className={cn(
+        "border-b border-black/10 px-5 py-6 transition-[padding] duration-300 md:sticky md:top-0 md:h-screen md:border-r md:border-b-0 md:px-7 md:py-8",
+        onProjectPage && "md:py-6",
+      )}
+    >
+      <div
+        className={cn(
+          "flex h-full flex-col gap-6",
+          onProjectPage && "md:gap-5",
+        )}
+      >
         <Link
           href="/"
           className="flex items-start gap-3"
@@ -85,7 +98,12 @@ export default function Header({
         </Link>
 
         {settings?.bio && (
-          <p className="max-w-sm text-[0.92rem] leading-[1.45] text-black/70">
+          <p
+            className={cn(
+              "max-w-sm text-[0.92rem] leading-[1.45] text-black/70",
+              onProjectPage && "md:text-[0.88rem] md:text-black/60",
+            )}
+          >
             {settings.bio}
           </p>
         )}
@@ -134,6 +152,7 @@ export default function Header({
             <ProjectSidebar
               projects={projects}
               activeSlug={activeSlug}
+              muted={onProjectPage}
             />
           </>
         )}

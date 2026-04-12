@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import BackToTopButton from "../../components/BackToTopButton";
 import Header from "../../components/Header";
 import { getAllPublishedProjects, getSiteSettings } from "../../lib/queries";
 import { urlFor } from "../../lib/sanity";
@@ -48,7 +49,7 @@ export default async function AboutPage() {
       <Header settings={settings} projects={projects} currentPage="about" />
 
       <main id="main-content" className="min-w-0 md:flex" aria-label="About">
-        <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+        <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
           <div className="flex flex-col gap-8">
             <h1 className="text-base font-medium leading-[1.45]">About</h1>
 
@@ -88,6 +89,7 @@ export default async function AboutPage() {
               </div>
             </div>
           </div>
+          <BackToTopButton />
         </div>
       </main>
     </div>

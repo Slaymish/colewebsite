@@ -12,7 +12,7 @@ interface SectionRendererProps {
 
 export default function SectionRenderer({ sections }: SectionRendererProps) {
   return (
-    <div className="flex flex-col gap-3 md:gap-4">
+    <div className="flex flex-col gap-6 md:gap-9">
       {sections.map((section) => {
         switch (section._type) {
           case "heroSection":

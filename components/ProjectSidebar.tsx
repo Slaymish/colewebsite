@@ -1,14 +1,18 @@
 import type { ProjectSummary } from "../types";
+import { cn } from "@/lib/utils";
 import ProjectCard from "./ProjectCard";
 
 interface ProjectSidebarProps {
   projects: ProjectSummary[];
   activeSlug?: string;
+  /** Softer typography on project pages so the main column reads as primary. */
+  muted?: boolean;
 }
 
 export default function ProjectSidebar({
   projects,
   activeSlug,
+  muted = false,
 }: ProjectSidebarProps) {
   const uncategorized = projects.filter((project) => {
     const category = project.category?.trim();
@@ -34,8 +38,16 @@ export default function ProjectSidebar({
   }));
 
   return (
-    <aside className="w-full max-w-sm" aria-label="Project list">
-      <div className="max-h-80 overflow-y-auto md:max-h-none">
+    <aside
+      className={cn("w-full max-w-sm", muted && "md:opacity-[0.88]")}
+      aria-label="Project list"
+    >
+      <div
+        className={cn(
+          "max-h-80 overflow-y-auto md:max-h-none",
+          muted && "text-[0.8125rem]",
+        )}
+      >
         {projects.length === 0 ? (
           <p className="px-4 py-6 text-sm text-neutral-400">No projects yet.</p>
         ) : (
@@ -53,7 +65,7 @@ export default function ProjectSidebar({
             )}
             {groups.map((group) => (
               <div key={group.category} className="space-y-1">
-                <h3 className="pb-1 text-sm font-semibold text-neutral-900">
+                <h3 className="mb-1 w-full bg-black px-2 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white">
                   {group.category}
                 </h3>
                 {group.projects.map((project) => (

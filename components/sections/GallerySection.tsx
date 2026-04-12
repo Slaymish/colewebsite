@@ -1,6 +1,6 @@
-import Image from "next/image";
 import type { GallerySection } from "../../types";
 import { urlFor } from "../../lib/sanity";
+import ExpandableImage from "../ExpandableImage";
 
 interface GallerySectionProps {
   section: GallerySection;
@@ -39,7 +39,7 @@ export default function GallerySectionComponent({
                 className="overflow-hidden bg-neutral-100"
                 style={{ aspectRatio, borderRadius }}
               >
-                <Image
+                <ExpandableImage
                   src={src}
                   alt={image.alt ?? ""}
                   width={900}

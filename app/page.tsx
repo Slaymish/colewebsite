@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import BackToTopButton from "../components/BackToTopButton";
 import Header from "../components/Header";
 import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
 import { urlFor } from "../lib/sanity";
@@ -37,7 +38,7 @@ export default async function HomePage() {
         <Header settings={settings} projects={projects} currentPage="home" />
 
         <main id="main-content" className="min-w-0 md:flex" aria-label="Home">
-          <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+          <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
             <div className="flex flex-col gap-6">
               <section aria-labelledby="hero-heading" className="pb-3">
                 <h1
@@ -104,6 +105,7 @@ export default async function HomePage() {
                 })}
               </section>
             </div>
+            <BackToTopButton />
           </div>
         </main>
       </div>
