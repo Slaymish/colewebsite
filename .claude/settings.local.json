@@ -1,0 +1,8 @@
+{
+  "enabledMcpjsonServers": [
+    "trello"
+  ],
+  "disabledMcpjsonServers": [
+    "shadcn"
+  ]
+}
