@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { FreeVideoObject } from "../../types";
+import { fetchVimeoAspectRatio } from "../../lib/vimeoOEmbed";
 
 interface FreeVideoObjectProps {
   obj: FreeVideoObject;
@@ -20,10 +22,28 @@ export default function FreeVideoObjectComponent({
   const zIndex = obj.zIndex ?? 10;
   const rotation = obj.rotation ?? 0;
   const opacity = obj.opacity ?? 1;
-  const aspectRatio = obj.aspectRatio ?? "16/9";
+  const fallbackAspect = obj.aspectRatio ?? "16/9";
   const borderRadius = obj.borderRadius ?? 0;
 
   const nativeUrl = obj.videoFile?.asset?.url ?? null;
+  const [resolvedAspect, setResolvedAspect] = useState<string | null>(null);
+
+  useEffect(() => {
+    setResolvedAspect(null);
+  }, [obj._key, nativeUrl, obj.vimeoUrl]);
+
+  useEffect(() => {
+    if (nativeUrl || !obj.vimeoUrl) return;
+    let cancelled = false;
+    fetchVimeoAspectRatio(obj.vimeoUrl).then((a) => {
+      if (!cancelled && a) setResolvedAspect(a);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [nativeUrl, obj.vimeoUrl]);
+
+  const aspectStyle = resolvedAspect ?? fallbackAspect;
 
   const containerStyle = {
     position: "absolute" as const,
@@ -40,7 +60,7 @@ export default function FreeVideoObjectComponent({
       <div style={containerStyle}>
         <div
           className="overflow-hidden bg-neutral-900"
-          style={{ aspectRatio, borderRadius }}
+          style={{ aspectRatio: aspectStyle, borderRadius }}
         >
           <video
             src={nativeUrl}
@@ -48,8 +68,14 @@ export default function FreeVideoObjectComponent({
             muted
             playsInline
             loop={obj.loop}
-            preload="metadata"
-            className="h-full w-full object-cover"
+            preload={obj.autoplay ? "auto" : "metadata"}
+            className="h-full w-full object-contain"
+            onLoadedMetadata={(e) => {
+              const v = e.currentTarget;
+              if (v.videoWidth && v.videoHeight) {
+                setResolvedAspect(`${v.videoWidth}/${v.videoHeight}`);
+              }
+            }}
           />
         </div>
       </div>
@@ -75,7 +101,7 @@ export default function FreeVideoObjectComponent({
     <div style={containerStyle}>
       <div
         className="overflow-hidden bg-neutral-900"
-        style={{ aspectRatio, borderRadius }}
+        style={{ aspectRatio: aspectStyle, borderRadius }}
       >
         <iframe
           src={embedUrl}
@@ -85,7 +111,7 @@ export default function FreeVideoObjectComponent({
           height="100%"
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
-          loading="lazy"
+          {...(obj.autoplay ? {} : { loading: "lazy" as const })}
         />
       </div>
     </div>

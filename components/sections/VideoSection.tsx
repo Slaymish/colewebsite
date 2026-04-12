@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { VideoSection } from "../../types";
 import { urlFor } from "../../lib/sanity";
+import { fetchVimeoAspectRatio } from "../../lib/vimeoOEmbed";
 
 interface VideoSectionProps {
   section: VideoSection;
@@ -16,11 +17,32 @@ function getVimeoId(url: string): string | null {
 
 export default function VideoSectionComponent({ section }: VideoSectionProps) {
   const [vimeoLoaded, setVimeoLoaded] = useState(false);
+  const [nativeAspect, setNativeAspect] = useState<string | null>(null);
+  const [vimeoAspect, setVimeoAspect] = useState<string | null>(null);
 
-  const aspectRatio = section.aspectRatio ?? "16/9";
+  const aspectFallback = section.aspectRatio ?? "16/9";
   const borderRadius = section.borderRadius ?? 2;
 
   const nativeUrl = section.videoFile?.asset?.url ?? null;
+
+  useEffect(() => {
+    setNativeAspect(null);
+    setVimeoAspect(null);
+    setVimeoLoaded(false);
+  }, [section._key, nativeUrl, section.vimeoUrl]);
+
+  useEffect(() => {
+    if (nativeUrl || !section.vimeoUrl) return;
+    let cancelled = false;
+    fetchVimeoAspectRatio(section.vimeoUrl).then((a) => {
+      if (!cancelled && a) setVimeoAspect(a);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [nativeUrl, section.vimeoUrl]);
+
+  const displayAspect = nativeAspect ?? vimeoAspect ?? aspectFallback;
 
   // --- Native video (uploaded file) ---
   if (nativeUrl) {
@@ -34,7 +56,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
         <figure>
           <div
             className="overflow-hidden bg-neutral-900"
-            style={{ aspectRatio, borderRadius }}
+            style={{ aspectRatio: displayAspect, borderRadius }}
           >
             <video
               src={nativeUrl}
@@ -43,7 +65,13 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
               playsInline
               loop={section.loop}
               preload="metadata"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
+              onLoadedMetadata={(e) => {
+                const v = e.currentTarget;
+                if (v.videoWidth && v.videoHeight) {
+                  setNativeAspect(`${v.videoWidth}/${v.videoHeight}`);
+                }
+              }}
             />
           </div>
           {section.caption && (
@@ -88,7 +116,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
       <figure>
         <div
           className="relative overflow-hidden bg-neutral-900"
-          style={{ aspectRatio, borderRadius }}
+          style={{ aspectRatio: displayAspect, borderRadius }}
         >
           {vimeoLoaded ? (
             <iframe

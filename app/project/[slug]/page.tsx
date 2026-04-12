@@ -99,7 +99,11 @@ export default async function ProjectPage({ params }: PageProps) {
       />
 
       <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
-        <Header settings={settings} projects={projects} activeSlug={slug} />
+        <Header
+          settings={settings}
+          projects={projects}
+          activeSlug={slug}
+        />
 
         <main
           id="main-content"
@@ -109,7 +113,9 @@ export default async function ProjectPage({ params }: PageProps) {
           <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
             <div className="flex flex-col gap-6">
               {coverUrl && (
-                <figure className="w-full overflow-hidden rounded-2xl bg-black/5">
+                <figure
+                  className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]"
+                >
                   <Image
                     src={coverUrl}
                     alt={project.cover_image?.alt ?? project.title}
@@ -129,8 +135,8 @@ export default async function ProjectPage({ params }: PageProps) {
                   {project.title}
                 </h1>
 
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-[0.82rem] text-black/50">
-                  {project.created_at && (
+                {project.created_at && (
+                  <div className="text-[0.82rem] text-black/50">
                     <time dateTime={project.created_at}>
                       {new Date(project.created_at).toLocaleDateString(
                         "en-NZ",
@@ -140,23 +146,8 @@ export default async function ProjectPage({ params }: PageProps) {
                         },
                       )}
                     </time>
-                  )}
-                  {project.tags && project.tags.length > 0 && (
-                    <div
-                      className="flex flex-wrap gap-x-3 gap-y-1"
-                      aria-label="Tags"
-                    >
-                      {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[0.82rem] text-black/50"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {project.meta_description && (
                   <p className="max-w-[42rem] text-[0.96rem] leading-[1.6] text-black/65">
@@ -169,9 +160,7 @@ export default async function ProjectPage({ params }: PageProps) {
                 <div
                   className="relative"
                   style={
-                    project.freeObjects?.length && !project.sections?.length
-                      ? { minHeight: "60vh" }
-                      : undefined
+                    project.freeObjects?.length ? { minHeight: 500 } : undefined
                   }
                 >
                   {project.sections && project.sections.length > 0 && (
