@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { Button } from "@/components/ui/button";
 import { ADMIN_COOKIE, verifySessionToken } from "../../../lib/adminAuth";
 import { getAllProjectsForAdmin } from "../../../lib/queries";
 import { urlFor } from "../../../lib/sanity";
@@ -24,13 +23,7 @@ async function ProjectList() {
   if (!projects.length) {
     return (
       <div className="py-16 text-center text-neutral-400">
-        <p>
-          No projects yet. Create one in{" "}
-          <Link href="/admin/cms" className="underline hover:text-neutral-600">
-            Sanity Studio
-          </Link>
-          .
-        </p>
+        <p>No projects yet.</p>
       </div>
     );
   }
@@ -130,12 +123,7 @@ export default async function AdminEditPage() {
               Select a project to edit its layout
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" className="text-sm">
-              <Link href="/admin/cms">Sanity Studio →</Link>
-            </Button>
-            <LogoutButton />
-          </div>
+          <LogoutButton />
         </div>
 
         <div className="rounded-2xl border border-neutral-100 bg-white px-4 shadow-sm">

@@ -106,7 +106,18 @@ export default function EditableSection({
       </div>
 
       {/* Section content */}
-      <div style={{ pointerEvents: 'none' }}>{renderSection(section)}</div>
+      <div style={{ pointerEvents: 'none' }}>
+        {section._type === 'spacingSection' ? (
+          <div
+            className="flex items-center justify-center border border-dashed border-neutral-300 bg-neutral-50/50 text-xs text-neutral-400"
+            style={{ height: (section as import('../../../../types').SpacingSection).height ?? 80 }}
+          >
+            Spacing · {(section as import('../../../../types').SpacingSection).height ?? 80}px
+          </div>
+        ) : (
+          renderSection(section)
+        )}
+      </div>
     </div>
   )
 }

@@ -1,7 +1,9 @@
 'use client'
 
 import type {
+  Project,
   Section,
+  SanityImage,
   HeroSection,
   TextSection,
   ImageSection,
@@ -14,18 +16,29 @@ import type {
   FreeVideoObject,
   FreeTextObject,
 } from '../../../../types'
+import { urlFor } from '../../../../lib/sanity'
+import ImageUploadField from './ImageUploadField'
 
 type PropsPanelProps =
   | {
       section: Section
       freeObject?: undefined
+      project?: undefined
       onChange: (patch: Partial<Section>) => void
       onClose: () => void
     }
   | {
       section?: undefined
       freeObject: FreeObject
+      project?: undefined
       onChange: (patch: Partial<FreeObject>) => void
+      onClose: () => void
+    }
+  | {
+      section?: undefined
+      freeObject?: undefined
+      project: Project
+      onChange: (patch: Partial<Project>) => void
       onClose: () => void
     }
 
@@ -300,6 +313,14 @@ function HeroPanel({
         />
       </Field>
 
+      <SectionDivider label="Background" />
+
+      <ImageUploadField
+        image={section.backgroundImage}
+        onChange={(img) => onChange({ backgroundImage: img })}
+        label="Background Image"
+      />
+
       <SectionDivider label="Overlay" />
 
       <Field label={`Overlay Opacity: ${Math.round((section.overlayOpacity ?? 0.3) * 100)}%`}>
@@ -324,14 +345,6 @@ function TextPanel({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
-        Edit rich text content in{' '}
-        <a href="/admin/cms" className="underline" target="_blank">
-          Sanity Studio
-        </a>
-        .
-      </p>
-
       <Field label="Max Width">
         <SelectInput
           value={section.maxWidth ?? 'md'}
@@ -430,6 +443,11 @@ function ImagePanel({
 }) {
   return (
     <div className="space-y-4">
+      <ImageUploadField
+        image={section.image}
+        onChange={(img) => onChange({ image: img })}
+      />
+
       <Field label="Caption">
         <TextInput
           value={section.caption ?? ''}
@@ -512,6 +530,90 @@ function ImagePanel({
   )
 }
 
+// Gallery images editor — add, remove, reorder
+function GalleryImagesEditor({
+  images,
+  onChange,
+}: {
+  images: (SanityImage & { _key: string })[]
+  onChange: (images: (SanityImage & { _key: string })[]) => void
+}) {
+  const addImage = (img: SanityImage | undefined) => {
+    if (!img) return
+    const withKey = { ...img, _key: `img-${Date.now()}` } as SanityImage & { _key: string }
+    onChange([...images, withKey])
+  }
+
+  const removeImage = (key: string) => {
+    onChange(images.filter((i) => i._key !== key))
+  }
+
+  const moveImage = (key: string, dir: 'up' | 'down') => {
+    const arr = [...images]
+    const idx = arr.findIndex((i) => i._key === key)
+    if (idx === -1) return
+    const newIdx = dir === 'up' ? idx - 1 : idx + 1
+    if (newIdx < 0 || newIdx >= arr.length) return
+    ;[arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]]
+    onChange(arr)
+  }
+
+  return (
+    <div className="space-y-2">
+      {images.map((img, idx) => {
+        let thumbUrl: string | null = null
+        try {
+          thumbUrl = urlFor(img).width(120).auto('format').url()
+        } catch {
+          const asset = img.asset as { url?: string }
+          thumbUrl = asset.url ?? null
+        }
+        return (
+          <div key={img._key} className="flex items-center gap-2 rounded border border-neutral-200 p-1.5">
+            <div className="h-10 w-14 shrink-0 overflow-hidden rounded bg-neutral-100">
+              {thumbUrl ? (
+                <img src={thumbUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-[0.6rem] text-neutral-400">
+                  No img
+                </div>
+              )}
+            </div>
+            <div className="flex flex-1 items-center gap-1">
+              <button
+                onClick={() => moveImage(img._key, 'up')}
+                disabled={idx === 0}
+                className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 text-xs px-1"
+              >
+                ↑
+              </button>
+              <button
+                onClick={() => moveImage(img._key, 'down')}
+                disabled={idx === images.length - 1}
+                className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 text-xs px-1"
+              >
+                ↓
+              </button>
+            </div>
+            <button
+              onClick={() => removeImage(img._key)}
+              className="text-neutral-400 hover:text-red-500 text-xs px-1"
+              title="Remove"
+            >
+              ✕
+            </button>
+          </div>
+        )
+      })}
+      <ImageUploadField
+        onChange={(img) => addImage(img)}
+        label="Add image"
+        showAlt={false}
+      />
+    </div>
+  )
+}
+
 function GalleryPanel({
   section,
   onChange,
@@ -521,13 +623,12 @@ function GalleryPanel({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
-        Manage gallery images in{' '}
-        <a href="/admin/cms" className="underline" target="_blank">
-          Sanity Studio
-        </a>
-        .
-      </p>
+      <SectionDivider label="Images" />
+
+      <GalleryImagesEditor
+        images={section.images ?? []}
+        onChange={(images) => onChange({ images })}
+      />
 
       <Field label="Columns">
         <SelectInput
@@ -660,6 +761,11 @@ function SplitPanel({
 }) {
   return (
     <div className="space-y-4">
+      <ImageUploadField
+        image={section.image}
+        onChange={(img) => onChange({ image: img })}
+      />
+
       <Field label="Caption">
         <TextInput
           value={section.caption ?? ''}
@@ -752,13 +858,10 @@ function FreeImagePanel({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
-        Change image in{' '}
-        <a href="/admin/cms" className="underline" target="_blank">
-          Sanity Studio
-        </a>
-        .
-      </p>
+      <ImageUploadField
+        image={obj.image}
+        onChange={(img) => onChange({ image: img } as Partial<FreeObject>)}
+      />
 
       <Field label={`Border Radius: ${obj.borderRadius ?? 0}px`}>
         <NumberInput
@@ -849,14 +952,6 @@ function FreeTextPanel({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-neutral-400 bg-neutral-50 rounded p-2">
-        Edit text content in{' '}
-        <a href="/admin/cms" className="underline" target="_blank">
-          Sanity Studio
-        </a>
-        .
-      </p>
-
       <Field label="Font Size">
         <SelectInput
           value={obj.fontSize ?? 'base'}
@@ -895,6 +990,84 @@ function FreeTextPanel({
   )
 }
 
+// === Page Settings panel ===
+
+function PageSettingsPanel({
+  project,
+  onChange,
+}: {
+  project: Project
+  onChange: (patch: Partial<Project>) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <Field label="Title">
+        <TextInput
+          value={project.title}
+          onChange={(v) => onChange({ title: v })}
+          placeholder="Project title…"
+        />
+      </Field>
+
+      <Field label="Meta Description">
+        <textarea
+          value={project.meta_description ?? ''}
+          onChange={(e) => onChange({ meta_description: e.target.value })}
+          placeholder="SEO description…"
+          rows={3}
+          className="w-full rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 placeholder-neutral-400 focus:border-neutral-400 focus:outline-none resize-none"
+        />
+      </Field>
+
+      <SectionDivider label="Cover Image" />
+
+      <ImageUploadField
+        image={project.cover_image}
+        onChange={(img) => onChange({ cover_image: img })}
+        label="Cover"
+      />
+
+      <SectionDivider label="Taxonomy" />
+
+      <Field label="Category">
+        <TextInput
+          value={project.category ?? ''}
+          onChange={(v) => onChange({ category: v })}
+          placeholder="e.g. Film, Design…"
+        />
+      </Field>
+
+      <Field label="Tags (comma-separated)">
+        <TextInput
+          value={(project.tags ?? []).join(', ')}
+          onChange={(v) =>
+            onChange({
+              tags: v
+                .split(',')
+                .map((t) => t.trim())
+                .filter(Boolean),
+            })
+          }
+          placeholder="tag1, tag2…"
+        />
+      </Field>
+
+      <SectionDivider label="Display" />
+
+      <Field label="Sidebar Mode">
+        <SelectInput
+          value={project.sidebarMode ?? 'auto'}
+          onChange={(v) => onChange({ sidebarMode: v as Project['sidebarMode'] })}
+          options={[
+            { label: 'Auto (show sidebar)', value: 'auto' },
+            { label: 'Hidden (minimal)', value: 'hidden' },
+          ]}
+        />
+      </Field>
+    </div>
+  )
+}
+
 // === Main panel ===
 
 export default function PropertiesPanel(props: PropsPanelProps) {
@@ -914,8 +1087,18 @@ export default function PropertiesPanel(props: PropsPanelProps) {
   }
 
   const itemType = props.section?._type ?? props.freeObject?._type ?? ''
+  const panelTitle = props.project ? 'Page Settings' : (typeLabels[itemType] ?? itemType)
 
   function renderPanel() {
+    if (props.project) {
+      return (
+        <PageSettingsPanel
+          project={props.project}
+          onChange={onChange as (patch: Partial<Project>) => void}
+        />
+      )
+    }
+
     if (props.section) {
       const section = props.section
       const sectionOnChange = onChange as (patch: Partial<Section>) => void
@@ -958,13 +1141,13 @@ export default function PropertiesPanel(props: PropsPanelProps) {
   }
 
   return (
-    <div className="w-72 shrink-0 bg-white border-l border-neutral-200 flex flex-col overflow-hidden">
+    <div className="w-80 shrink-0 bg-white border-l border-neutral-200 shadow-2xl flex flex-col overflow-hidden h-full">
       {/* Panel header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
         <div>
           <span className="text-xs text-neutral-400 uppercase tracking-wide">Properties</span>
           <h3 className="text-sm font-semibold text-neutral-900">
-            {typeLabels[itemType] ?? itemType}
+            {panelTitle}
           </h3>
         </div>
         <button
@@ -972,7 +1155,7 @@ export default function PropertiesPanel(props: PropsPanelProps) {
           className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
           aria-label="Close properties"
         >
-          x
+          ✕
         </button>
       </div>
 

@@ -1,25 +1,38 @@
 "use client";
 
-import Link from "next/link";
-import { useState, useCallback, useRef } from "react";
+import Image from "next/image";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { Project, Section, FreeObject, SpacingSection } from "../../../../types";
-import EditToolbar from "./EditToolbar";
+import type {
+  Project,
+  ProjectSummary,
+  SiteSettings,
+  Section,
+  FreeObject,
+  SpacingSection,
+} from "../../../../types";
+import { urlFor } from "../../../../lib/sanity";
+import Header from "../../../../components/Header";
 import EditableSection from "./EditableSection";
 import EditableFreeObject from "./EditableFreeObject";
 import PropertiesPanel from "./PropertiesPanel";
 
 interface EditorClientProps {
   initialProject: Project;
+  projects: ProjectSummary[];
+  settings: SiteSettings | null;
 }
 
 type SelectedItem =
   | { kind: "section"; key: string }
   | { kind: "freeObject"; key: string }
+  | { kind: "pageSettings" }
   | null;
 
 export default function EditorClient({
   initialProject,
+  projects,
+  settings,
 }: EditorClientProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project>(initialProject);
@@ -44,6 +57,17 @@ export default function EditorClient({
     selected?.kind === "freeObject"
       ? (freeObjects.find((o) => o._key === selected.key) ?? null)
       : null;
+
+  const showPageSettings = selected?.kind === "pageSettings";
+
+  // Close panel on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Update a section by key
   const updateSection = useCallback((key: string, patch: Partial<Section>) => {
@@ -72,6 +96,13 @@ export default function EditorClient({
     [],
   );
 
+  // Update project-level fields
+  const updateProject = useCallback((patch: Partial<Project>) => {
+    setProject((prev) => ({ ...prev, ...patch }));
+    setIsDirty(true);
+    setSaveSuccess(false);
+  }, []);
+
   // Move section up or down
   const moveSection = useCallback((key: string, direction: "up" | "down") => {
     setProject((prev) => {
@@ -93,7 +124,8 @@ export default function EditorClient({
         ...prev,
         sections: (prev.sections ?? []).filter((s) => s._key !== key),
       }));
-      if (selected?.kind === "section" && selected.key === key) setSelected(null);
+      if (selected?.kind === "section" && selected.key === key)
+        setSelected(null);
       setIsDirty(true);
     },
     [selected],
@@ -112,19 +144,50 @@ export default function EditorClient({
         newSection = { _type: "imageSection", _key: key };
         break;
       case "gallerySection":
-        newSection = { _type: "gallerySection", _key: key, columns: 2, gap: 12, aspectRatio: "3/2", borderRadius: 2 };
+        newSection = {
+          _type: "gallerySection",
+          _key: key,
+          columns: 2,
+          gap: 12,
+          aspectRatio: "3/2",
+          borderRadius: 2,
+        };
         break;
       case "videoSection":
-        newSection = { _type: "videoSection", _key: key, aspectRatio: "16/9", borderRadius: 2 };
+        newSection = {
+          _type: "videoSection",
+          _key: key,
+          aspectRatio: "16/9",
+          borderRadius: 2,
+        };
         break;
       case "heroSection":
-        newSection = { _type: "heroSection", _key: key, minHeight: "60vh", overlayOpacity: 0.3, textAlign: "left", textPosition: "bottom" };
+        newSection = {
+          _type: "heroSection",
+          _key: key,
+          minHeight: "60vh",
+          overlayOpacity: 0.3,
+          textAlign: "left",
+          textPosition: "bottom",
+        };
         break;
       case "splitSection":
-        newSection = { _type: "splitSection", _key: key, imagePosition: "left", verticalAlign: "center", gap: 24, imageAspectRatio: "4/3", borderRadius: 2 };
+        newSection = {
+          _type: "splitSection",
+          _key: key,
+          imagePosition: "left",
+          verticalAlign: "center",
+          gap: 24,
+          imageAspectRatio: "4/3",
+          borderRadius: 2,
+        };
         break;
       case "spacingSection":
-        newSection = { _type: "spacingSection", _key: key, height: 80 } as SpacingSection;
+        newSection = {
+          _type: "spacingSection",
+          _key: key,
+          height: 80,
+        } as SpacingSection;
         break;
       default:
         return;
@@ -145,13 +208,14 @@ export default function EditorClient({
         ...prev,
         freeObjects: (prev.freeObjects ?? []).filter((o) => o._key !== key),
       }));
-      if (selected?.kind === "freeObject" && selected.key === key) setSelected(null);
+      if (selected?.kind === "freeObject" && selected.key === key)
+        setSelected(null);
       setIsDirty(true);
     },
     [selected],
   );
 
-  // Save to Sanity (draft)
+  // Save to Sanity
   const save = useCallback(
     async (newStatus?: "draft" | "published") => {
       setIsSaving(true);
@@ -194,63 +258,184 @@ export default function EditorClient({
     [project],
   );
 
-  const handleCancel = useCallback(() => {
+  const handleExit = useCallback(() => {
     if (isDirty) {
       if (!confirm("Discard unsaved changes?")) return;
     }
     router.push("/admin/edit");
   }, [isDirty, router]);
 
+  const isPublished = project.status === "published";
+
+  // Cover image
+  const coverUrl = project.cover_image?.asset
+    ? (() => {
+        try {
+          return urlFor(project.cover_image).width(1400).auto("format").url();
+        } catch {
+          const asset = project.cover_image!.asset as { url?: string };
+          return asset.url ?? null;
+        }
+      })()
+    : null;
+
+  // Determine if right panel is open
+  const panelOpen = selectedSection || selectedFreeObject || showPageSettings;
+
   return (
-    <div className="min-h-screen bg-neutral-100 flex flex-col">
-      {/* Sticky top toolbar */}
-      <EditToolbar
-        project={project}
-        isDirty={isDirty}
-        isSaving={isSaving}
-        saveSuccess={saveSuccess}
-        saveError={saveError}
-        onSaveDraft={() => save("draft")}
-        onPublish={() => save("published")}
-        onUnpublish={() => save("draft")}
-        onCancel={handleCancel}
+    <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
+      {/* Left sidebar — real site Header */}
+      <Header
+        settings={settings}
+        projects={projects}
+        activeSlug={project.slug.current}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Canvas */}
-        <div
-          className="flex-1 overflow-y-auto"
-          onClick={() => setSelected(null)}
-        >
-          <div className="max-w-5xl mx-auto my-6 bg-white shadow-lg rounded-xl overflow-hidden">
-            {/* Project header preview */}
-            <div className="px-8 py-6 border-b border-neutral-100">
-              <h1 className="text-2xl font-semibold text-neutral-900">
+      {/* Main editor area */}
+      <div className="relative min-w-0 overflow-y-auto" onClick={() => setSelected(null)}>
+        {/* Floating editor bar */}
+        <div className="sticky top-0 z-40 px-5 pt-4 pb-2 md:px-10 xl:px-12 pointer-events-none">
+          <div className="flex items-center justify-end">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-2xl border border-black/10 bg-white/90 px-3 py-2 shadow-lg backdrop-blur">
+              {/* Status indicator */}
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full ${
+                  isPublished
+                    ? "bg-green-100 text-green-700"
+                    : "bg-neutral-100 text-neutral-500"
+                }`}
+              >
+                {isPublished ? "Published" : "Draft"}
+              </span>
+
+              {/* Save feedback */}
+              {saveError && (
+                <span className="text-xs text-red-600">{saveError}</span>
+              )}
+              {saveSuccess && !saveError && (
+                <span className="text-xs text-green-700">Saved</span>
+              )}
+              {isDirty && !saveError && !saveSuccess && (
+                <span className="text-xs text-neutral-400">Unsaved</span>
+              )}
+
+              <div className="w-px h-4 bg-black/10" />
+
+              {/* Page settings */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelected({ kind: "pageSettings" });
+                }}
+                className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
+                  showPageSettings
+                    ? "bg-blue-100 text-blue-700"
+                    : "text-neutral-600 hover:bg-neutral-100"
+                }`}
+              >
+                Settings
+              </button>
+
+              {/* Preview */}
+              {isPublished && (
+                <a
+                  href={`/project/${project.slug.current}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-neutral-500 hover:text-neutral-900 px-2.5 py-1 rounded-lg hover:bg-neutral-100 transition-colors"
+                >
+                  Preview ↗
+                </a>
+              )}
+
+              {/* Save draft */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  save("draft");
+                }}
+                disabled={isSaving || !isDirty}
+                className="text-xs px-2.5 py-1 rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSaving ? "Saving…" : "Save draft"}
+              </button>
+
+              {/* Publish / Unpublish */}
+              {isPublished ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    save("draft");
+                  }}
+                  disabled={isSaving}
+                  className="text-xs px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Unpublish
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    save("published");
+                  }}
+                  disabled={isSaving}
+                  className="text-xs px-2.5 py-1 rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Publish
+                </button>
+              )}
+
+              <div className="w-px h-4 bg-black/10" />
+
+              {/* Exit */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExit();
+                }}
+                className="text-xs text-neutral-400 hover:text-neutral-700 px-1.5 py-1 rounded-lg hover:bg-neutral-100 transition-colors"
+                title="Exit editor"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Project content — matches public page layout */}
+        <div className="w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+          <div className="flex flex-col gap-6">
+            {/* Cover image — matches public page */}
+            {coverUrl && (
+              <figure className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]">
+                <Image
+                  src={coverUrl}
+                  alt={project.cover_image?.alt ?? project.title}
+                  width={1400}
+                  height={875}
+                  className="h-auto w-full"
+                  priority
+                  sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
+                />
+              </figure>
+            )}
+
+            {/* Title — matches public page */}
+            <div className="flex flex-col gap-3 pb-1">
+              <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
                 {project.title}
               </h1>
-              {project.category && (
-                <p className="mt-1 text-sm text-neutral-500">{project.category}</p>
-              )}
-              {project.tags && project.tags.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-neutral-200 px-3 py-0.5 text-xs text-neutral-500"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* Shared canvas: sections in flow, free objects as absolute overlays */}
+            {/* Sections + free objects */}
             {sections.length === 0 && freeObjects.length === 0 ? (
               <div className="py-16 text-center text-neutral-400">
                 <p className="text-sm">No sections yet.</p>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setShowAddSection(true); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAddSection(true);
+                  }}
                   className="mt-3 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-xs text-neutral-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
                 >
                   + Add Section
@@ -259,29 +444,42 @@ export default function EditorClient({
             ) : (
               <div
                 ref={canvasRef}
-                className="relative"
-                style={{ minHeight: freeObjects.length > 0 ? canvasMinHeight : undefined }}
+                className={`relative${freeObjects.length > 0 ? " md:min-h-[500px]" : ""}`}
+                style={{
+                  minHeight:
+                    freeObjects.length > 0 ? canvasMinHeight : undefined,
+                }}
               >
-                {sections.map((section, index) => (
-                  <EditableSection
-                    key={section._key}
-                    section={section}
-                    index={index}
-                    total={sections.length}
-                    isSelected={
-                      selected?.kind === "section" &&
-                      selected.key === section._key
-                    }
-                    onSelect={(e) => {
-                      e.stopPropagation();
-                      setSelected({ kind: "section", key: section._key });
-                    }}
-                    onMoveUp={() => moveSection(section._key, "up")}
-                    onMoveDown={() => moveSection(section._key, "down")}
-                    onDelete={() => deleteSection(section._key)}
-                    onChange={(patch) => updateSection(section._key, patch)}
-                  />
-                ))}
+                {/* Sections wrapper — matches SectionRenderer gap */}
+                {sections.length > 0 && (
+                  <div className="flex flex-col gap-6 md:gap-9">
+                    {sections.map((section, index) => (
+                      <EditableSection
+                        key={section._key}
+                        section={section}
+                        index={index}
+                        total={sections.length}
+                        isSelected={
+                          selected?.kind === "section" &&
+                          selected.key === section._key
+                        }
+                        onSelect={(e) => {
+                          e.stopPropagation();
+                          setSelected({
+                            kind: "section",
+                            key: section._key,
+                          });
+                        }}
+                        onMoveUp={() => moveSection(section._key, "up")}
+                        onMoveDown={() => moveSection(section._key, "down")}
+                        onDelete={() => deleteSection(section._key)}
+                        onChange={(patch) =>
+                          updateSection(section._key, patch)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
                 {freeObjects.map((obj) => (
                   <EditableFreeObject
                     key={obj._key}
@@ -293,11 +491,16 @@ export default function EditorClient({
                     canvasRef={canvasRef}
                     onSelect={(e) => {
                       e.stopPropagation();
-                      setSelected({ kind: "freeObject", key: obj._key });
+                      setSelected({
+                        kind: "freeObject",
+                        key: obj._key,
+                      });
                     }}
                     onDelete={() => deleteFreeObject(obj._key)}
                     onChange={(patch) => updateFreeObject(obj._key, patch)}
-                    onExpandCanvas={(h) => setCanvasMinHeight((prev) => Math.max(prev, h))}
+                    onExpandCanvas={(h) =>
+                      setCanvasMinHeight((prev) => Math.max(prev, h))
+                    }
                   />
                 ))}
               </div>
@@ -317,28 +520,44 @@ export default function EditorClient({
             </div>
           </div>
         </div>
-
-        {/* Properties panel */}
-        {selectedSection && (
-          <PropertiesPanel
-            section={selectedSection}
-            onChange={(patch) => updateSection(selectedSection._key, patch)}
-            onClose={() => setSelected(null)}
-          />
-        )}
-        {selectedFreeObject && (
-          <PropertiesPanel
-            freeObject={selectedFreeObject}
-            onChange={(patch) =>
-              updateFreeObject(
-                selectedFreeObject._key,
-                patch as Partial<FreeObject>,
-              )
-            }
-            onClose={() => setSelected(null)}
-          />
-        )}
       </div>
+
+      {/* Right properties drawer — overlays canvas */}
+      {panelOpen && (
+        <div className="fixed right-0 top-0 bottom-0 z-50 flex">
+          {/* Backdrop — click to close */}
+          <div
+            className="hidden md:block md:w-[calc(100vw-320px)]"
+            onClick={() => setSelected(null)}
+          />
+          {selectedSection && (
+            <PropertiesPanel
+              section={selectedSection}
+              onChange={(patch) => updateSection(selectedSection._key, patch)}
+              onClose={() => setSelected(null)}
+            />
+          )}
+          {selectedFreeObject && (
+            <PropertiesPanel
+              freeObject={selectedFreeObject}
+              onChange={(patch) =>
+                updateFreeObject(
+                  selectedFreeObject._key,
+                  patch as Partial<FreeObject>,
+                )
+              }
+              onClose={() => setSelected(null)}
+            />
+          )}
+          {showPageSettings && (
+            <PropertiesPanel
+              project={project}
+              onChange={(patch) => updateProject(patch)}
+              onClose={() => setSelected(null)}
+            />
+          )}
+        </div>
+      )}
 
       {/* Add Section modal */}
       {showAddSection && (
@@ -351,7 +570,9 @@ export default function EditorClient({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-neutral-900">Add Section</h3>
+              <h3 className="text-sm font-semibold text-neutral-900">
+                Add Section
+              </h3>
               <button
                 onClick={() => setShowAddSection(false)}
                 className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
@@ -381,10 +602,6 @@ export default function EditorClient({
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs text-neutral-400">
-              Image/gallery/video/hero content must be set in{" "}
-              <a href="/admin/cms" target="_blank" className="underline">Sanity Studio</a>.
-            </p>
           </div>
         </div>
       )}
