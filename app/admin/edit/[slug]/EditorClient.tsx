@@ -39,6 +39,7 @@ export default function EditorClient({
   const [selected, setSelected] = useState<SelectedItem>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasMinHeight, setCanvasMinHeight] = useState(500);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -282,17 +283,71 @@ export default function EditorClient({
   // Determine if right panel is open
   const panelOpen = selectedSection || selectedFreeObject || showPageSettings;
 
+  // Sidebar logo / initials
+  const sidebarName = settings?.name ?? "Cole Anderson";
+  const sidebarLogoUrl =
+    settings?.logo?.asset && "_id" in settings.logo.asset
+      ? urlFor(settings.logo).width(128).height(128).auto("format").url()
+      : null;
+  const sidebarInitials = sidebarName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
-      {/* Left sidebar — real site Header */}
-      <Header
-        settings={settings}
-        projects={projects}
-        activeSlug={project.slug.current}
-      />
+    <div className={sidebarCollapsed ? "min-h-screen flex" : "min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]"}>
+      {/* Left sidebar */}
+      {sidebarCollapsed ? (
+        <div className="hidden md:flex md:flex-col md:items-center md:w-14 md:shrink-0 md:border-r md:border-black/10 md:py-5 md:gap-4">
+          <button
+            onClick={() => setSidebarCollapsed(false)}
+            aria-label="Open sidebar"
+            className="flex flex-col items-center gap-1 group"
+          >
+            {sidebarLogoUrl ? (
+              <span className="relative h-9 w-9 overflow-hidden rounded-full border border-black/10 bg-white group-hover:border-black/25 transition-colors">
+                <Image
+                  src={sidebarLogoUrl}
+                  alt={sidebarName}
+                  width={72}
+                  height={72}
+                  className="h-full w-full object-cover"
+                />
+              </span>
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-[0.65rem] font-semibold text-neutral-700 group-hover:border-black/30 transition-colors">
+                {sidebarInitials || "—"}
+              </span>
+            )}
+            <span className="text-[0.6rem] text-black/35 group-hover:text-black/60 transition-colors">
+              menu
+            </span>
+          </button>
+        </div>
+      ) : (
+        <div className="relative">
+          <Header
+            settings={settings}
+            projects={projects}
+            activeSlug={project.slug.current}
+          />
+          <button
+            onClick={() => setSidebarCollapsed(true)}
+            aria-label="Collapse sidebar"
+            className="absolute top-3 right-3 hidden md:flex items-center gap-1 rounded px-1.5 py-1 text-[0.72rem] text-black/35 hover:text-black/70 hover:bg-black/5 transition-colors"
+            title="Hide sidebar"
+          >
+            ←
+          </button>
+        </div>
+      )}
 
       {/* Main editor area */}
-      <div className="relative min-w-0 overflow-y-auto" onClick={() => setSelected(null)}>
+      <div className={`relative min-w-0 overflow-y-auto${sidebarCollapsed ? " flex-1" : ""}`} onClick={() => setSelected(null)}>
         {/* Floating editor bar */}
         <div className="sticky top-0 z-40 px-5 pt-4 pb-2 md:px-10 xl:px-12 pointer-events-none">
           <div className="flex items-center justify-end">

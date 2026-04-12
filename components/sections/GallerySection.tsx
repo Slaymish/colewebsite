@@ -20,6 +20,14 @@ export default function GallerySectionComponent({
   const gridClass =
     cols === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2";
 
+  const validImages = section.images.filter((image) => image.asset);
+  const galleryImages = validImages.map((image) => ({
+    src: urlFor(image).width(900).height(600).auto("format").url(),
+    alt: image.alt ?? "",
+    width: 900,
+    height: 600,
+  }));
+
   return (
     <section className="px-8 py-6">
       <div
@@ -28,9 +36,8 @@ export default function GallerySectionComponent({
         role="list"
         aria-label="Image gallery"
       >
-        {section.images.map((image) => {
-          if (!image.asset) return null;
-          const src = urlFor(image).width(900).height(600).auto("format").url();
+        {validImages.map((image, galleryIndex) => {
+          const src = galleryImages[galleryIndex].src;
           const thumb = urlFor(image).width(40).blur(10).url();
 
           const imageAspectRatio = image.aspectRatio || aspectRatio;
@@ -52,6 +59,8 @@ export default function GallerySectionComponent({
                   blurDataURL={thumb}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   loading="lazy"
+                  galleryImages={galleryImages}
+                  galleryIndex={galleryIndex}
                 />
               </div>
               {image.caption && (
