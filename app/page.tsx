@@ -28,7 +28,7 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
+      <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,min(22vw,280px))_minmax(0,1fr)]">
         <Header settings={settings} projects={projects} currentPage="home" />
 
         <main id="main-content" className="min-w-0 md:flex" aria-label="Home">
