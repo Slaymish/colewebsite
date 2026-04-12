@@ -102,7 +102,7 @@ export default async function ProjectPage({ params }: PageProps) {
       className="min-w-0 md:flex"
       aria-label={project.title}
     >
-      <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+      <div className="relative w-full max-w-[1040px] mx-auto px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
         <div className="flex flex-col gap-6">
           <Link
             href="/"
