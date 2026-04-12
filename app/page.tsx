@@ -67,7 +67,7 @@ export default async function HomePage({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             personJsonLd(settings),
-            websiteJsonlamLd(settings),
+            websiteJsonLd(settings),
           ]),
         }}
       />

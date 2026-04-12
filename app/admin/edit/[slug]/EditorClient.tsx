@@ -362,7 +362,6 @@ export default function EditorClient({
             </div>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { type: "heroSection", label: "Hero" },
                 { type: "textSection", label: "Text" },
                 { type: "imageSection", label: "Image" },
                 { type: "gallerySection", label: "Gallery" },

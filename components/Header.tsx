@@ -118,7 +118,7 @@ export default function Header({
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/about" legacyBehavior passHref>
+              <Link href="/?page=about" legacyBehavior passHref>
                 <NavigationMenuLink active={nav === "about"}>
                   About
                 </NavigationMenuLink>

@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSiteSettings } from "../../lib/queries";
 import { urlFor } from "../../lib/sanity";
-
-export const revalidate = false;
+import { platformLabels } from "../../lib/platformLabels";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -12,20 +11,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "About Cole Anderson — portfolio and creative work.",
   };
 }
-
-// Simple platform → label mapping for social links
-const platformLabels: Record<string, string> = {
-  instagram: "Instagram",
-  twitter: "Twitter / X",
-  x: "X",
-  linkedin: "LinkedIn",
-  vimeo: "Vimeo",
-  youtube: "YouTube",
-  github: "GitHub",
-  behance: "Behance",
-  dribbble: "Dribbble",
-  website: "Website",
-};
 
 export default async function AboutPage() {
   const settings = await getSiteSettings();

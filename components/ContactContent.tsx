@@ -1,7 +1,5 @@
-import type { SiteSettings } from "../../types";
-import Image from "next/image";
-import { urlFor } from "../../lib/sanity";
-import { platformLabels } from "../../lib/platformLabels";
+import type { SiteSettings } from "../types";
+import { platformLabels } from "../lib/platformLabels";
 
 interface ContactContentProps {
   settings: SiteSettings | null;
