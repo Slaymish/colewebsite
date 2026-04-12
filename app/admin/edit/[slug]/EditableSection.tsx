@@ -6,6 +6,7 @@ import HeroSectionComponent from '../../../../components/sections/HeroSection'
 import TextSectionComponent from '../../../../components/sections/TextSection'
 import ImageSectionComponent from '../../../../components/sections/ImageSection'
 import GallerySectionComponent from '../../../../components/sections/GallerySection'
+import SpacingSectionComponent from '../../../../components/sections/SpacingSection'
 import VideoSectionComponent from '../../../../components/sections/VideoSection'
 import SplitSectionComponent from '../../../../components/sections/SplitSection'
 
@@ -29,8 +30,14 @@ function sectionLabel(type: string): string {
     gallerySection: 'Gallery',
     videoSection: 'Video',
     splitSection: 'Split',
+    spacingSection: 'Spacing',
   }
   return labels[type] ?? type
+}
+
+function getSectionCustomTitle(section: Section): string | undefined {
+  if ('sectionTitle' in section) return (section as { sectionTitle?: string }).sectionTitle
+  return undefined
 }
 
 export default function EditableSection({
@@ -64,7 +71,7 @@ export default function EditableSection({
         onClick={(e) => e.stopPropagation()}
       >
         <span className="text-white text-xs font-medium px-1">
-          {sectionLabel(section._type)}
+          {getSectionCustomTitle(section) ?? sectionLabel(section._type)}
         </span>
         <div className="flex items-center gap-1">
           <button
@@ -118,6 +125,8 @@ function renderSection(section: Section) {
       return <VideoSectionComponent section={section} />
     case 'splitSection':
       return <SplitSectionComponent section={section} />
+    case 'spacingSection':
+      return <SpacingSectionComponent section={section} />
     default:
       return null
   }

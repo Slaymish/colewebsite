@@ -11,6 +11,7 @@ import {
 import { urlFor } from "../../../lib/sanity";
 import { projectJsonLd } from "../../../lib/structured-data";
 import BackToTopButton from "../../../components/BackToTopButton";
+import CollapsibleSidebar from "../../../components/CollapsibleSidebar";
 import Header from "../../../components/Header";
 import ProjectFooterNav from "../../../components/ProjectFooterNav";
 import ProjectShell from "../../../components/ProjectShell";
@@ -97,6 +98,72 @@ export default async function ProjectPage({ params }: PageProps) {
     (project.sections?.length ?? 0) > 0 ||
     (project.freeObjects?.length ?? 0) > 0;
 
+  const sidebarMode = project.sidebarMode ?? "auto";
+
+  const mainContent = (
+    <main
+      id="main-content"
+      className="min-w-0 md:flex"
+      aria-label={project.title}
+    >
+      <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+        <div className="flex flex-col gap-6">
+          <Link
+            href="/"
+            className="w-fit text-[0.9rem] text-black/45 transition hover:text-black/80"
+          >
+            ← Back to home
+          </Link>
+
+          {coverUrl && (
+            <figure className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]">
+              <Image
+                src={coverUrl}
+                alt={project.cover_image?.alt ?? project.title}
+                width={1400}
+                height={875}
+                className="h-auto w-full"
+                priority
+                placeholder={coverThumb ? "blur" : "empty"}
+                blurDataURL={coverThumb ?? undefined}
+                sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
+              />
+            </figure>
+          )}
+
+          <div className="flex flex-col gap-3 pb-1">
+            <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+              {project.title}
+            </h1>
+          </div>
+
+          {hasBody ? (
+            <div
+              className="relative"
+              style={
+                project.freeObjects?.length ? { minHeight: 500 } : undefined
+              }
+            >
+              {project.sections && project.sections.length > 0 && (
+                <SectionRenderer sections={project.sections} />
+              )}
+              {project.freeObjects && project.freeObjects.length > 0 && (
+                <FreeObjectRenderer freeObjects={project.freeObjects} />
+              )}
+            </div>
+          ) : null}
+
+          <ProjectFooterNav
+            projects={projects}
+            currentSlug={slug}
+            createdAt={project.created_at}
+          />
+        </div>
+        <BackToTopButton />
+      </div>
+    </main>
+  );
+
   return (
     <>
       <script
@@ -107,75 +174,21 @@ export default async function ProjectPage({ params }: PageProps) {
       />
 
       <ProjectShell>
-        <Header
-          settings={settings}
-          projects={projects}
-          activeSlug={slug}
-        />
-
-        <main
-          id="main-content"
-          className="min-w-0 md:flex"
-          aria-label={project.title}
-        >
-          <div className="relative w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
-            <div className="flex flex-col gap-6">
-              <Link
-                href="/"
-                className="w-fit text-[0.9rem] text-black/45 transition hover:text-black/80"
-              >
-                ← Back to home
-              </Link>
-
-              {coverUrl && (
-                <figure
-                  className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]"
-                >
-                  <Image
-                    src={coverUrl}
-                    alt={project.cover_image?.alt ?? project.title}
-                    width={1400}
-                    height={875}
-                    className="h-auto w-full"
-                    priority
-                    placeholder={coverThumb ? "blur" : "empty"}
-                    blurDataURL={coverThumb ?? undefined}
-                    sizes="(max-width: 899px) 100vw, min(1040px, 78vw)"
-                  />
-                </figure>
-              )}
-
-              <div className="flex flex-col gap-3 pb-1">
-                <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
-                  {project.title}
-                </h1>
-              </div>
-
-              {hasBody ? (
-                <div
-                  className="relative"
-                  style={
-                    project.freeObjects?.length ? { minHeight: 500 } : undefined
-                  }
-                >
-                  {project.sections && project.sections.length > 0 && (
-                    <SectionRenderer sections={project.sections} />
-                  )}
-                  {project.freeObjects && project.freeObjects.length > 0 && (
-                    <FreeObjectRenderer freeObjects={project.freeObjects} />
-                  )}
-                </div>
-              ) : null}
-
-              <ProjectFooterNav
-                projects={projects}
-                currentSlug={slug}
-                createdAt={project.created_at}
-              />
-            </div>
-            <BackToTopButton />
+        {sidebarMode === "hidden" ? (
+          <CollapsibleSidebar
+            settings={settings}
+            projects={projects}
+            activeSlug={slug}
+            startCollapsed={true}
+          >
+            {mainContent}
+          </CollapsibleSidebar>
+        ) : (
+          <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
+            <Header settings={settings} projects={projects} activeSlug={slug} />
+            {mainContent}
           </div>
-        </main>
+        )}
       </ProjectShell>
     </>
   );

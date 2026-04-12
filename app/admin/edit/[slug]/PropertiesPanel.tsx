@@ -8,6 +8,7 @@ import type {
   GallerySection,
   VideoSection,
   SplitSection,
+  SpacingSection,
   FreeObject,
   FreeImageObject,
   FreeVideoObject,
@@ -362,6 +363,54 @@ function TextPanel({
           ]}
         />
       </Field>
+
+      <Field label="Line Height">
+        <SelectInput
+          value={section.lineHeight ?? 'relaxed'}
+          onChange={(v) => onChange({ lineHeight: v as TextSection['lineHeight'] })}
+          options={[
+            { label: 'Tight', value: 'tight' },
+            { label: 'Normal', value: 'normal' },
+            { label: 'Relaxed', value: 'relaxed' },
+            { label: 'Loose', value: 'loose' },
+          ]}
+        />
+      </Field>
+
+      <Field label="Letter Spacing">
+        <SelectInput
+          value={section.letterSpacing ?? 'normal'}
+          onChange={(v) => onChange({ letterSpacing: v as TextSection['letterSpacing'] })}
+          options={[
+            { label: 'Tighter', value: 'tighter' },
+            { label: 'Tight', value: 'tight' },
+            { label: 'Normal', value: 'normal' },
+            { label: 'Wide', value: 'wide' },
+            { label: 'Wider', value: 'wider' },
+          ]}
+        />
+      </Field>
+    </div>
+  )
+}
+
+function SpacingPanel({
+  section,
+  onChange,
+}: {
+  section: SpacingSection
+  onChange: (patch: Partial<SpacingSection>) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <Field label={`Height: ${section.height ?? 80}px`}>
+        <NumberInput
+          value={section.height ?? 80}
+          onChange={(v) => onChange({ height: v })}
+          min={0}
+          max={500}
+        />
+      </Field>
     </div>
   )
 }
@@ -442,6 +491,15 @@ function ImagePanel({
           min={0}
           max={1}
           step={0.05}
+        />
+      </Field>
+
+      <Field label={`Rotation: ${section.rotation ?? 0}°`}>
+        <NumberInput
+          value={section.rotation ?? 0}
+          onChange={(v) => onChange({ rotation: v })}
+          min={-45}
+          max={45}
         />
       </Field>
     </div>
@@ -843,6 +901,7 @@ export default function PropertiesPanel(props: PropsPanelProps) {
     gallerySection: 'Gallery',
     videoSection: 'Video',
     splitSection: 'Split',
+    spacingSection: 'Spacing',
     freeImageObject: 'Free Image',
     freeVideoObject: 'Free Video',
     freeTextObject: 'Free Text',
@@ -867,6 +926,8 @@ export default function PropertiesPanel(props: PropsPanelProps) {
           return <VideoPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
         case 'splitSection':
           return <SplitPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case 'spacingSection':
+          return <SpacingPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
         default:
           return <p className="text-sm text-neutral-400">No properties available.</p>
       }

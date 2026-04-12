@@ -7,6 +7,7 @@ import {
   gallerySection,
   videoSection,
   splitSection,
+  spacingSection,
   freeImageObject,
   freeVideoObject,
   freeTextObject,
@@ -23,6 +24,7 @@ export const schemaTypes = [
   gallerySection,
   videoSection,
   splitSection,
+  spacingSection,
   // Free object types (absolutely positioned)
   freeImageObject,
   freeVideoObject,

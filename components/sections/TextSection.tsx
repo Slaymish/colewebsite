@@ -81,17 +81,34 @@ const fontSizeMap: Record<string, string> = {
   lg: "text-lg",
 };
 
+const lineHeightMap: Record<string, string> = {
+  tight: "leading-tight",
+  normal: "leading-normal",
+  relaxed: "leading-relaxed",
+  loose: "leading-loose",
+};
+
+const letterSpacingMap: Record<string, string> = {
+  tighter: "tracking-tighter",
+  tight: "tracking-tight",
+  normal: "tracking-normal",
+  wide: "tracking-wide",
+  wider: "tracking-wider",
+};
+
 export default function TextSectionComponent({ section }: TextSectionProps) {
   if (!section.content?.length) return null;
 
   const maxWidth = maxWidthMap[section.maxWidth ?? "md"] ?? "max-w-2xl";
   const fontSize = fontSizeMap[section.fontSize ?? "base"] ?? "text-base";
+  const lineHeight = lineHeightMap[section.lineHeight ?? "relaxed"] ?? "leading-relaxed";
+  const letterSpacing = letterSpacingMap[section.letterSpacing ?? "normal"] ?? "tracking-normal";
   const textAlign = section.textAlign ?? "left";
 
   return (
     <section className="px-8 py-10">
       <div
-        className={`prose prose-neutral mx-auto ${maxWidth} space-y-4 ${fontSize} text-neutral-800`}
+        className={`prose prose-neutral mx-auto ${maxWidth} space-y-4 ${fontSize} ${lineHeight} ${letterSpacing} text-neutral-800`}
         style={{ textAlign }}
       >
         {section.content.map((block) => renderBlock(block))}

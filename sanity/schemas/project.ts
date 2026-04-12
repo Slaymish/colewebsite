@@ -51,6 +51,20 @@ export const project = defineType({
       options: { layout: 'tags' },
     },
     {
+      name: 'sidebarMode',
+      title: 'Sidebar',
+      type: 'string',
+      initialValue: 'auto',
+      description: '"Auto" shows the sidebar normally. "Hidden" collapses it — a small toggle lets visitors reopen it.',
+      options: {
+        list: [
+          { title: 'Auto (show sidebar)', value: 'auto' },
+          { title: 'Hidden (full-width layout)', value: 'hidden' },
+        ],
+        layout: 'radio',
+      },
+    },
+    {
       name: 'meta_description',
       title: 'Meta Description',
       type: 'text',
@@ -97,6 +111,7 @@ export const project = defineType({
         defineArrayMember({ type: 'gallerySection', title: 'Gallery' }),
         defineArrayMember({ type: 'videoSection', title: 'Video' }),
         defineArrayMember({ type: 'splitSection', title: 'Split (Image + Text)' }),
+        defineArrayMember({ type: 'spacingSection', title: 'Spacing' }),
       ],
     },
     {

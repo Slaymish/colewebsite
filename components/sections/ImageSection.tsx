@@ -15,6 +15,11 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
   const borderRadius = section.borderRadius ?? 2;
   const grayscale = section.grayscale ?? false;
   const opacity = section.opacity ?? 1;
+  const rotation = section.rotation ?? 0;
+  // Scale up to ensure the image covers the rounded corners when rotated
+  const scale = rotation !== 0
+    ? 1 / Math.cos(Math.abs(rotation) * Math.PI / 180)
+    : 1;
 
   const imageUrl = urlFor(section.image).width(1400).auto("format").url();
   const thumbUrl = urlFor(section.image).width(40).blur(10).url();
@@ -39,6 +44,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
               objectFit,
               filter: grayscale ? "grayscale(1)" : undefined,
               opacity,
+              transform: rotation !== 0 ? `rotate(${rotation}deg) scale(${scale.toFixed(4)})` : undefined,
             }}
             placeholder={thumbUrl ? "blur" : "empty"}
             blurDataURL={thumbUrl}

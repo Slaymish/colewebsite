@@ -2,6 +2,7 @@ import type { Section } from "../types";
 import GallerySectionComponent from "./sections/GallerySection";
 import HeroSectionComponent from "./sections/HeroSection";
 import ImageSectionComponent from "./sections/ImageSection";
+import SpacingSectionComponent from "./sections/SpacingSection";
 import SplitSectionComponent from "./sections/SplitSection";
 import TextSectionComponent from "./sections/TextSection";
 import VideoSectionComponent from "./sections/VideoSection";
@@ -38,6 +39,10 @@ export default function SectionRenderer({ sections }: SectionRendererProps) {
           case "splitSection":
             return (
               <SplitSectionComponent key={section._key} section={section} />
+            );
+          case "spacingSection":
+            return (
+              <SpacingSectionComponent key={section._key} section={section} />
             );
           default:
             return null;

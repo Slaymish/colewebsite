@@ -11,6 +11,7 @@ const PROJECT_SUMMARY_FIELDS = `
   created_at,
   category,
   tags,
+  sidebarMode,
   cover_image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
 `;
 

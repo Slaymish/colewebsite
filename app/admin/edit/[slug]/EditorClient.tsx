@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { Project, Section, FreeObject } from "../../../../types";
+import type { Project, Section, FreeObject, SpacingSection } from "../../../../types";
 import EditToolbar from "./EditToolbar";
 import EditableSection from "./EditableSection";
 import EditableFreeObject from "./EditableFreeObject";
@@ -25,10 +25,12 @@ export default function EditorClient({
   const [project, setProject] = useState<Project>(initialProject);
   const [selected, setSelected] = useState<SelectedItem>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [canvasMinHeight, setCanvasMinHeight] = useState(500);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showAddSection, setShowAddSection] = useState(false);
 
   const sections = project.sections ?? [];
   const freeObjects = project.freeObjects ?? [];
@@ -96,6 +98,45 @@ export default function EditorClient({
     },
     [selected],
   );
+
+  // Add a new section of a given type with sensible defaults
+  const addSection = useCallback((type: string) => {
+    const key = `${type}-${Date.now()}`;
+    let newSection: Section;
+
+    switch (type) {
+      case "textSection":
+        newSection = { _type: "textSection", _key: key, content: [] };
+        break;
+      case "imageSection":
+        newSection = { _type: "imageSection", _key: key };
+        break;
+      case "gallerySection":
+        newSection = { _type: "gallerySection", _key: key, columns: 2, gap: 12, aspectRatio: "3/2", borderRadius: 2 };
+        break;
+      case "videoSection":
+        newSection = { _type: "videoSection", _key: key, aspectRatio: "16/9", borderRadius: 2 };
+        break;
+      case "heroSection":
+        newSection = { _type: "heroSection", _key: key, minHeight: "60vh", overlayOpacity: 0.3, textAlign: "left", textPosition: "bottom" };
+        break;
+      case "splitSection":
+        newSection = { _type: "splitSection", _key: key, imagePosition: "left", verticalAlign: "center", gap: 24, imageAspectRatio: "4/3", borderRadius: 2 };
+        break;
+      case "spacingSection":
+        newSection = { _type: "spacingSection", _key: key, height: 80 } as SpacingSection;
+        break;
+      default:
+        return;
+    }
+
+    setProject((prev) => ({
+      ...prev,
+      sections: [...(prev.sections ?? []), newSection],
+    }));
+    setIsDirty(true);
+    setSaveSuccess(false);
+  }, []);
 
   // Delete a free object
   const deleteFreeObject = useCallback(
@@ -208,19 +249,18 @@ export default function EditorClient({
             {sections.length === 0 && freeObjects.length === 0 ? (
               <div className="py-16 text-center text-neutral-400">
                 <p className="text-sm">No sections yet.</p>
-                <p className="text-xs mt-1">
-                  Add sections in{" "}
-                  <Link href="/admin/cms" className="underline">
-                    Sanity Studio
-                  </Link>
-                  .
-                </p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowAddSection(true); }}
+                  className="mt-3 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-xs text-neutral-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                >
+                  + Add Section
+                </button>
               </div>
             ) : (
               <div
                 ref={canvasRef}
                 className="relative"
-                style={{ minHeight: freeObjects.length > 0 ? 500 : undefined }}
+                style={{ minHeight: freeObjects.length > 0 ? canvasMinHeight : undefined }}
               >
                 {sections.map((section, index) => (
                   <EditableSection
@@ -257,12 +297,24 @@ export default function EditorClient({
                     }}
                     onDelete={() => deleteFreeObject(obj._key)}
                     onChange={(patch) => updateFreeObject(obj._key, patch)}
+                    onExpandCanvas={(h) => setCanvasMinHeight((prev) => Math.max(prev, h))}
                   />
                 ))}
               </div>
             )}
 
-            <div className="h-16" />
+            {/* Add Section button */}
+            <div
+              className="flex justify-center py-4 border-t border-neutral-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowAddSection(true)}
+                className="rounded-full border border-neutral-300 bg-white px-5 py-1.5 text-xs text-neutral-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+              >
+                + Add Section
+              </button>
+            </div>
           </div>
         </div>
 
@@ -287,6 +339,56 @@ export default function EditorClient({
           />
         )}
       </div>
+
+      {/* Add Section modal */}
+      {showAddSection && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => setShowAddSection(false)}
+        >
+          <div
+            className="w-80 rounded-xl bg-white shadow-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-neutral-900">Add Section</h3>
+              <button
+                onClick={() => setShowAddSection(false)}
+                className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { type: "heroSection", label: "Hero" },
+                { type: "textSection", label: "Text" },
+                { type: "imageSection", label: "Image" },
+                { type: "gallerySection", label: "Gallery" },
+                { type: "videoSection", label: "Video" },
+                { type: "splitSection", label: "Split" },
+                { type: "spacingSection", label: "Spacing" },
+              ].map(({ type, label }) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    addSection(type);
+                    setShowAddSection(false);
+                  }}
+                  className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-3 text-sm text-neutral-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">
+              Image/gallery/video/hero content must be set in{" "}
+              <a href="/admin/cms" target="_blank" className="underline">Sanity Studio</a>.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

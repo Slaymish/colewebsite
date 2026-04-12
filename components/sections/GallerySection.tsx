@@ -33,18 +33,20 @@ export default function GallerySectionComponent({
           const src = urlFor(image).width(900).height(600).auto("format").url();
           const thumb = urlFor(image).width(40).blur(10).url();
 
-          return (
+          const imageAspectRatio = image.aspectRatio || aspectRatio;
+
+        return (
             <figure key={image._key} role="listitem">
               <div
                 className="overflow-hidden bg-neutral-100"
-                style={{ aspectRatio, borderRadius }}
+                style={{ aspectRatio: imageAspectRatio, borderRadius }}
               >
                 <ExpandableImage
                   src={src}
                   alt={image.alt ?? ""}
                   width={900}
                   height={600}
-                  className="h-full w-full transition-transform duration-300 hover:scale-[1.02]"
+                  className="h-full w-full"
                   style={{ objectFit }}
                   placeholder={thumb ? "blur" : "empty"}
                   blurDataURL={thumb}

@@ -31,6 +31,7 @@ export interface BlockContent {
 export interface HeroSection {
   _type: "heroSection";
   _key: string;
+  sectionTitle?: string;
   heading?: string;
   subheading?: string;
   backgroundImage?: SanityImage;
@@ -43,15 +44,19 @@ export interface HeroSection {
 export interface TextSection {
   _type: "textSection";
   _key: string;
+  sectionTitle?: string;
   content?: BlockContent[];
   maxWidth?: "sm" | "md" | "lg" | "xl" | "full";
   textAlign?: "left" | "center" | "right";
   fontSize?: "sm" | "base" | "lg";
+  lineHeight?: "tight" | "normal" | "relaxed" | "loose";
+  letterSpacing?: "tighter" | "tight" | "normal" | "wide" | "wider";
 }
 
 export interface ImageSection {
   _type: "imageSection";
   _key: string;
+  sectionTitle?: string;
   image?: SanityImage;
   caption?: string;
   fullWidth?: boolean;
@@ -60,12 +65,20 @@ export interface ImageSection {
   borderRadius?: number;
   grayscale?: boolean;
   opacity?: number;
+  rotation?: number;
+}
+
+export interface SpacingSection {
+  _type: "spacingSection";
+  _key: string;
+  height?: number;
 }
 
 export interface GallerySection {
   _type: "gallerySection";
   _key: string;
-  images?: (SanityImage & { _key: string })[];
+  sectionTitle?: string;
+  images?: (SanityImage & { _key: string; aspectRatio?: string })[];
   columns?: 2 | 3;
   gap?: number;
   aspectRatio?: string;
@@ -76,6 +89,7 @@ export interface GallerySection {
 export interface VideoSection {
   _type: "videoSection";
   _key: string;
+  sectionTitle?: string;
   videoFile?: { asset: { url: string } };
   vimeoUrl?: string;
   caption?: string;
@@ -89,6 +103,7 @@ export interface VideoSection {
 export interface SplitSection {
   _type: "splitSection";
   _key: string;
+  sectionTitle?: string;
   image?: SanityImage;
   imagePosition?: "left" | "right";
   content?: BlockContent[];
@@ -106,7 +121,8 @@ export type Section =
   | ImageSection
   | GallerySection
   | VideoSection
-  | SplitSection;
+  | SplitSection
+  | SpacingSection;
 
 // Free object types (absolutely positioned)
 
@@ -160,6 +176,7 @@ export interface Project {
   created_at?: string;
   category?: string;
   tags?: string[];
+  sidebarMode?: "auto" | "hidden";
   meta_description?: string;
   cover_image?: SanityImage;
   og_image?: SanityImage;
@@ -175,6 +192,7 @@ export interface ProjectSummary {
   created_at?: string;
   category?: string;
   tags?: string[];
+  sidebarMode?: "auto" | "hidden";
   cover_image?: SanityImage;
 }
 

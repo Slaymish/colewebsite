@@ -204,6 +204,7 @@ interface EditableFreeObjectProps {
   onSelect: (e: React.MouseEvent) => void;
   onDelete: () => void;
   onChange: (patch: Partial<FreeObject>) => void;
+  onExpandCanvas?: (newMinHeight: number) => void;
 }
 
 export default function EditableFreeObject({
@@ -213,6 +214,7 @@ export default function EditableFreeObject({
   onSelect,
   onDelete,
   onChange,
+  onExpandCanvas,
 }: EditableFreeObjectProps) {
   const xPercent = obj.xPercent ?? 10;
   const yPercent = obj.yPercent ?? 10;
@@ -253,10 +255,22 @@ export default function EditableFreeObject({
           ((me.clientY - dragState.current.startY) / rect.height) * 100;
 
         if (dragState.current.type === "move") {
+          const newYPct = dragState.current.startYPct + dy;
           onChange({
             xPercent: Math.round(dragState.current.startXPct + dx),
-            yPercent: Math.round(dragState.current.startYPct + dy),
+            yPercent: Math.round(newYPct),
           });
+
+          // Auto-expand canvas if dragging near the bottom edge
+          if (onExpandCanvas) {
+            const canvasCurrentHeight = canvasRef.current.offsetHeight;
+            const objectTopPx = (newYPct / 100) * canvasCurrentHeight;
+            const EXPAND_THRESHOLD = 100; // px from bottom to trigger expand
+            const EXPAND_AMOUNT = 200; // px to add each time
+            if (objectTopPx > canvasCurrentHeight - EXPAND_THRESHOLD) {
+              onExpandCanvas(canvasCurrentHeight + EXPAND_AMOUNT);
+            }
+          }
         } else {
           const sign = dragState.current.type.endsWith("r") ? 1 : -1;
           const newW = Math.max(10, dragState.current.startWPct + dx * sign);
@@ -273,7 +287,7 @@ export default function EditableFreeObject({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [xPercent, yPercent, widthPercent, onChange, canvasRef],
+    [xPercent, yPercent, widthPercent, onChange, canvasRef, onExpandCanvas],
   );
 
   const handleStyle: React.CSSProperties = {

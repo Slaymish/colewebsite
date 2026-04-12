@@ -49,6 +49,12 @@ export const heroSection = defineType({
   type: 'object',
   fields: [
     {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
+    {
       name: 'heading',
       title: 'Heading',
       type: 'string',
@@ -124,8 +130,8 @@ export const heroSection = defineType({
     },
   ],
   preview: {
-    select: { title: 'heading' },
-    prepare: ({ title }) => ({ title: title || 'Hero Section', subtitle: 'Hero' }),
+    select: { label: 'sectionTitle', title: 'heading' },
+    prepare: ({ label, title }) => ({ title: label || title || 'Hero Section', subtitle: 'Hero' }),
   },
 })
 
@@ -134,6 +140,12 @@ export const textSection = defineType({
   title: 'Text Section',
   type: 'object',
   fields: [
+    {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
     {
       name: 'content',
       title: 'Content',
@@ -214,9 +226,41 @@ export const textSection = defineType({
         layout: 'radio',
       },
     },
+    {
+      name: 'lineHeight',
+      title: 'Line Height',
+      type: 'string',
+      initialValue: 'relaxed',
+      options: {
+        list: [
+          { title: 'Tight', value: 'tight' },
+          { title: 'Normal', value: 'normal' },
+          { title: 'Relaxed', value: 'relaxed' },
+          { title: 'Loose', value: 'loose' },
+        ],
+        layout: 'radio',
+      },
+    },
+    {
+      name: 'letterSpacing',
+      title: 'Letter Spacing',
+      type: 'string',
+      initialValue: 'normal',
+      options: {
+        list: [
+          { title: 'Tighter', value: 'tighter' },
+          { title: 'Tight', value: 'tight' },
+          { title: 'Normal', value: 'normal' },
+          { title: 'Wide', value: 'wide' },
+          { title: 'Wider', value: 'wider' },
+        ],
+        layout: 'radio',
+      },
+    },
   ],
   preview: {
-    prepare: () => ({ title: 'Text Section', subtitle: 'Text' }),
+    select: { label: 'sectionTitle' },
+    prepare: ({ label }) => ({ title: label || 'Text Section', subtitle: 'Text' }),
   },
 })
 
@@ -225,6 +269,12 @@ export const imageSection = defineType({
   title: 'Image Section',
   type: 'object',
   fields: [
+    {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
     {
       name: 'image',
       title: 'Image',
@@ -302,10 +352,18 @@ export const imageSection = defineType({
       initialValue: 1,
       validation: (r) => r.min(0).max(1),
     },
+    {
+      name: 'rotation',
+      title: 'Rotation (°)',
+      type: 'number',
+      initialValue: 0,
+      description: 'Rotate the image. It will scale automatically to cover the frame.',
+      validation: (r) => r.min(-45).max(45),
+    },
   ],
   preview: {
-    select: { title: 'caption', media: 'image' },
-    prepare: ({ title, media }) => ({ title: title || 'Image Section', subtitle: 'Image', media }),
+    select: { title: 'sectionTitle', caption: 'caption', media: 'image' },
+    prepare: ({ title, caption, media }) => ({ title: title || caption || 'Image Section', subtitle: 'Image', media }),
   },
 })
 
@@ -314,6 +372,12 @@ export const gallerySection = defineType({
   title: 'Gallery Section',
   type: 'object',
   fields: [
+    {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
     {
       name: 'images',
       title: 'Images',
@@ -333,6 +397,23 @@ export const gallerySection = defineType({
               name: 'caption',
               title: 'Caption',
               type: 'string',
+            },
+            {
+              name: 'aspectRatio',
+              title: 'Aspect Ratio Override',
+              type: 'string',
+              description: 'Override the gallery aspect ratio for this image only.',
+              options: {
+                list: [
+                  { title: 'Gallery default', value: '' },
+                  { title: '3:2', value: '3/2' },
+                  { title: '4:3', value: '4/3' },
+                  { title: '1:1 (Square)', value: '1/1' },
+                  { title: '16:9', value: '16/9' },
+                  { title: '3:4 (Portrait)', value: '3/4' },
+                  { title: '9:16 (Tall)', value: '9/16' },
+                ],
+              },
             },
           ],
         }),
@@ -395,9 +476,9 @@ export const gallerySection = defineType({
     },
   ],
   preview: {
-    select: { count: 'images' },
-    prepare: ({ count }) => ({
-      title: 'Gallery Section',
+    select: { label: 'sectionTitle', count: 'images' },
+    prepare: ({ label, count }) => ({
+      title: label || 'Gallery Section',
       subtitle: `${Array.isArray(count) ? count.length : 0} images`,
     }),
   },
@@ -408,6 +489,12 @@ export const videoSection = defineType({
   title: 'Video Section',
   type: 'object',
   fields: [
+    {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
     {
       name: 'videoFile',
       title: 'Video File',
@@ -475,9 +562,9 @@ export const videoSection = defineType({
     },
   ],
   preview: {
-    select: { title: 'caption', url: 'vimeoUrl', file: 'videoFile' },
-    prepare: ({ title, url, file }) => ({
-      title: title || 'Video Section',
+    select: { label: 'sectionTitle', title: 'caption', url: 'vimeoUrl', file: 'videoFile' },
+    prepare: ({ label, title, url, file }) => ({
+      title: label || title || 'Video Section',
       subtitle: file?.asset ? 'Uploaded file' : url || 'No video set',
     }),
   },
@@ -488,6 +575,12 @@ export const splitSection = defineType({
   title: 'Split Layout (Image + Text)',
   type: 'object',
   fields: [
+    {
+      name: 'sectionTitle',
+      title: 'Section Label (internal)',
+      type: 'string',
+      description: 'Optional label for reference in the editor. Not shown on the public page.',
+    },
     {
       name: 'image',
       title: 'Image',
@@ -600,12 +693,32 @@ export const splitSection = defineType({
     },
   ],
   preview: {
-    select: { media: 'image', pos: 'imagePosition' },
-    prepare: ({ media, pos }) => ({
-      title: 'Split Section',
+    select: { label: 'sectionTitle', media: 'image', pos: 'imagePosition' },
+    prepare: ({ label, media, pos }) => ({
+      title: label || 'Split Section',
       subtitle: `Image ${pos || 'left'}`,
       media,
     }),
+  },
+})
+
+export const spacingSection = defineType({
+  name: 'spacingSection',
+  title: 'Spacing',
+  type: 'object',
+  fields: [
+    {
+      name: 'height',
+      title: 'Height (px)',
+      type: 'number',
+      initialValue: 80,
+      description: 'Vertical whitespace to insert between sections.',
+      validation: (r) => r.min(0).max(500),
+    },
+  ],
+  preview: {
+    select: { h: 'height' },
+    prepare: ({ h }) => ({ title: 'Spacing', subtitle: `${h ?? 80}px gap` }),
   },
 })
 
