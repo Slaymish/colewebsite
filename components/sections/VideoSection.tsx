@@ -48,7 +48,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
         : null;
 
     return (
-      <section className="px-8 py-6">
+      <section className="px-5 py-4 md:px-8 md:py-6">
         <figure>
           <div
             className="overflow-hidden bg-black"
@@ -102,7 +102,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
       : null;
 
   return (
-    <section className="px-8 py-6">
+    <section className="px-5 py-4 md:px-8 md:py-6">
       <figure>
         <div
           className="relative overflow-hidden bg-black"

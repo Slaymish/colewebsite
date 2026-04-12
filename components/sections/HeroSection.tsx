@@ -34,7 +34,7 @@ export default function HeroSectionComponent({ section }: HeroSectionProps) {
 
   return (
     <section
-      className={`relative flex p-8 ${
+      className={`relative flex p-5 md:p-8 ${
         bgUrl ? "text-white" : "bg-black/[0.03] text-black"
       }`}
       style={{
@@ -65,7 +65,7 @@ export default function HeroSectionComponent({ section }: HeroSectionProps) {
         style={{ textAlign }}
       >
         {section.heading && (
-          <h2 className="text-4xl font-bold tracking-[-0.04em] md:text-5xl">
+          <h2 className="text-2xl font-bold tracking-[-0.04em] sm:text-4xl md:text-5xl">
             {section.heading}
           </h2>
         )}

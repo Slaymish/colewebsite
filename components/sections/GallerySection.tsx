@@ -18,7 +18,7 @@ export default function GallerySectionComponent({
   const objectFit = (section.objectFit as "cover" | "contain") ?? "cover";
 
   const gridClass =
-    cols === 3 ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2";
+    cols === 3 ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" : "grid-cols-1 sm:grid-cols-2";
 
   const validImages = section.images.filter((image) => image.asset);
   const galleryImages = validImages.map((image) => ({
@@ -29,7 +29,7 @@ export default function GallerySectionComponent({
   }));
 
   return (
-    <section className="px-8 py-6">
+    <section className="px-5 py-4 md:px-8 md:py-6">
       <div
         className={`grid ${gridClass}`}
         style={{ gap }}

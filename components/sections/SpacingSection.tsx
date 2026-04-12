@@ -5,5 +5,11 @@ interface SpacingSectionProps {
 }
 
 export default function SpacingSectionComponent({ section }: SpacingSectionProps) {
-  return <div style={{ height: section.height ?? 80 }} aria-hidden="true" />;
+  const height = section.height ?? 80;
+  return (
+    <>
+      <div className="md:hidden" style={{ height: Math.round(height * 0.5) }} aria-hidden="true" />
+      <div className="hidden md:block" style={{ height }} aria-hidden="true" />
+    </>
+  );
 }

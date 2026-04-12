@@ -44,7 +44,7 @@ export default function TextSectionComponent({ section }: TextSectionProps) {
   const textAlign = section.textAlign ?? "left";
 
   return (
-    <section className="px-8 py-10">
+    <section className="px-5 py-6 md:px-8 md:py-10">
       <div
         className={`prose mx-auto ${maxWidth} space-y-4 ${fontSize} ${lineHeight} ${letterSpacing} text-black/80`}
         style={{ textAlign }}

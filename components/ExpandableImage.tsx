@@ -224,7 +224,7 @@ export default function ExpandableImage({
                 e.stopPropagation();
                 handleClose();
               }}
-              className="absolute -right-1 -top-10 border border-white bg-white text-black px-3 py-1 text-sm hover:bg-black hover:text-white md:-right-2 md:-top-12"
+              className="absolute right-3 top-3 z-10 border border-white bg-white text-black px-3 py-2 text-sm hover:bg-black hover:text-white md:right-4 md:top-4"
             >
               Close
             </button>
@@ -238,7 +238,7 @@ export default function ExpandableImage({
                     e.stopPropagation();
                     handlePrev();
                   }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/10 p-3 text-white hover:bg-white/20 md:left-4"
                   aria-label="Previous image"
                 >
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -251,7 +251,7 @@ export default function ExpandableImage({
                     e.stopPropagation();
                     handleNext();
                   }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/10 p-3 text-white hover:bg-white/20 md:right-4"
                   aria-label="Next image"
                 >
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
