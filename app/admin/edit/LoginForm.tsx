@@ -25,7 +25,8 @@ export default function LoginForm() {
       });
 
       if (res.ok) {
-        const redirect = searchParams.get("redirect") || "/admin/edit";
+        const raw = searchParams.get("redirect") || "/admin/edit";
+        const redirect = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/admin/edit";
         router.push(redirect);
         router.refresh();
       } else {

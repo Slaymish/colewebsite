@@ -9,10 +9,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const ALLOWED_TYPES = new Set([
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif', 'image/svg+xml',
+      'video/mp4', 'video/webm', 'video/quicktime',
+    ])
+
     const formData = await request.formData()
     const file = formData.get('file') as File | null
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
+
+    if (!ALLOWED_TYPES.has(file.type)) {
+      return NextResponse.json({ error: 'File type not allowed' }, { status: 400 })
     }
 
     const client = getWriteClient()

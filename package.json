@@ -9,13 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@portabletext/sanity-bridge": "1.2.14",
     "@radix-ui/react-navigation-menu": "^1.2.13",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@portabletext/sanity-bridge": "1.2.14",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^4.22.0",
+    "motion": "^12.38.0",
     "next": "16.1.6",
     "next-sanity": "^11.6.12",
     "react": "19.2.3",

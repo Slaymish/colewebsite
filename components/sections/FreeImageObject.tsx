@@ -48,7 +48,7 @@ export default function FreeImageObjectComponent({
         }}
         placeholder={thumbUrl ? "blur" : "empty"}
         blurDataURL={thumbUrl}
-        sizes="100vw"
+        sizes={`${width}vw`}
         loading="lazy"
       />
     </div>

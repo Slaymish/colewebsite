@@ -28,7 +28,7 @@ export default function ProjectCard({
       )}
       aria-current={isActive ? "page" : undefined}
     >
-      <h2 className="text-sm font-normal leading-snug">{project.title}</h2>
+      <span className="text-sm font-normal leading-snug">{project.title}</span>
     </Link>
   );
 }

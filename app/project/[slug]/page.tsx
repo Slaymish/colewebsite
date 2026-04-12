@@ -11,8 +11,6 @@ import {
 import { urlFor } from "../../../lib/sanity";
 import { projectJsonLd } from "../../../lib/structured-data";
 import BackToTopButton from "../../../components/BackToTopButton";
-import CollapsibleSidebar from "../../../components/CollapsibleSidebar";
-import Header from "../../../components/Header";
 import ProjectFooterNav from "../../../components/ProjectFooterNav";
 import ProjectShell from "../../../components/ProjectShell";
 import SectionRenderer from "../../../components/SectionRenderer";
@@ -98,8 +96,6 @@ export default async function ProjectPage({ params }: PageProps) {
     (project.sections?.length ?? 0) > 0 ||
     (project.freeObjects?.length ?? 0) > 0;
 
-  const sidebarMode = project.sidebarMode ?? "auto";
-
   const mainContent = (
     <main
       id="main-content"
@@ -166,25 +162,17 @@ export default async function ProjectPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(projectJsonLd(project, settings)),
+          __html: JSON.stringify(projectJsonLd(project, settings)).replace(/</g, '\\u003c'),
         }}
       />
 
-      {sidebarMode === "hidden" ? (
-        <CollapsibleSidebar
-          settings={settings}
-          projects={projects}
-          activeSlug={slug}
-          startCollapsed={true}
-        >
-          {mainContent}
-        </CollapsibleSidebar>
-      ) : (
-        <ProjectShell>
-          <Header settings={settings} projects={projects} activeSlug={slug} />
-          {mainContent}
-        </ProjectShell>
-      )}
+      <ProjectShell
+        settings={settings}
+        projects={projects}
+        activeSlug={slug}
+      >
+        {mainContent}
+      </ProjectShell>
     </>
   );
 }
