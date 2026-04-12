@@ -55,7 +55,7 @@ export default function FreeVideoObjectComponent({
     return (
       <div style={containerStyle}>
         <div
-          className="overflow-hidden bg-neutral-900"
+          className="overflow-hidden bg-black"
           style={{ aspectRatio: aspectStyle, borderRadius }}
         >
           <video

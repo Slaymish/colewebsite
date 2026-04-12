@@ -15,6 +15,7 @@ export default async function HomePage() {
   const name = settings?.name ?? "Cole Anderson";
   const bio = settings?.bio ?? "Designer and creative.";
 
+
   return (
     <>
       <script
@@ -36,17 +37,17 @@ export default async function HomePage() {
               <section aria-labelledby="hero-heading" className="pb-3">
                 <h1
                   id="hero-heading"
-                  className="text-base font-medium leading-[1.45]"
+                  className="text-sm font-bold uppercase tracking-[0.15em]"
                 >
                   Selected Work
                 </h1>
-                <p className="mt-2 max-w-[34rem] text-[0.96rem] leading-[1.55] text-black/65">
+                <p className="mt-2 max-w-[34rem] text-[0.96rem] leading-[1.55] text-black/50">
                   {bio}
                 </p>
               </section>
 
               <section
-                className="flex flex-col gap-10"
+                className="flex flex-col gap-12"
                 aria-label={`${name} projects`}
               >
                 {projects.map((project, index) => {
@@ -66,10 +67,10 @@ export default async function HomePage() {
                     <Link
                       key={project._id}
                       href={`/project/${project.slug.current}`}
-                      className="flex flex-col gap-3.5"
+                      className="flex flex-col gap-2"
                     >
                       {cover && (
-                        <div className="w-full overflow-hidden rounded-2xl bg-black/5">
+                        <div className="w-full overflow-hidden bg-black/[0.03]">
                           <Image
                             src={cover}
                             alt={project.cover_image?.alt ?? project.title}
@@ -85,11 +86,11 @@ export default async function HomePage() {
                         </div>
                       )}
                       <div className="flex items-baseline justify-between gap-4">
-                        <h2 className="text-base font-medium leading-[1.35]">
+                        <h2 className="text-sm font-normal uppercase tracking-[0.05em]">
                           {project.title}
                         </h2>
                         {project.created_at && (
-                          <span className="whitespace-nowrap text-[0.85rem] text-black/60">
+                          <span className="whitespace-nowrap text-xs text-black/40">
                             {new Date(project.created_at).getFullYear()}
                           </span>
                         )}

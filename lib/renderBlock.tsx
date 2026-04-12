@@ -76,7 +76,7 @@ export function renderBlock(
       return (
         <blockquote
           key={block._key}
-          className="border-l-2 border-neutral-300 pl-4 italic text-neutral-600"
+          className="border-l-2 border-black pl-4 italic text-black/50"
         >
           {text}
         </blockquote>

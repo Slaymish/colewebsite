@@ -22,9 +22,9 @@ export default function ProjectCard({
     <Link
       href={`/project/${slug}`}
       className={cn(
-        "group block border-l-2 border-transparent py-1 pl-2 text-sm font-normal leading-snug text-neutral-700 transition-colors hover:text-neutral-950",
+        "group block border-l-2 border-transparent py-1 pl-2 text-sm font-normal leading-snug text-black/60 transition-colors duration-100 hover:text-black",
         isActive &&
-          "border-neutral-900 bg-black/[0.03] font-medium text-neutral-950",
+          "border-black font-medium text-black",
       )}
       aria-current={isActive ? "page" : undefined}
     >

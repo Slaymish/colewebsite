@@ -106,13 +106,13 @@ export default async function ProjectPage({ params }: PageProps) {
         <div className="flex flex-col gap-6">
           <Link
             href="/"
-            className="w-fit text-[0.9rem] text-black/45 transition hover:text-black/80"
+            className="w-fit text-xs uppercase tracking-[0.1em] text-black/40 duration-100 hover:text-black"
           >
             ← Back to home
           </Link>
 
           {coverUrl && (
-            <figure className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/5 md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]">
+            <figure className="-mx-5 w-[calc(100%+2.5rem)] max-w-none overflow-hidden bg-black/[0.03] md:-mx-10 md:w-[calc(100%+5rem)] xl:-mx-12 xl:w-[calc(100%+6rem)]">
               <Image
                 src={coverUrl}
                 alt={project.cover_image?.alt ?? project.title}
@@ -128,7 +128,7 @@ export default async function ProjectPage({ params }: PageProps) {
           )}
 
           <div className="flex flex-col gap-3 pb-1">
-            <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+            <h1 className="text-[clamp(1.1rem,2vw,1.4rem)] font-bold uppercase tracking-[0.02em] leading-[1.15]">
               {project.title}
             </h1>
           </div>

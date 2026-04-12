@@ -18,7 +18,7 @@ export default function ProjectFooterNav({
     ix >= 0 && ix < projects.length - 1 ? projects[ix + 1] : null;
 
   return (
-    <footer className="mt-14 flex flex-col gap-5 border-t border-black/10 pt-8">
+    <footer className="mt-14 flex flex-col gap-5 border-t border-black pt-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-6">
         {createdAt && (
           <div className="text-[0.82rem] text-black/50">
@@ -37,22 +37,22 @@ export default function ProjectFooterNav({
           {prev ? (
             <Link
               href={`/project/${prev.slug.current}`}
-              className="text-black/70 transition hover:text-black"
+              className="text-black/50 transition hover:text-black"
             >
               ← {prev.title}
             </Link>
           ) : (
-            <span className="text-black/30">← Previous</span>
+            <span className="text-black/20">← Previous</span>
           )}
           {next ? (
             <Link
               href={`/project/${next.slug.current}`}
-              className="text-black/70 transition hover:text-black"
+              className="text-black/50 transition hover:text-black"
             >
               {next.title} →
             </Link>
           ) : (
-            <span className="text-black/30">Next →</span>
+            <span className="text-black/20">Next →</span>
           )}
         </nav>
       </div>

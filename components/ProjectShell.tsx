@@ -67,7 +67,7 @@ export default function ProjectShell({
     <div className="min-h-screen md:flex">
       {/* Sidebar column — animated width */}
       <motion.div
-        className="hidden md:flex md:sticky md:top-0 md:h-screen md:shrink-0 md:border-r md:border-black/10 md:overflow-hidden"
+        className="hidden md:flex md:sticky md:top-0 md:h-screen md:shrink-0 md:border-r md:border-black md:overflow-hidden"
         animate={{ width: isCollapsed ? 56 : "min(22vw, 280px)" }}
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
       >
@@ -90,7 +90,7 @@ export default function ProjectShell({
                 className="flex flex-col items-center gap-1 group"
               >
                 {logoUrl ? (
-                  <span className="relative h-9 w-9 overflow-hidden rounded-full border border-black/10 bg-white group-hover:border-black/25 transition-colors">
+                  <span className="relative h-9 w-9 overflow-hidden border border-black bg-white group-hover:border-black transition-colors">
                     <Image
                       src={logoUrl}
                       alt={name}
@@ -100,7 +100,7 @@ export default function ProjectShell({
                     />
                   </span>
                 ) : (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-[0.65rem] font-semibold text-neutral-700 group-hover:border-black/30 transition-colors">
+                  <span className="flex h-9 w-9 items-center justify-center border border-black bg-white text-[0.65rem] font-bold text-black group-hover:bg-black group-hover:text-white transition-colors">
                     {initials || "—"}
                   </span>
                 )}
@@ -129,7 +129,7 @@ export default function ProjectShell({
                   setCollapsed(true);
                 }}
                 aria-label="Collapse sidebar"
-                className="absolute top-3 right-3 flex items-center gap-1 rounded px-1.5 py-1 text-[0.72rem] text-black/35 hover:text-black/70 hover:bg-black/5 transition-colors"
+                className="absolute top-3 right-3 flex items-center gap-1 px-1.5 py-1 text-[0.72rem] text-black/35 hover:text-black hover:bg-black/5 transition-colors"
                 title="Hide sidebar"
               >
                 ←

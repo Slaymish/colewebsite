@@ -48,10 +48,10 @@ export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Minimal top nav */}
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-10 md:px-14 border-b border-black/8">
+      <nav className="flex items-center justify-between px-6 py-5 sm:px-10 md:px-14 border-b border-black">
         <Link
           href="/"
-          className="text-[0.85rem] text-black/50 transition hover:text-black/80"
+          className="text-[0.85rem] text-black/50 hover:text-black"
         >
           ← {name}
         </Link>
@@ -60,7 +60,7 @@ export default async function AboutPage() {
             href={cvUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[0.85rem] text-black/50 transition hover:text-black/80"
+            className="text-[0.85rem] text-black/50 hover:text-black"
           >
             CV / Info
           </a>
@@ -76,7 +76,7 @@ export default async function AboutPage() {
         {/* Portrait + name */}
         <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
           {portraitUrl ? (
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-black/10 bg-black/5">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden border border-black">
               <Image
                 src={portraitUrl}
                 alt={settings?.logo?.alt ?? name}
@@ -90,19 +90,19 @@ export default async function AboutPage() {
             </div>
           ) : (
             <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-2xl font-semibold tracking-tight text-neutral-800"
+              className="flex h-24 w-24 shrink-0 items-center justify-center border border-black bg-white text-2xl font-semibold tracking-tight text-black"
               aria-hidden
             >
               {initials || "—"}
             </div>
           )}
-          <h1 className="text-3xl font-semibold tracking-[-0.03em] text-neutral-900 sm:text-4xl">
+          <h1 className="text-3xl font-bold tracking-[-0.03em] text-black sm:text-4xl">
             {name}
           </h1>
         </div>
 
         {/* Bio */}
-        <div className="mt-8 space-y-4 text-[1rem] leading-[1.7] text-black/70">
+        <div className="mt-8 space-y-4 text-[1rem] leading-[1.7] text-black/50">
           <p>{bio}</p>
         </div>
 
@@ -111,7 +111,7 @@ export default async function AboutPage() {
           <div className="mt-6">
             <a
               href={`mailto:${settings.contact_email}`}
-              className="text-[0.95rem] text-black/80 underline decoration-black/25 underline-offset-2 transition hover:decoration-black/60"
+              className="text-[0.95rem] text-black/60 underline decoration-black/30 underline-offset-2 duration-100 hover:text-black"
             >
               {settings.contact_email}
             </a>
@@ -127,7 +127,7 @@ export default async function AboutPage() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-black/15 px-4 py-1.5 text-[0.82rem] text-black/60 transition hover:border-black/30 hover:text-black/90"
+                className="border border-black px-4 py-1.5 text-[0.82rem] text-black/50 duration-100 hover:text-black hover:border-black"
               >
                 {link.label ||
                   platformLabels[link.platform?.toLowerCase()] ||

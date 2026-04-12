@@ -224,7 +224,7 @@ export default function ExpandableImage({
                 e.stopPropagation();
                 handleClose();
               }}
-              className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+              className="absolute -right-1 -top-10 border border-white bg-white text-black px-3 py-1 text-sm hover:bg-black hover:text-white md:-right-2 md:-top-12"
             >
               Close
             </button>

@@ -39,7 +39,7 @@ export default function ProjectSidebar({
 
   return (
     <aside
-      className={cn("w-full max-w-sm", muted && "md:opacity-[0.88]")}
+      className={cn("w-full max-w-sm", muted && "md:opacity-75")}
       aria-label="Project list"
     >
       <div
@@ -65,7 +65,7 @@ export default function ProjectSidebar({
             )}
             {groups.map((group) => (
               <div key={group.category} className="space-y-1">
-                <h3 className="mb-1 w-full bg-black px-2 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white">
+                <h3 className="mb-1 w-full bg-black px-2 py-1.5 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-white">
                   {group.category}
                 </h3>
                 {group.projects.map((project) => (

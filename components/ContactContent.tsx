@@ -10,7 +10,7 @@ export default function ContactContent({ settings }: ContactContentProps) {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-semibold tracking-[-0.03em] text-neutral-900 sm:text-4xl">
+      <h1 className="text-3xl font-bold tracking-[-0.03em] text-black sm:text-4xl">
         Contact
       </h1>
 
@@ -52,7 +52,7 @@ export default function ContactContent({ settings }: ContactContentProps) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-black/15 px-4 py-1.5 text-[0.82rem] text-black/60 transition hover:border-black/30 hover:text-black/90"
+                className="border border-black px-4 py-1.5 text-[0.82rem] text-black/50 transition hover:border-black hover:text-black"
               >
                 {link.label ||
                   platformLabels[link.platform?.toLowerCase()] ||

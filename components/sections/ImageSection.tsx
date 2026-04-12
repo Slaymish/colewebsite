@@ -28,7 +28,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
     <section className="py-3">
       <figure>
         <div
-          className="overflow-hidden rounded-2xl bg-neutral-100"
+          className="overflow-hidden bg-black/[0.03]"
           style={{
             aspectRatio,
             borderRadius,
@@ -55,7 +55,7 @@ export default function ImageSectionComponent({ section }: ImageSectionProps) {
           />
         </div>
         {section.caption && (
-          <figcaption className="mt-2 text-xs text-neutral-400">
+          <figcaption className="mt-2 text-xs text-black/40">
             {section.caption}
           </figcaption>
         )}

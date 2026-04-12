@@ -27,7 +27,7 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   const imageEl = (
     <div className="space-y-2">
       <div
-        className="overflow-hidden rounded-2xl bg-neutral-100"
+        className="overflow-hidden bg-black/[0.03]"
         style={{ aspectRatio: imageAspectRatio, borderRadius }}
       >
         <Image
@@ -44,7 +44,7 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
         />
       </div>
       {section.caption && (
-        <p className="mt-1 text-xs text-neutral-400">{section.caption}</p>
+        <p className="mt-1 text-xs text-black/40">{section.caption}</p>
       )}
     </div>
   );

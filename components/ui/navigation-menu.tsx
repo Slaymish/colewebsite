@@ -24,7 +24,7 @@ export function NavigationMenuLink({ className, ...props }: React.ComponentProps
   return (
     <NavigationMenuPrimitive.Link
       className={cn(
-        "inline-flex w-fit rounded-md px-0 py-1 text-[0.98rem] leading-6 text-neutral-700 transition-colors hover:text-neutral-950 data-[active]:font-medium data-[active]:text-neutral-950",
+        "inline-flex w-fit px-0 py-1 text-[0.98rem] leading-6 text-black/60 transition-colors duration-100 hover:text-black data-[active]:font-medium data-[active]:text-black",
         className,
       )}
       {...props}

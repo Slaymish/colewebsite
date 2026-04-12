@@ -23,7 +23,7 @@ export default function FreeTextObjectComponent({ obj }: FreeTextObjectProps) {
   const opacity = obj.opacity ?? 1;
   const fontSize = fontSizeMap[obj.fontSize ?? "base"] ?? "text-base";
   const textAlign = obj.textAlign ?? "left";
-  const color = obj.color ?? "#171717";
+  const color = obj.color ?? "#000000";
 
   return (
     <div

@@ -45,7 +45,7 @@ export default function GallerySectionComponent({
         return (
             <figure key={image._key} role="listitem">
               <div
-                className="overflow-hidden bg-neutral-100"
+                className="overflow-hidden bg-black/[0.03]"
                 style={{ aspectRatio: imageAspectRatio, borderRadius }}
               >
                 <ExpandableImage
@@ -64,7 +64,7 @@ export default function GallerySectionComponent({
                 />
               </div>
               {image.caption && (
-                <figcaption className="mt-1 text-xs text-neutral-400">
+                <figcaption className="mt-1 text-xs text-black/40">
                   {image.caption}
                 </figcaption>
               )}

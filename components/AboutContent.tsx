@@ -36,7 +36,7 @@ export default function AboutContent({ settings }: AboutContentProps) {
       {/* Portrait + name */}
       <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
         {portraitUrl ? (
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-black/10 bg-black/5">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden border border-black bg-black/[0.03]">
             <Image
               src={portraitUrl}
               alt={settings?.logo?.alt ?? name}
@@ -50,19 +50,19 @@ export default function AboutContent({ settings }: AboutContentProps) {
           </div>
         ) : (
           <div
-            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-2xl font-semibold tracking-tight text-neutral-800"
+            className="flex h-24 w-24 shrink-0 items-center justify-center border border-black bg-white text-2xl font-semibold tracking-tight text-black"
             aria-hidden
           >
             {initials || "—"}
           </div>
         )}
-        <h1 className="text-3xl font-semibold tracking-[-0.03em] text-neutral-900 sm:text-4xl">
+        <h1 className="text-3xl font-bold tracking-[-0.03em] text-black sm:text-4xl">
           {name}
         </h1>
       </div>
 
       {/* Bio */}
-      <div className="mt-8 space-y-4 text-[1rem] leading-[1.7] text-black/70">
+      <div className="mt-8 space-y-4 text-[1rem] leading-[1.7] text-black/50">
         <p>{bio}</p>
       </div>
     </>

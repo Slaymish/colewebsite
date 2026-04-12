@@ -46,7 +46,7 @@ export default function TextSectionComponent({ section }: TextSectionProps) {
   return (
     <section className="px-8 py-10">
       <div
-        className={`prose prose-neutral mx-auto ${maxWidth} space-y-4 ${fontSize} ${lineHeight} ${letterSpacing} text-neutral-800`}
+        className={`prose mx-auto ${maxWidth} space-y-4 ${fontSize} ${lineHeight} ${letterSpacing} text-black/80`}
         style={{ textAlign }}
       >
         {section.content.map((block) => renderBlock(block, { variant: "section" }))}

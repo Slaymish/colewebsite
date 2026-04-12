@@ -51,7 +51,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
       <section className="px-8 py-6">
         <figure>
           <div
-            className="overflow-hidden bg-neutral-900"
+            className="overflow-hidden bg-black"
             style={{ aspectRatio: displayAspect, borderRadius }}
           >
             <video
@@ -71,7 +71,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
             />
           </div>
           {section.caption && (
-            <figcaption className="mt-2 text-xs text-neutral-400">
+            <figcaption className="mt-2 text-xs text-black/40">
               {section.caption}
             </figcaption>
           )}
@@ -105,7 +105,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
     <section className="px-8 py-6">
       <figure>
         <div
-          className="relative overflow-hidden bg-neutral-900"
+          className="relative overflow-hidden bg-black"
           style={{ aspectRatio: displayAspect, borderRadius }}
         >
           {vimeoLoaded ? (
@@ -136,11 +136,11 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
                   blurDataURL={posterLqip ?? undefined}
                 />
               ) : (
-                <div className="h-full w-full bg-neutral-900" />
+                <div className="h-full w-full bg-black" />
               )}
               {/* Play button */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-transform group-hover:scale-110">
+                <div className="flex h-16 w-16 items-center justify-center bg-white/20 hover:bg-white/30">
                   <svg
                     viewBox="0 0 24 24"
                     fill="white"
@@ -155,7 +155,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
           )}
         </div>
         {section.caption && (
-          <figcaption className="mt-2 text-xs text-neutral-400">
+          <figcaption className="mt-2 text-xs text-black/40">
             {section.caption}
           </figcaption>
         )}
