@@ -139,10 +139,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
           {hasBody ? (
             <div
-              className="relative"
-              style={
-                project.freeObjects?.length ? { minHeight: 500 } : undefined
-              }
+              className={`relative${project.freeObjects?.length ? " md:min-h-[500px]" : ""}`}
             >
               {project.sections && project.sections.length > 0 && (
                 <SectionRenderer sections={project.sections} />
@@ -173,23 +170,21 @@ export default async function ProjectPage({ params }: PageProps) {
         }}
       />
 
-      <ProjectShell>
-        {sidebarMode === "hidden" ? (
-          <CollapsibleSidebar
-            settings={settings}
-            projects={projects}
-            activeSlug={slug}
-            startCollapsed={true}
-          >
-            {mainContent}
-          </CollapsibleSidebar>
-        ) : (
-          <div className="min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]">
-            <Header settings={settings} projects={projects} activeSlug={slug} />
-            {mainContent}
-          </div>
-        )}
-      </ProjectShell>
+      {sidebarMode === "hidden" ? (
+        <CollapsibleSidebar
+          settings={settings}
+          projects={projects}
+          activeSlug={slug}
+          startCollapsed={true}
+        >
+          {mainContent}
+        </CollapsibleSidebar>
+      ) : (
+        <ProjectShell>
+          <Header settings={settings} projects={projects} activeSlug={slug} />
+          {mainContent}
+        </ProjectShell>
+      )}
     </>
   );
 }

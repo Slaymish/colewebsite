@@ -3,14 +3,10 @@
 import { useEffect, useState } from "react";
 import type { FreeVideoObject } from "../../types";
 import { fetchVimeoAspectRatio } from "../../lib/vimeoOEmbed";
+import { getVimeoId, buildVimeoEmbedUrl } from "../../lib/vimeo";
 
 interface FreeVideoObjectProps {
   obj: FreeVideoObject;
-}
-
-function getVimeoId(url: string): string | null {
-  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  return match ? match[1] : null;
 }
 
 export default function FreeVideoObjectComponent({
@@ -86,16 +82,10 @@ export default function FreeVideoObjectComponent({
   const videoId = getVimeoId(obj.vimeoUrl);
   if (!videoId) return null;
 
-  const params = new URLSearchParams({
-    autoplay: obj.autoplay ? "1" : "0",
-    muted: "1",
-    loop: obj.loop ? "1" : "0",
-    title: "0",
-    byline: "0",
-    portrait: "0",
-    dnt: "1",
+  const embedUrl = buildVimeoEmbedUrl(videoId, {
+    autoplay: obj.autoplay,
+    loop: obj.loop,
   });
-  const embedUrl = `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
 
   return (
     <div style={containerStyle}>

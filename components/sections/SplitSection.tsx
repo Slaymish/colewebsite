@@ -1,29 +1,10 @@
 import Image from "next/image";
-import type { SplitSection, BlockContent } from "../../types";
+import type { SplitSection } from "../../types";
 import { urlFor } from "../../lib/sanity";
+import { renderBlock } from "../../lib/renderBlock";
 
 interface SplitSectionProps {
   section: SplitSection;
-}
-
-function renderContent(content: BlockContent[]) {
-  return content.map((block) => {
-    const text = block.children.map((child) => child.text).join("");
-    switch (block.style) {
-      case "h3":
-        return (
-          <h3 key={block._key} className="text-lg font-medium">
-            {text}
-          </h3>
-        );
-      default:
-        return (
-          <p key={block._key} className="leading-relaxed text-neutral-700">
-            {text}
-          </p>
-        );
-    }
-  });
 }
 
 export default function SplitSectionComponent({ section }: SplitSectionProps) {
@@ -73,7 +54,7 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
       className="flex flex-col gap-4 text-base"
       style={{ justifyContent: verticalAlign }}
     >
-      {section.content ? renderContent(section.content) : null}
+      {section.content?.map((block) => renderBlock(block, { variant: "compact" }))}
     </div>
   );
 

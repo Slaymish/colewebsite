@@ -27,3 +27,17 @@ export function getClient(): SanityClient {
 export function urlFor(source: unknown) {
   return imageUrlBuilder(getClient()).image(source as never);
 }
+
+/**
+ * Narrows an asset field to a resolved Sanity asset (has `_id` + `url`)
+ * as opposed to an unresolved reference stub (has only `_ref`).
+ */
+export function isResolvedAsset(
+  asset: unknown,
+): asset is { _id: string; url: string; metadata?: unknown } {
+  return (
+    Boolean(asset) &&
+    typeof asset === "object" &&
+    "_id" in (asset as object)
+  );
+}

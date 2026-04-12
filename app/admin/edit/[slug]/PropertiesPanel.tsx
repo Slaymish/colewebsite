@@ -92,6 +92,12 @@ function NumberInput({
         max={max}
         step={step}
         onChange={(e) => onChange(Number(e.target.value))}
+        onBlur={(e) => {
+          let v = Number(e.target.value)
+          if (min !== undefined) v = Math.max(min, v)
+          if (max !== undefined) v = Math.min(max, v)
+          onChange(v)
+        }}
         className="w-16 rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-900 text-right focus:border-neutral-400 focus:outline-none"
       />
     </div>

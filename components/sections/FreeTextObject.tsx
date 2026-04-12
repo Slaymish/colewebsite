@@ -1,59 +1,8 @@
-import type { FreeTextObject, BlockContent } from "../../types";
+import type { FreeTextObject } from "../../types";
+import { renderBlock } from "../../lib/renderBlock";
 
 interface FreeTextObjectProps {
   obj: FreeTextObject;
-}
-
-function renderBlock(block: BlockContent) {
-  const text = block.children.map((child) => {
-    let content: React.ReactNode = child.text;
-    if (child.marks.includes("strong"))
-      content = <strong key={child._key}>{content}</strong>;
-    if (child.marks.includes("em"))
-      content = <em key={child._key}>{content}</em>;
-
-    const linkMark = block.markDefs.find(
-      (def) => child.marks.includes(def._key) && def._type === "link",
-    );
-    if (linkMark?.href) {
-      content = (
-        <a
-          key={child._key}
-          href={linkMark.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
-        >
-          {content}
-        </a>
-      );
-    }
-    return content;
-  });
-
-  switch (block.style) {
-    case "h2":
-      return (
-        <h2
-          key={block._key}
-          className="text-2xl font-semibold tracking-tight"
-        >
-          {text}
-        </h2>
-      );
-    case "h3":
-      return (
-        <h3 key={block._key} className="text-xl font-medium">
-          {text}
-        </h3>
-      );
-    default:
-      return (
-        <p key={block._key} className="leading-relaxed">
-          {text}
-        </p>
-      );
-  }
 }
 
 const fontSizeMap: Record<string, string> = {
@@ -91,7 +40,7 @@ export default function FreeTextObjectComponent({ obj }: FreeTextObjectProps) {
       }}
       className={`${fontSize} space-y-2`}
     >
-      {obj.content.map((block) => renderBlock(block))}
+      {obj.content.map((block) => renderBlock(block, { variant: "compact" }))}
     </div>
   );
 }

@@ -7,65 +7,10 @@ import type {
   FreeImageObject,
   FreeVideoObject,
   FreeTextObject,
-  BlockContent,
 } from "../../../../types";
 import { urlFor } from "../../../../lib/sanity";
-
-// --- Helpers matching public page rendering ---
-
-function getVimeoId(url: string): string | null {
-  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  return match ? match[1] : null;
-}
-
-function renderBlock(block: BlockContent) {
-  const text = block.children.map((child) => {
-    let content: React.ReactNode = child.text;
-    if (child.marks.includes("strong"))
-      content = <strong key={child._key}>{content}</strong>;
-    if (child.marks.includes("em"))
-      content = <em key={child._key}>{content}</em>;
-
-    const linkMark = block.markDefs.find(
-      (def) => child.marks.includes(def._key) && def._type === "link",
-    );
-    if (linkMark?.href) {
-      content = (
-        <a
-          key={child._key}
-          href={linkMark.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
-        >
-          {content}
-        </a>
-      );
-    }
-    return content;
-  });
-
-  switch (block.style) {
-    case "h2":
-      return (
-        <h2 key={block._key} className="text-2xl font-semibold tracking-tight">
-          {text}
-        </h2>
-      );
-    case "h3":
-      return (
-        <h3 key={block._key} className="text-xl font-medium">
-          {text}
-        </h3>
-      );
-    default:
-      return (
-        <p key={block._key} className="leading-relaxed">
-          {text}
-        </p>
-      );
-  }
-}
+import { renderBlock } from "../../../../lib/renderBlock";
+import { getVimeoId, buildVimeoEmbedUrl } from "../../../../lib/vimeo";
 
 const fontSizeMap: Record<string, string> = {
   sm: "text-sm",
@@ -132,17 +77,10 @@ function VideoContent({ obj }: { obj: FreeVideoObject }) {
     );
   }
 
-  const params = new URLSearchParams({
-    autoplay: obj.autoplay ? "1" : "0",
-    muted: "1",
-    loop: obj.loop ? "1" : "0",
-    title: "0",
-    byline: "0",
-    portrait: "0",
-    dnt: "1",
+  const embedUrl = buildVimeoEmbedUrl(videoId, {
+    autoplay: obj.autoplay,
+    loop: obj.loop,
   });
-
-  const embedUrl = `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
 
   return (
     <div
@@ -177,7 +115,7 @@ function TextContent({ obj }: { obj: FreeTextObject }) {
         textAlign: (obj.textAlign as React.CSSProperties["textAlign"]) ?? "left",
       }}
     >
-      {obj.content.map((block) => renderBlock(block))}
+      {obj.content.map((block) => renderBlock(block, { variant: "compact" }))}
     </div>
   );
 }

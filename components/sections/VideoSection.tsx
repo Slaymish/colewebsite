@@ -5,14 +5,10 @@ import Image from "next/image";
 import type { VideoSection } from "../../types";
 import { urlFor } from "../../lib/sanity";
 import { fetchVimeoAspectRatio } from "../../lib/vimeoOEmbed";
+import { getVimeoId, buildVimeoEmbedUrl } from "../../lib/vimeo";
 
 interface VideoSectionProps {
   section: VideoSection;
-}
-
-function getVimeoId(url: string): string | null {
-  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  return match ? match[1] : null;
 }
 
 export default function VideoSectionComponent({ section }: VideoSectionProps) {
@@ -89,16 +85,10 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
   const videoId = getVimeoId(section.vimeoUrl);
   if (!videoId) return null;
 
-  const params = new URLSearchParams({
-    autoplay: "1",
-    muted: "1",
-    loop: section.loop ? "1" : "0",
-    title: "0",
-    byline: "0",
-    portrait: "0",
-    dnt: "1",
+  const embedUrl = buildVimeoEmbedUrl(videoId, {
+    autoplay: section.autoplay,
+    loop: section.loop,
   });
-  const embedUrl = `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
 
   const posterUrl =
     section.poster?.asset && "_id" in section.poster.asset
