@@ -20,12 +20,15 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
   const borderRadius = section.borderRadius ?? 2;
 
   const nativeUrl = section.videoFile?.asset?.url ?? null;
+  const resetKey = `${section._key}|${nativeUrl}|${section.vimeoUrl}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
 
-  useEffect(() => {
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
     setNativeAspect(null);
     setVimeoAspect(null);
     setVimeoLoaded(false);
-  }, [section._key, nativeUrl, section.vimeoUrl]);
+  }
 
   useEffect(() => {
     if (nativeUrl || !section.vimeoUrl) return;

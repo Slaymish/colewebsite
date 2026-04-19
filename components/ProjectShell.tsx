@@ -22,7 +22,9 @@ export default function ProjectShell({
   activeSlug,
   children,
 }: ProjectShellProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() =>
+    typeof window !== "undefined" ? window.scrollY > SCROLL_THRESHOLD : false,
+  );
   const [manualOverride, setManualOverride] = useState<boolean | null>(null);
 
   const name = settings?.name ?? "Cole Anderson";
@@ -45,7 +47,6 @@ export default function ProjectShell({
   }, [manualOverride]);
 
   useEffect(() => {
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [onScroll]);

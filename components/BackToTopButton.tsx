@@ -3,22 +3,25 @@
 import { useCallback, useEffect, useState } from "react";
 
 export default function BackToTopButton() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() =>
+    typeof globalThis.window !== "undefined" ? globalThis.window.scrollY > 360 : false,
+  );
 
   const onScroll = useCallback(() => {
-    setVisible(window.scrollY > 360);
+    setVisible(globalThis.window.scrollY > 360);
   }, []);
 
   useEffect(() => {
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    globalThis.window.addEventListener("scroll", onScroll, { passive: true });
+    return () => globalThis.window.removeEventListener("scroll", onScroll);
   }, [onScroll]);
+
+  if (!visible) return null;
 
   return (
     <button
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => globalThis.window.scrollTo({ top: 0, behavior: "smooth" })}
       className="fixed right-5 bottom-6 z-40 flex h-10 w-10 items-center justify-center border border-black bg-white text-black transition-colors duration-100 hover:bg-black hover:text-white md:right-8 md:bottom-8"
       aria-label="Back to top"
     >

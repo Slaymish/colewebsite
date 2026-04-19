@@ -20,11 +20,14 @@ export default function FreeVideoObjectComponent({ obj }: FreeVideoObjectProps) 
   const borderRadius = obj.borderRadius ?? 0;
 
   const nativeUrl = obj.videoFile?.asset?.url ?? null;
+  const resetKey = `${obj._key}|${nativeUrl}|${obj.vimeoUrl}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
   const [resolvedAspect, setResolvedAspect] = useState<string | null>(null);
 
-  useEffect(() => {
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
     setResolvedAspect(null);
-  }, [obj._key, nativeUrl, obj.vimeoUrl]);
+  }
 
   useEffect(() => {
     if (nativeUrl || !obj.vimeoUrl) return;
