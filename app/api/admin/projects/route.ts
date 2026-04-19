@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, verifySessionToken } from "../../../../lib/adminAuth";
 import { getClient, isSanityConfigured } from "../../../../lib/sanity";
+import { createProject, deleteProject } from "../../../../lib/sanityWrite";
 import type { Project } from "../../../../types";
 
 const PROJECT_FULL_FIELDS = `
@@ -71,6 +73,53 @@ export async function GET(request: NextRequest) {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Fetch failed";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get(ADMIN_COOKIE)?.value;
+  if (!token || !(await verifySessionToken(token))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = (await request.json()) as { title?: string; slug?: string };
+    const title = (body.title ?? "").trim();
+    if (!title) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+
+    const created = await createProject({ title, slug: body.slug ?? title });
+    revalidatePath("/", "layout");
+    return NextResponse.json(created, { status: 201 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Create failed";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const token = request.cookies.get(ADMIN_COOKIE)?.value;
+  if (!token || !(await verifySessionToken(token))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const slug = searchParams.get("slug");
+
+    if (!id) {
+      return NextResponse.json({ error: "id query param is required" }, { status: 400 });
+    }
+
+    await deleteProject(id);
+    revalidatePath("/", "layout");
+    if (slug) revalidatePath(`/project/${slug}`);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Delete failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

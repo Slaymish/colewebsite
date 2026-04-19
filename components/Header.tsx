@@ -13,7 +13,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "./ui/navigation-menu";
-import { Separator } from "./ui/separator";
 
 interface HeaderProps {
   settings: SiteSettings | null;
@@ -21,6 +20,11 @@ interface HeaderProps {
   activeSlug?: string;
   /** When not on a project page, distinguishes Home vs About vs Contact. */
   currentPage?: "home" | "about" | "contact";
+  /**
+   * When true, the sidebar's nav links and project cards point at
+   * `/admin/edit/*` routes so you stay inside the editor while browsing.
+   */
+  editMode?: boolean;
 }
 
 /**
@@ -31,6 +35,7 @@ export default function Header({
   projects = [],
   activeSlug,
   currentPage = "home",
+  editMode = false,
 }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const name = settings?.name ?? "Cole Anderson";
@@ -57,6 +62,11 @@ export default function Header({
 
   const onProjectPage = activeSlug !== undefined;
 
+  // Route targets — swap to admin editors when editMode is active
+  const homeHref = editMode ? "/admin/edit" : "/";
+  const aboutHref = editMode ? "/admin/edit/about" : "/about";
+  const contactHref = editMode ? "/admin/edit/contact" : "/contact";
+
   return (
     <header
       className={cn(
@@ -67,7 +77,7 @@ export default function Header({
       <div className={cn("flex h-full flex-col gap-5", onProjectPage && "md:gap-4")}>
         {/* Mobile: name row + hamburger */}
         <div className="flex items-start justify-between gap-3">
-          <Link href="/" className="flex items-start gap-3" aria-label={`${name} — home`}>
+          <Link href={homeHref} className="flex items-start gap-3" aria-label={`${name} — home`}>
             {logoUrl ? (
               <span className="relative mt-1 h-11 w-11 shrink-0 overflow-hidden border border-black bg-white md:hidden">
                 <Image
@@ -119,10 +129,11 @@ export default function Header({
           </button>
         </div>
 
-        {/* Collapsible content — always visible on md+, toggled on mobile */}
+        {/* Collapsible content — always visible on md+, toggled on mobile.
+            md:flex-1 ensures `mt-auto` on the footer pins it to the bottom. */}
         <div
           className={cn(
-            "flex flex-col gap-5 overflow-hidden transition-all duration-300 md:!flex md:!max-h-none md:!opacity-100",
+            "flex flex-col gap-5 overflow-hidden transition-all duration-500 md:flex! md:max-h-none! md:flex-1 md:opacity-100!",
             onProjectPage && "md:gap-4",
             mobileOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 md:opacity-100",
           )}
@@ -142,17 +153,17 @@ export default function Header({
             <NavigationMenuList aria-label="Main navigation">
               <NavigationMenuItem>
                 <NavigationMenuLink asChild active={nav === "home"}>
-                  <Link href="/">Home</Link>
+                  <Link href={homeHref}>Home</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink asChild active={nav === "about"}>
-                  <Link href="/about">About</Link>
+                  <Link href={aboutHref}>About</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink asChild active={nav === "contact"}>
-                  <Link href="/contact">Contact</Link>
+                  <Link href={contactHref}>Contact</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               {cvUrl && (
@@ -171,13 +182,16 @@ export default function Header({
           </NavigationMenu>
 
           {projects.length > 0 && (
-            <>
-              <Separator className="hidden md:block" />
-              <ProjectSidebar projects={projects} activeSlug={activeSlug} muted={onProjectPage} />
-            </>
+            <ProjectSidebar
+              projects={projects}
+              activeSlug={activeSlug}
+              muted={onProjectPage}
+              editMode={editMode}
+            />
           )}
 
-          <div className="mt-auto flex flex-col gap-1 text-[0.7rem] leading-[1.45] text-black/40">
+          {/* Footer pinned to the bottom of the sidebar */}
+          <div className="mt-auto flex flex-col gap-1 pt-6 text-[0.7rem] leading-[1.45] text-black/40">
             <span>{copyright}</span>
           </div>
         </div>

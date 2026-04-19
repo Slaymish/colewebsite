@@ -22,8 +22,10 @@ Portfolio site for Cole Anderson built with **Next.js App Router**, **Sanity CMS
 - `/` — Home: hero + project list sidebar layout
 - `/project/[slug]` — Individual project pages (also rendered inline on home via client-side selection)
 - `/about` — About page
-- `/admin/cms` — Embedded Sanity Studio
-- `/admin/edit` / `/admin/edit/[slug]` — Custom visual project editor
+- `/admin/edit` — Project list + "Pages" shortcuts (home / about / contact)
+- `/admin/edit/[slug]` — Project editor (sections, free objects, page settings)
+- `/admin/edit/home` — Homepage editor (selected projects + drag reorder)
+- `/admin/edit/about` / `/admin/edit/contact` — Site-settings editors scoped per page
 
 The home page uses a split layout: fixed left column (project list) + main content area. Clicking a project loads it without a full page reload; `/project/:slug` also works as a standalone deep link.
 

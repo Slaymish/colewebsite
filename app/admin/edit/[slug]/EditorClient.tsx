@@ -9,6 +9,9 @@ import type {
   SiteSettings,
   Section,
   FreeObject,
+  FreeImageObject,
+  FreeVideoObject,
+  FreeTextObject,
   SpacingSection,
 } from "../../../../types";
 import { urlFor } from "../../../../lib/sanity";
@@ -41,6 +44,10 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAddSection, setShowAddSection] = useState(false);
+  // When set, "+ Add Section" in the modal inserts at this index instead of appending.
+  const [addInsertIndex, setAddInsertIndex] = useState<number | null>(null);
+  const [autosaveEnabled, setAutosaveEnabled] = useState(true);
+  const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sections = project.sections ?? [];
   const freeObjects = project.freeObjects ?? [];
@@ -109,6 +116,31 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
     setIsDirty(true);
   }, []);
 
+  // Reorder a section by dragging — move `sourceKey` to the position of
+  // `targetKey` (insert before target). If `after` is true, insert after.
+  const reorderSection = useCallback(
+    (sourceKey: string, targetKey: string, placement: "before" | "after") => {
+      if (sourceKey === targetKey) return;
+      setProject((prev) => {
+        const secs = [...(prev.sections ?? [])];
+        const fromIdx = secs.findIndex((s) => s._key === sourceKey);
+        if (fromIdx === -1) return prev;
+        const [moved] = secs.splice(fromIdx, 1);
+        let targetIdx = secs.findIndex((s) => s._key === targetKey);
+        if (targetIdx === -1) {
+          secs.push(moved);
+          return { ...prev, sections: secs };
+        }
+        if (placement === "after") targetIdx += 1;
+        secs.splice(targetIdx, 0, moved);
+        return { ...prev, sections: secs };
+      });
+      setIsDirty(true);
+      setSaveSuccess(false);
+    },
+    [],
+  );
+
   // Delete a section
   const deleteSection = useCallback(
     (key: string) => {
@@ -123,62 +155,135 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
   );
 
   // Add a new section of a given type with sensible defaults
-  const addSection = useCallback((type: string) => {
+  const addSection = useCallback(
+    (type: string) => {
+      const key = `${type}-${Date.now()}`;
+      let newSection: Section;
+
+      switch (type) {
+        case "textSection":
+          newSection = { _type: "textSection", _key: key, content: [] };
+          break;
+        case "imageSection":
+          newSection = { _type: "imageSection", _key: key };
+          break;
+        case "gallerySection":
+          newSection = {
+            _type: "gallerySection",
+            _key: key,
+            columns: 2,
+            gap: 12,
+            aspectRatio: "3/2",
+            borderRadius: 2,
+          };
+          break;
+        case "videoSection":
+          newSection = {
+            _type: "videoSection",
+            _key: key,
+            aspectRatio: "16/9",
+            borderRadius: 2,
+          };
+          break;
+        case "heroSection":
+          newSection = {
+            _type: "heroSection",
+            _key: key,
+            minHeight: "60vh",
+            overlayOpacity: 0.3,
+            textAlign: "left",
+            textPosition: "bottom",
+          };
+          break;
+        case "splitSection":
+          newSection = {
+            _type: "splitSection",
+            _key: key,
+            imagePosition: "left",
+            verticalAlign: "center",
+            gap: 24,
+            imageAspectRatio: "4/3",
+            borderRadius: 2,
+          };
+          break;
+        case "spacingSection":
+          newSection = {
+            _type: "spacingSection",
+            _key: key,
+            height: 80,
+          } as SpacingSection;
+          break;
+        default:
+          return;
+      }
+
+      setProject((prev) => {
+        const existing = prev.sections ?? [];
+        if (addInsertIndex === null || addInsertIndex >= existing.length) {
+          return { ...prev, sections: [...existing, newSection] };
+        }
+        const next = [...existing];
+        next.splice(Math.max(0, addInsertIndex), 0, newSection);
+        return { ...prev, sections: next };
+      });
+      setAddInsertIndex(null);
+      // Auto-select the new section so the properties panel opens immediately —
+      // makes it obvious that the section was added, even when empty.
+      setSelected({ kind: "section", key });
+      setIsDirty(true);
+      setSaveSuccess(false);
+    },
+    [addInsertIndex],
+  );
+
+  // Add a new free object (image / video / text) with sensible defaults
+  const addFreeObject = useCallback((type: FreeObject["_type"]) => {
     const key = `${type}-${Date.now()}`;
-    let newSection: Section;
+    let newObject: FreeObject;
 
     switch (type) {
-      case "textSection":
-        newSection = { _type: "textSection", _key: key, content: [] };
-        break;
-      case "imageSection":
-        newSection = { _type: "imageSection", _key: key };
-        break;
-      case "gallerySection":
-        newSection = {
-          _type: "gallerySection",
+      case "freeImageObject":
+        newObject = {
+          _type: "freeImageObject",
           _key: key,
-          columns: 2,
-          gap: 12,
-          aspectRatio: "3/2",
-          borderRadius: 2,
-        };
+          xPercent: 10,
+          yPercent: 10,
+          widthPercent: 40,
+          zIndex: 10,
+          rotation: 0,
+          opacity: 1,
+          borderRadius: 0,
+        } as FreeImageObject;
         break;
-      case "videoSection":
-        newSection = {
-          _type: "videoSection",
+      case "freeVideoObject":
+        newObject = {
+          _type: "freeVideoObject",
           _key: key,
+          xPercent: 10,
+          yPercent: 10,
+          widthPercent: 40,
+          zIndex: 10,
+          rotation: 0,
+          opacity: 1,
           aspectRatio: "16/9",
-          borderRadius: 2,
-        };
+          borderRadius: 0,
+        } as FreeVideoObject;
         break;
-      case "heroSection":
-        newSection = {
-          _type: "heroSection",
+      case "freeTextObject":
+        newObject = {
+          _type: "freeTextObject",
           _key: key,
-          minHeight: "60vh",
-          overlayOpacity: 0.3,
+          xPercent: 10,
+          yPercent: 10,
+          widthPercent: 40,
+          zIndex: 10,
+          rotation: 0,
+          opacity: 1,
+          fontSize: "base",
           textAlign: "left",
-          textPosition: "bottom",
-        };
-        break;
-      case "splitSection":
-        newSection = {
-          _type: "splitSection",
-          _key: key,
-          imagePosition: "left",
-          verticalAlign: "center",
-          gap: 24,
-          imageAspectRatio: "4/3",
-          borderRadius: 2,
-        };
-        break;
-      case "spacingSection":
-        newSection = {
-          _type: "spacingSection",
-          _key: key,
-          height: 80,
-        } as SpacingSection;
+          color: "#171717",
+          content: [],
+        } as FreeTextObject;
         break;
       default:
         return;
@@ -186,8 +291,9 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
 
     setProject((prev) => ({
       ...prev,
-      sections: [...(prev.sections ?? []), newSection],
+      freeObjects: [...(prev.freeObjects ?? []), newObject],
     }));
+    setSelected({ kind: "freeObject", key });
     setIsDirty(true);
     setSaveSuccess(false);
   }, []);
@@ -225,6 +331,10 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
             meta_description: project.meta_description,
             category: project.category ?? "",
             tags: project.tags,
+            isSelectedOnHome: project.isSelectedOnHome ?? false,
+            homeOrder: project.homeOrder,
+            cover_image: project.cover_image ?? null,
+            og_image: project.og_image ?? null,
           }),
         });
 
@@ -247,6 +357,34 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
     },
     [project],
   );
+
+  // Autosave: 1.5s after the last change, persist as a draft-or-current-status
+  // save. Uses a ref so the debounce timer survives re-renders without adding
+  // `save` as a dependency (which would re-trigger immediately on every edit).
+  const saveRef = useRef(save);
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
+
+  useEffect(() => {
+    if (!autosaveEnabled) return;
+    if (!isDirty || isSaving) return;
+
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+    }
+
+    autosaveTimeoutRef.current = setTimeout(() => {
+      saveRef.current("draft");
+    }, 1500);
+
+    return () => {
+      if (autosaveTimeoutRef.current) {
+        clearTimeout(autosaveTimeoutRef.current);
+        autosaveTimeoutRef.current = null;
+      }
+    };
+  }, [autosaveEnabled, isDirty, isSaving, project]);
 
   const handleExit = useCallback(() => {
     if (isDirty) {
@@ -325,7 +463,12 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
         </div>
       ) : (
         <div className="relative">
-          <Header settings={settings} projects={projects} activeSlug={project.slug.current} />
+          <Header
+            settings={settings}
+            projects={projects}
+            activeSlug={project.slug.current}
+            editMode
+          />
           <button
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
@@ -337,9 +480,12 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
         </div>
       )}
 
-      {/* Main editor area */}
+      {/* Main editor area — add right padding when the properties panel is
+          open so the canvas and panel don't overlap. */}
       <div
-        className={`relative min-w-0 overflow-y-auto${sidebarCollapsed ? "flex-1" : ""}`}
+        className={`relative min-w-0 overflow-y-auto transition-[padding] duration-200 ${
+          sidebarCollapsed ? "flex-1" : ""
+        } ${panelOpen ? "md:pr-80" : ""}`}
         onClick={() => setSelected(null)}
       >
         {/* Floating editor bar */}
@@ -357,10 +503,36 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
 
               {/* Save feedback */}
               {saveError && <span className="text-xs text-red-600">{saveError}</span>}
-              {saveSuccess && !saveError && <span className="text-xs text-green-700">Saved</span>}
-              {isDirty && !saveError && !saveSuccess && (
-                <span className="text-xs text-neutral-400">Unsaved</span>
+              {!saveError && isSaving && <span className="text-xs text-neutral-500">Saving…</span>}
+              {!saveError && !isSaving && saveSuccess && (
+                <span className="text-xs text-green-700">Saved</span>
               )}
+              {!saveError && !isSaving && !saveSuccess && isDirty && (
+                <span className="text-xs text-neutral-400">
+                  {autosaveEnabled ? "Autosave pending…" : "Unsaved"}
+                </span>
+              )}
+
+              {/* Autosave toggle */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAutosaveEnabled((v) => !v);
+                }}
+                className={`rounded-lg px-2 py-0.5 text-[0.7rem] transition-colors ${
+                  autosaveEnabled
+                    ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                    : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                }`}
+                title={
+                  autosaveEnabled
+                    ? "Autosave on — click to disable"
+                    : "Autosave off — click to enable"
+                }
+              >
+                {autosaveEnabled ? "Auto" : "Manual"}
+              </button>
 
               <div className="h-4 w-px bg-black/10" />
 
@@ -496,24 +668,46 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
                 {sections.length > 0 && (
                   <div className="flex flex-col gap-6 md:gap-9">
                     {sections.map((section, index) => (
-                      <EditableSection
-                        key={section._key}
-                        section={section}
-                        index={index}
-                        total={sections.length}
-                        isSelected={selected?.kind === "section" && selected.key === section._key}
-                        onSelect={(e) => {
-                          e.stopPropagation();
-                          setSelected({
-                            kind: "section",
-                            key: section._key,
-                          });
-                        }}
-                        onMoveUp={() => moveSection(section._key, "up")}
-                        onMoveDown={() => moveSection(section._key, "down")}
-                        onDelete={() => deleteSection(section._key)}
-                        onChange={(patch) => updateSection(section._key, patch)}
-                      />
+                      <div key={section._key} className="group/section relative">
+                        <EditableSection
+                          section={section}
+                          index={index}
+                          total={sections.length}
+                          isSelected={selected?.kind === "section" && selected.key === section._key}
+                          onSelect={(e) => {
+                            e.stopPropagation();
+                            setSelected({
+                              kind: "section",
+                              key: section._key,
+                            });
+                          }}
+                          onMoveUp={() => moveSection(section._key, "up")}
+                          onMoveDown={() => moveSection(section._key, "down")}
+                          onDelete={() => deleteSection(section._key)}
+                          onChange={(patch) => updateSection(section._key, patch)}
+                          onReorder={reorderSection}
+                        />
+                        {/* Insert-below button — appears on hover in the gap
+                            between this section and the next one. */}
+                        <div
+                          className="pointer-events-none absolute right-0 left-0 z-30 flex justify-center opacity-0 transition-opacity group-hover/section:opacity-100"
+                          style={{ bottom: "-1.25rem" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setAddInsertIndex(index + 1);
+                              setShowAddSection(true);
+                            }}
+                            className="pointer-events-auto flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-[0.7rem] text-neutral-600 shadow-sm transition-colors hover:border-blue-400 hover:text-blue-600"
+                            title="Insert a section here"
+                          >
+                            + Add section
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -592,21 +786,35 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
       {showAddSection && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-          onClick={() => setShowAddSection(false)}
+          onClick={() => {
+            setShowAddSection(false);
+            setAddInsertIndex(null);
+          }}
         >
           <div
-            className="w-80 rounded-xl bg-white p-5 shadow-2xl"
+            className="w-[22rem] rounded-xl bg-white p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-neutral-900">Add Section</h3>
+              <h3 className="text-sm font-semibold text-neutral-900">
+                {addInsertIndex === null
+                  ? "Add to page"
+                  : `Insert at position ${addInsertIndex + 1}`}
+              </h3>
               <button
-                onClick={() => setShowAddSection(false)}
+                onClick={() => {
+                  setShowAddSection(false);
+                  setAddInsertIndex(null);
+                }}
                 className="p-1 text-lg leading-none text-neutral-400 hover:text-neutral-700"
                 aria-label="Close"
               >
                 ×
               </button>
+            </div>
+
+            <div className="mb-2 text-[0.65rem] font-semibold tracking-wider text-neutral-400 uppercase">
+              Sections (flow layout)
             </div>
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -616,6 +824,7 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
                 { type: "videoSection", label: "Video" },
                 { type: "splitSection", label: "Split" },
                 { type: "spacingSection", label: "Spacing" },
+                { type: "heroSection", label: "Hero" },
               ].map(({ type, label }) => (
                 <button
                   key={type}
@@ -624,6 +833,30 @@ export default function EditorClient({ initialProject, projects, settings }: Edi
                     setShowAddSection(false);
                   }}
                   className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-3 text-left text-sm text-neutral-700 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 mb-2 text-[0.65rem] font-semibold tracking-wider text-neutral-400 uppercase">
+              Free objects (absolute)
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {(
+                [
+                  { type: "freeImageObject", label: "Image" },
+                  { type: "freeVideoObject", label: "Video" },
+                  { type: "freeTextObject", label: "Text" },
+                ] as { type: FreeObject["_type"]; label: string }[]
+              ).map(({ type, label }) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    addFreeObject(type);
+                    setShowAddSection(false);
+                  }}
+                  className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-3 text-center text-sm text-neutral-700 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
                 >
                   {label}
                 </button>

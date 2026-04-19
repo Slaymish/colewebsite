@@ -144,8 +144,8 @@ export default function ExpandableImage({
     const translateX = thumbCenterX - centerX;
     const translateY = thumbCenterY - centerY;
     const imgAspect = currentImage.width / currentImage.height;
-    const maxW = viewportW * 0.85;
-    const maxH = viewportH * 0.85;
+    const maxW = viewportW * 0.95;
+    const maxH = viewportH * 0.95;
     let fitW: number, fitH: number;
     if (maxW / maxH > imgAspect) {
       fitH = maxH;
@@ -188,7 +188,7 @@ export default function ExpandableImage({
         {open && (
           <motion.div
             ref={dialogRef}
-            className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/92 p-4 md:p-10"
+            className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/92 p-2 md:p-4"
             onClick={handleClose}
             role="dialog"
             aria-modal="true"
@@ -199,7 +199,7 @@ export default function ExpandableImage({
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="relative flex max-h-[85vh] max-w-[85vw] items-center justify-center"
+              className="relative flex max-h-[95vh] max-w-[95vw] items-center justify-center"
               onClick={(e) => e.stopPropagation()}
               initial={getInitialTransform()}
               animate={{ x: 0, y: 0, scale: 1 }}
@@ -211,7 +211,7 @@ export default function ExpandableImage({
                 alt={currentImage.alt}
                 width={currentImage.width}
                 height={currentImage.height}
-                className="max-h-[85vh] w-auto max-w-full object-contain"
+                className="max-h-[95vh] w-auto max-w-full object-contain"
                 sizes="100vw"
                 priority
               />
