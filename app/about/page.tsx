@@ -16,9 +16,7 @@ export default async function AboutPage() {
   const settings = await getSiteSettings();
 
   const name = settings?.name ?? "Cole Anderson";
-  const bio =
-    settings?.bio ??
-    "Designer and creative. Add a bio in Site Settings in Sanity.";
+  const bio = settings?.bio ?? "Designer and creative. Add a bio in Site Settings in Sanity.";
 
   const portraitUrl =
     settings?.logo?.asset && "_id" in settings.logo.asset
@@ -40,19 +38,15 @@ export default async function AboutPage() {
     .toUpperCase();
 
   const cvUrl =
-    settings?.cv?.url ||
-    (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
+    settings?.cv?.url || (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
 
   const socialLinks = settings?.social_links ?? [];
 
   return (
     <div className="min-h-screen bg-white">
       {/* Minimal top nav */}
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-10 md:px-14 border-b border-black">
-        <Link
-          href="/"
-          className="text-[0.85rem] text-black/50 hover:text-black"
-        >
+      <nav className="flex items-center justify-between border-b border-black px-6 py-5 sm:px-10 md:px-14">
+        <Link href="/" className="text-[0.85rem] text-black/50 hover:text-black">
           ← {name}
         </Link>
         {cvUrl && (
@@ -96,9 +90,7 @@ export default async function AboutPage() {
               {initials || "—"}
             </div>
           )}
-          <h1 className="text-3xl font-bold tracking-[-0.03em] text-black sm:text-4xl">
-            {name}
-          </h1>
+          <h1 className="text-3xl font-bold tracking-[-0.03em] text-black sm:text-4xl">{name}</h1>
         </div>
 
         {/* Bio */}
@@ -127,11 +119,9 @@ export default async function AboutPage() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-black px-4 py-1.5 text-[0.82rem] text-black/50 duration-100 hover:text-black hover:border-black"
+                className="border border-black px-4 py-1.5 text-[0.82rem] text-black/50 duration-100 hover:border-black hover:text-black"
               >
-                {link.label ||
-                  platformLabels[link.platform?.toLowerCase()] ||
-                  link.platform}
+                {link.label || platformLabels[link.platform?.toLowerCase()] || link.platform}
               </a>
             ))}
           </div>

@@ -17,33 +17,19 @@ export default function SectionRenderer({ sections }: SectionRendererProps) {
       {sections.map((section) => {
         switch (section._type) {
           case "heroSection":
-            return (
-              <HeroSectionComponent key={section._key} section={section} />
-            );
+            return <HeroSectionComponent key={section._key} section={section} />;
           case "textSection":
-            return (
-              <TextSectionComponent key={section._key} section={section} />
-            );
+            return <TextSectionComponent key={section._key} section={section} />;
           case "imageSection":
-            return (
-              <ImageSectionComponent key={section._key} section={section} />
-            );
+            return <ImageSectionComponent key={section._key} section={section} />;
           case "gallerySection":
-            return (
-              <GallerySectionComponent key={section._key} section={section} />
-            );
+            return <GallerySectionComponent key={section._key} section={section} />;
           case "videoSection":
-            return (
-              <VideoSectionComponent key={section._key} section={section} />
-            );
+            return <VideoSectionComponent key={section._key} section={section} />;
           case "splitSection":
-            return (
-              <SplitSectionComponent key={section._key} section={section} />
-            );
+            return <SplitSectionComponent key={section._key} section={section} />;
           case "spacingSection":
-            return (
-              <SpacingSectionComponent key={section._key} section={section} />
-            );
+            return <SpacingSectionComponent key={section._key} section={section} />;
           default:
             return null;
         }

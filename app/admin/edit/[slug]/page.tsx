@@ -1,7 +1,11 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { ADMIN_COOKIE, verifySessionToken } from "../../../../lib/adminAuth";
-import { getProjectBySlugForAdmin, getAllPublishedProjects, getSiteSettings } from "../../../../lib/queries";
+import {
+  getProjectBySlugForAdmin,
+  getAllPublishedProjects,
+  getSiteSettings,
+} from "../../../../lib/queries";
 import EditorClient from "./EditorClient";
 
 export const dynamic = "force-dynamic";

@@ -1,0 +1,11 @@
+.next
+out
+build
+dist
+node_modules
+pnpm-lock.yaml
+package-lock.json
+coverage
+.sanity
+tsconfig.tsbuildinfo
+public

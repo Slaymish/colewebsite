@@ -18,9 +18,7 @@ export default defineConfig({
         S.list()
           .title("Content")
           .items([
-            S.listItem()
-              .title("Projects")
-              .child(S.documentTypeList("project").title("Projects")),
+            S.listItem().title("Projects").child(S.documentTypeList("project").title("Projects")),
             S.divider(),
             S.listItem()
               .title("Site Settings")

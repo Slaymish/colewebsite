@@ -86,9 +86,7 @@ export async function getAllProjectsForAdmin(): Promise<ProjectSummary[]> {
   );
 }
 
-export async function getProjectBySlugForAdmin(
-  slug: string,
-): Promise<Project | null> {
+export async function getProjectBySlugForAdmin(slug: string): Promise<Project | null> {
   if (!isSanityConfigured()) return null;
   const results = await getClient().fetch<Project[]>(
     `*[_type == "project" && slug.current == $slug] | order(_updatedAt desc) [0..0] { ${PROJECT_FULL_FIELDS} }`,

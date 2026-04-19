@@ -29,11 +29,7 @@ type SelectedItem =
   | { kind: "pageSettings" }
   | null;
 
-export default function EditorClient({
-  initialProject,
-  projects,
-  settings,
-}: EditorClientProps) {
+export default function EditorClient({ initialProject, projects, settings }: EditorClientProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project>(initialProject);
   const [selected, setSelected] = useState<SelectedItem>(null);
@@ -50,9 +46,7 @@ export default function EditorClient({
   const freeObjects = project.freeObjects ?? [];
 
   const selectedSection =
-    selected?.kind === "section"
-      ? (sections.find((s) => s._key === selected.key) ?? null)
-      : null;
+    selected?.kind === "section" ? (sections.find((s) => s._key === selected.key) ?? null) : null;
 
   const selectedFreeObject =
     selected?.kind === "freeObject"
@@ -83,19 +77,16 @@ export default function EditorClient({
   }, []);
 
   // Update a free object by key
-  const updateFreeObject = useCallback(
-    (key: string, patch: Partial<FreeObject>) => {
-      setProject((prev) => ({
-        ...prev,
-        freeObjects: (prev.freeObjects ?? []).map((o) =>
-          o._key === key ? ({ ...o, ...patch } as FreeObject) : o,
-        ),
-      }));
-      setIsDirty(true);
-      setSaveSuccess(false);
-    },
-    [],
-  );
+  const updateFreeObject = useCallback((key: string, patch: Partial<FreeObject>) => {
+    setProject((prev) => ({
+      ...prev,
+      freeObjects: (prev.freeObjects ?? []).map((o) =>
+        o._key === key ? ({ ...o, ...patch } as FreeObject) : o,
+      ),
+    }));
+    setIsDirty(true);
+    setSaveSuccess(false);
+  }, []);
 
   // Update project-level fields
   const updateProject = useCallback((patch: Partial<Project>) => {
@@ -125,8 +116,7 @@ export default function EditorClient({
         ...prev,
         sections: (prev.sections ?? []).filter((s) => s._key !== key),
       }));
-      if (selected?.kind === "section" && selected.key === key)
-        setSelected(null);
+      if (selected?.kind === "section" && selected.key === key) setSelected(null);
       setIsDirty(true);
     },
     [selected],
@@ -209,8 +199,7 @@ export default function EditorClient({
         ...prev,
         freeObjects: (prev.freeObjects ?? []).filter((o) => o._key !== key),
       }));
-      if (selected?.kind === "freeObject" && selected.key === key)
-        setSelected(null);
+      if (selected?.kind === "freeObject" && selected.key === key) setSelected(null);
       setIsDirty(true);
     },
     [selected],
@@ -299,17 +288,23 @@ export default function EditorClient({
     .toUpperCase();
 
   return (
-    <div className={sidebarCollapsed ? "min-h-screen flex" : "min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]"}>
+    <div
+      className={
+        sidebarCollapsed
+          ? "flex min-h-screen"
+          : "min-h-screen md:grid md:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)]"
+      }
+    >
       {/* Left sidebar */}
       {sidebarCollapsed ? (
-        <div className="hidden md:flex md:flex-col md:items-center md:w-14 md:shrink-0 md:border-r md:border-black/10 md:py-5 md:gap-4">
+        <div className="hidden md:flex md:w-14 md:shrink-0 md:flex-col md:items-center md:gap-4 md:border-r md:border-black/10 md:py-5">
           <button
             onClick={() => setSidebarCollapsed(false)}
             aria-label="Open sidebar"
-            className="flex flex-col items-center gap-1 group"
+            className="group flex flex-col items-center gap-1"
           >
             {sidebarLogoUrl ? (
-              <span className="relative h-9 w-9 overflow-hidden rounded-full border border-black/10 bg-white group-hover:border-black/25 transition-colors">
+              <span className="relative h-9 w-9 overflow-hidden rounded-full border border-black/10 bg-white transition-colors group-hover:border-black/25">
                 <Image
                   src={sidebarLogoUrl}
                   alt={sidebarName}
@@ -319,26 +314,22 @@ export default function EditorClient({
                 />
               </span>
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-[0.65rem] font-semibold text-neutral-700 group-hover:border-black/30 transition-colors">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-black/15 bg-black/[0.04] text-[0.65rem] font-semibold text-neutral-700 transition-colors group-hover:border-black/30">
                 {sidebarInitials || "—"}
               </span>
             )}
-            <span className="text-[0.6rem] text-black/35 group-hover:text-black/60 transition-colors">
+            <span className="text-[0.6rem] text-black/35 transition-colors group-hover:text-black/60">
               menu
             </span>
           </button>
         </div>
       ) : (
         <div className="relative">
-          <Header
-            settings={settings}
-            projects={projects}
-            activeSlug={project.slug.current}
-          />
+          <Header settings={settings} projects={projects} activeSlug={project.slug.current} />
           <button
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
-            className="absolute top-3 right-3 hidden md:flex items-center gap-1 rounded px-1.5 py-1 text-[0.72rem] text-black/35 hover:text-black/70 hover:bg-black/5 transition-colors"
+            className="absolute top-3 right-3 hidden items-center gap-1 rounded px-1.5 py-1 text-[0.72rem] text-black/35 transition-colors hover:bg-black/5 hover:text-black/70 md:flex"
             title="Hide sidebar"
           >
             ←
@@ -347,34 +338,31 @@ export default function EditorClient({
       )}
 
       {/* Main editor area */}
-      <div className={`relative min-w-0 overflow-y-auto${sidebarCollapsed ? " flex-1" : ""}`} onClick={() => setSelected(null)}>
+      <div
+        className={`relative min-w-0 overflow-y-auto${sidebarCollapsed ? "flex-1" : ""}`}
+        onClick={() => setSelected(null)}
+      >
         {/* Floating editor bar */}
-        <div className="sticky top-0 z-40 px-5 pt-4 pb-2 md:px-10 xl:px-12 pointer-events-none">
+        <div className="pointer-events-none sticky top-0 z-40 px-5 pt-4 pb-2 md:px-10 xl:px-12">
           <div className="flex items-center justify-end">
             <div className="pointer-events-auto flex items-center gap-2 rounded-2xl border border-black/10 bg-white/90 px-3 py-2 shadow-lg backdrop-blur">
               {/* Status indicator */}
               <span
-                className={`text-xs px-2 py-0.5 rounded-full ${
-                  isPublished
-                    ? "bg-green-100 text-green-700"
-                    : "bg-neutral-100 text-neutral-500"
+                className={`rounded-full px-2 py-0.5 text-xs ${
+                  isPublished ? "bg-green-100 text-green-700" : "bg-neutral-100 text-neutral-500"
                 }`}
               >
                 {isPublished ? "Published" : "Draft"}
               </span>
 
               {/* Save feedback */}
-              {saveError && (
-                <span className="text-xs text-red-600">{saveError}</span>
-              )}
-              {saveSuccess && !saveError && (
-                <span className="text-xs text-green-700">Saved</span>
-              )}
+              {saveError && <span className="text-xs text-red-600">{saveError}</span>}
+              {saveSuccess && !saveError && <span className="text-xs text-green-700">Saved</span>}
               {isDirty && !saveError && !saveSuccess && (
                 <span className="text-xs text-neutral-400">Unsaved</span>
               )}
 
-              <div className="w-px h-4 bg-black/10" />
+              <div className="h-4 w-px bg-black/10" />
 
               {/* Page settings */}
               <button
@@ -382,7 +370,7 @@ export default function EditorClient({
                   e.stopPropagation();
                   setSelected({ kind: "pageSettings" });
                 }}
-                className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
+                className={`rounded-lg px-2.5 py-1 text-xs transition-colors ${
                   showPageSettings
                     ? "bg-blue-100 text-blue-700"
                     : "text-neutral-600 hover:bg-neutral-100"
@@ -397,7 +385,7 @@ export default function EditorClient({
                   href={`/project/${project.slug.current}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-neutral-500 hover:text-neutral-900 px-2.5 py-1 rounded-lg hover:bg-neutral-100 transition-colors"
+                  className="rounded-lg px-2.5 py-1 text-xs text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
                 >
                   Preview ↗
                 </a>
@@ -410,7 +398,7 @@ export default function EditorClient({
                   save("draft");
                 }}
                 disabled={isSaving || !isDirty}
-                className="text-xs px-2.5 py-1 rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {isSaving ? "Saving…" : "Save draft"}
               </button>
@@ -423,7 +411,7 @@ export default function EditorClient({
                     save("draft");
                   }}
                   disabled={isSaving}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-lg bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700 transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Unpublish
                 </button>
@@ -434,13 +422,13 @@ export default function EditorClient({
                     save("published");
                   }}
                   disabled={isSaving}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="rounded-lg bg-neutral-900 px-2.5 py-1 text-xs text-white transition-colors hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Publish
                 </button>
               )}
 
-              <div className="w-px h-4 bg-black/10" />
+              <div className="h-4 w-px bg-black/10" />
 
               {/* Exit */}
               <button
@@ -448,7 +436,7 @@ export default function EditorClient({
                   e.stopPropagation();
                   handleExit();
                 }}
-                className="text-xs text-neutral-400 hover:text-neutral-700 px-1.5 py-1 rounded-lg hover:bg-neutral-100 transition-colors"
+                className="rounded-lg px-1.5 py-1 text-xs text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
                 title="Exit editor"
               >
                 ✕
@@ -477,7 +465,7 @@ export default function EditorClient({
 
             {/* Title — matches public page */}
             <div className="flex flex-col gap-3 pb-1">
-              <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+              <h1 className="text-[clamp(1.2rem,2vw,1.55rem)] leading-[1.2] font-medium tracking-[-0.02em]">
                 {project.title}
               </h1>
             </div>
@@ -491,7 +479,7 @@ export default function EditorClient({
                     e.stopPropagation();
                     setShowAddSection(true);
                   }}
-                  className="mt-3 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-xs text-neutral-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                  className="mt-3 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-xs text-neutral-600 transition-colors hover:border-blue-400 hover:text-blue-600"
                 >
                   + Add Section
                 </button>
@@ -499,10 +487,9 @@ export default function EditorClient({
             ) : (
               <div
                 ref={canvasRef}
-                className={`relative${freeObjects.length > 0 ? " md:min-h-[500px]" : ""}`}
+                className={`relative${freeObjects.length > 0 ? "md:min-h-[500px]" : ""}`}
                 style={{
-                  minHeight:
-                    freeObjects.length > 0 ? canvasMinHeight : undefined,
+                  minHeight: freeObjects.length > 0 ? canvasMinHeight : undefined,
                 }}
               >
                 {/* Sections wrapper — matches SectionRenderer gap */}
@@ -514,10 +501,7 @@ export default function EditorClient({
                         section={section}
                         index={index}
                         total={sections.length}
-                        isSelected={
-                          selected?.kind === "section" &&
-                          selected.key === section._key
-                        }
+                        isSelected={selected?.kind === "section" && selected.key === section._key}
                         onSelect={(e) => {
                           e.stopPropagation();
                           setSelected({
@@ -528,9 +512,7 @@ export default function EditorClient({
                         onMoveUp={() => moveSection(section._key, "up")}
                         onMoveDown={() => moveSection(section._key, "down")}
                         onDelete={() => deleteSection(section._key)}
-                        onChange={(patch) =>
-                          updateSection(section._key, patch)
-                        }
+                        onChange={(patch) => updateSection(section._key, patch)}
                       />
                     ))}
                   </div>
@@ -539,10 +521,7 @@ export default function EditorClient({
                   <EditableFreeObject
                     key={obj._key}
                     obj={obj}
-                    isSelected={
-                      selected?.kind === "freeObject" &&
-                      selected.key === obj._key
-                    }
+                    isSelected={selected?.kind === "freeObject" && selected.key === obj._key}
                     canvasRef={canvasRef}
                     onSelect={(e) => {
                       e.stopPropagation();
@@ -553,9 +532,7 @@ export default function EditorClient({
                     }}
                     onDelete={() => deleteFreeObject(obj._key)}
                     onChange={(patch) => updateFreeObject(obj._key, patch)}
-                    onExpandCanvas={(h) =>
-                      setCanvasMinHeight((prev) => Math.max(prev, h))
-                    }
+                    onExpandCanvas={(h) => setCanvasMinHeight((prev) => Math.max(prev, h))}
                   />
                 ))}
               </div>
@@ -563,12 +540,12 @@ export default function EditorClient({
 
             {/* Add Section button */}
             <div
-              className="flex justify-center py-4 border-t border-neutral-100"
+              className="flex justify-center border-t border-neutral-100 py-4"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setShowAddSection(true)}
-                className="rounded-full border border-neutral-300 bg-white px-5 py-1.5 text-xs text-neutral-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                className="rounded-full border border-neutral-300 bg-white px-5 py-1.5 text-xs text-neutral-600 transition-colors hover:border-blue-400 hover:text-blue-600"
               >
                 + Add Section
               </button>
@@ -579,7 +556,7 @@ export default function EditorClient({
 
       {/* Right properties drawer — overlays canvas */}
       {panelOpen && (
-        <div className="fixed right-0 top-0 bottom-0 z-50 flex">
+        <div className="fixed top-0 right-0 bottom-0 z-50 flex">
           {/* Backdrop — click to close */}
           <div
             className="hidden md:block md:w-[calc(100vw-320px)]"
@@ -596,10 +573,7 @@ export default function EditorClient({
             <PropertiesPanel
               freeObject={selectedFreeObject}
               onChange={(patch) =>
-                updateFreeObject(
-                  selectedFreeObject._key,
-                  patch as Partial<FreeObject>,
-                )
+                updateFreeObject(selectedFreeObject._key, patch as Partial<FreeObject>)
               }
               onClose={() => setSelected(null)}
             />
@@ -621,16 +595,14 @@ export default function EditorClient({
           onClick={() => setShowAddSection(false)}
         >
           <div
-            className="w-80 rounded-xl bg-white shadow-2xl p-5"
+            className="w-80 rounded-xl bg-white p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-neutral-900">
-                Add Section
-              </h3>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-neutral-900">Add Section</h3>
               <button
                 onClick={() => setShowAddSection(false)}
-                className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
+                className="p-1 text-lg leading-none text-neutral-400 hover:text-neutral-700"
                 aria-label="Close"
               >
                 ×
@@ -651,7 +623,7 @@ export default function EditorClient({
                     addSection(type);
                     setShowAddSection(false);
                   }}
-                  className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-3 text-sm text-neutral-700 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                  className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-3 text-left text-sm text-neutral-700 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
                 >
                   {label}
                 </button>

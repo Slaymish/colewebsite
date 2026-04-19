@@ -1,18 +1,18 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        pathname: '/images/**',
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        pathname: "/images/**",
       },
     ],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
   },
   // Exclude Sanity CLI and studio files from the Next.js build where not needed
   typedRoutes: false,
-}
+};
 
-export default nextConfig
+export default nextConfig;

@@ -1,10 +1,5 @@
 import Image from "next/image";
-import type {
-  FreeObject,
-  FreeImageObject,
-  FreeVideoObject,
-  FreeTextObject,
-} from "../types";
+import type { FreeObject, FreeImageObject, FreeVideoObject, FreeTextObject } from "../types";
 import { urlFor } from "../lib/sanity";
 import { renderBlock } from "../lib/renderBlock";
 import { getVimeoId, buildVimeoEmbedUrl } from "../lib/vimeo";
@@ -116,13 +111,9 @@ function MobileTextFallback({ obj }: { obj: FreeTextObject }) {
   );
 }
 
-export default function FreeObjectRenderer({
-  freeObjects,
-}: FreeObjectRendererProps) {
+export default function FreeObjectRenderer({ freeObjects }: FreeObjectRendererProps) {
   // Sort by yPercent for natural reading order on mobile
-  const sorted = [...freeObjects].sort(
-    (a, b) => (a.yPercent ?? 10) - (b.yPercent ?? 10),
-  );
+  const sorted = [...freeObjects].sort((a, b) => (a.yPercent ?? 10) - (b.yPercent ?? 10));
 
   return (
     <>
@@ -131,26 +122,11 @@ export default function FreeObjectRenderer({
         {sorted.map((obj) => {
           switch (obj._type) {
             case "freeImageObject":
-              return (
-                <MobileImageFallback
-                  key={obj._key}
-                  obj={obj as FreeImageObject}
-                />
-              );
+              return <MobileImageFallback key={obj._key} obj={obj as FreeImageObject} />;
             case "freeVideoObject":
-              return (
-                <MobileVideoFallback
-                  key={obj._key}
-                  obj={obj as FreeVideoObject}
-                />
-              );
+              return <MobileVideoFallback key={obj._key} obj={obj as FreeVideoObject} />;
             case "freeTextObject":
-              return (
-                <MobileTextFallback
-                  key={obj._key}
-                  obj={obj as FreeTextObject}
-                />
-              );
+              return <MobileTextFallback key={obj._key} obj={obj as FreeTextObject} />;
             default:
               return null;
           }

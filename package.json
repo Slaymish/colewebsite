@@ -2,11 +2,14 @@
   "name": "cole-website",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@portabletext/sanity-bridge": "1.2.14",
@@ -16,9 +19,11 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^4.22.0",
+    "knip": "^6.4.1",
     "motion": "^12.38.0",
     "next": "16.1.6",
     "next-sanity": "^11.6.12",
+    "prettier": "^3.8.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sanity": "^4.22.0"
@@ -30,6 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

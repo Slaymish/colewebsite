@@ -27,15 +27,12 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
 
-  const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://coleanderson.com";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://coleanderson.com";
   const ogImageUrl = project.og_image?.asset
     ? urlFor(project.og_image).width(1200).height(630).auto("format").url()
     : project.cover_image?.asset
@@ -92,21 +89,15 @@ export default async function ProjectPage({ params }: PageProps) {
     ? urlFor(project.cover_image).width(40).blur(10).url()
     : null;
 
-  const hasBody =
-    (project.sections?.length ?? 0) > 0 ||
-    (project.freeObjects?.length ?? 0) > 0;
+  const hasBody = (project.sections?.length ?? 0) > 0 || (project.freeObjects?.length ?? 0) > 0;
 
   const mainContent = (
-    <main
-      id="main-content"
-      className="min-w-0 md:flex"
-      aria-label={project.title}
-    >
-      <div className="relative w-full max-w-[1040px] mx-auto px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
+    <main id="main-content" className="min-w-0 md:flex" aria-label={project.title}>
+      <div className="relative mx-auto w-full max-w-[1040px] px-5 py-6 pb-16 md:px-10 md:py-8 md:pb-20 xl:px-12">
         <div className="flex flex-col gap-6">
           <Link
             href="/"
-            className="w-fit text-xs uppercase tracking-[0.1em] text-black/40 duration-100 hover:text-black"
+            className="w-fit text-xs tracking-[0.1em] text-black/40 uppercase duration-100 hover:text-black"
           >
             ← Back to home
           </Link>
@@ -128,15 +119,13 @@ export default async function ProjectPage({ params }: PageProps) {
           )}
 
           <div className="flex flex-col gap-3 pb-1">
-            <h1 className="text-[clamp(1.1rem,2vw,1.4rem)] font-bold uppercase tracking-[0.02em] leading-[1.15]">
+            <h1 className="text-[clamp(1.1rem,2vw,1.4rem)] leading-[1.15] font-bold tracking-[0.02em] uppercase">
               {project.title}
             </h1>
           </div>
 
           {hasBody ? (
-            <div
-              className={`relative${project.freeObjects?.length ? " md:min-h-[500px]" : ""}`}
-            >
+            <div className={`relative${project.freeObjects?.length ? "md:min-h-[500px]" : ""}`}>
               {project.sections && project.sections.length > 0 && (
                 <SectionRenderer sections={project.sections} />
               )}
@@ -146,11 +135,7 @@ export default async function ProjectPage({ params }: PageProps) {
             </div>
           ) : null}
 
-          <ProjectFooterNav
-            projects={projects}
-            currentSlug={slug}
-            createdAt={project.created_at}
-          />
+          <ProjectFooterNav projects={projects} currentSlug={slug} createdAt={project.created_at} />
         </div>
         <BackToTopButton />
       </div>
@@ -162,15 +147,11 @@ export default async function ProjectPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(projectJsonLd(project, settings)).replace(/</g, '\\u003c'),
+          __html: JSON.stringify(projectJsonLd(project, settings)).replace(/</g, "\\u003c"),
         }}
       />
 
-      <ProjectShell
-        settings={settings}
-        projects={projects}
-        activeSlug={slug}
-      >
+      <ProjectShell settings={settings} projects={projects} activeSlug={slug}>
         {mainContent}
       </ProjectShell>
     </>

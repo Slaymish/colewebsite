@@ -20,12 +20,15 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
   const borderRadius = section.borderRadius ?? 2;
 
   const nativeUrl = section.videoFile?.asset?.url ?? null;
+  const resetKey = `${section._key}|${nativeUrl}|${section.vimeoUrl}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
 
-  useEffect(() => {
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
     setNativeAspect(null);
     setVimeoAspect(null);
     setVimeoLoaded(false);
-  }, [section._key, nativeUrl, section.vimeoUrl]);
+  }
 
   useEffect(() => {
     if (nativeUrl || !section.vimeoUrl) return;
@@ -71,9 +74,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
             />
           </div>
           {section.caption && (
-            <figcaption className="mt-2 text-xs text-black/40">
-              {section.caption}
-            </figcaption>
+            <figcaption className="mt-2 text-xs text-black/40">{section.caption}</figcaption>
           )}
         </figure>
       </section>
@@ -97,8 +98,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
 
   const posterLqip =
     section.poster?.asset && "_id" in section.poster.asset
-      ? (section.poster.asset as { metadata?: { lqip?: string } }).metadata
-          ?.lqip ?? null
+      ? ((section.poster.asset as { metadata?: { lqip?: string } }).metadata?.lqip ?? null)
       : null;
 
   return (
@@ -155,9 +155,7 @@ export default function VideoSectionComponent({ section }: VideoSectionProps) {
           )}
         </div>
         {section.caption && (
-          <figcaption className="mt-2 text-xs text-black/40">
-            {section.caption}
-          </figcaption>
+          <figcaption className="mt-2 text-xs text-black/40">{section.caption}</figcaption>
         )}
       </figure>
     </section>

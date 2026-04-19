@@ -24,7 +24,7 @@ const fontSizeMap: Record<string, string> = {
 function ImageContent({ obj }: { obj: FreeImageObject }) {
   if (!obj.image?.asset) {
     return (
-      <div className="w-full h-24 bg-neutral-200 flex items-center justify-center text-xs text-neutral-400">
+      <div className="flex h-24 w-full items-center justify-center bg-neutral-200 text-xs text-neutral-400">
         No image
       </div>
     );
@@ -57,7 +57,7 @@ function VideoContent({ obj }: { obj: FreeVideoObject }) {
   if (!obj.vimeoUrl) {
     return (
       <div
-        className="w-full bg-neutral-900 flex items-center justify-center text-neutral-400 text-xs"
+        className="flex w-full items-center justify-center bg-neutral-900 text-xs text-neutral-400"
         style={{ aspectRatio, borderRadius }}
       >
         No URL
@@ -69,7 +69,7 @@ function VideoContent({ obj }: { obj: FreeVideoObject }) {
   if (!videoId) {
     return (
       <div
-        className="w-full bg-neutral-900 flex items-center justify-center text-neutral-400 text-xs"
+        className="flex w-full items-center justify-center bg-neutral-900 text-xs text-neutral-400"
         style={{ aspectRatio, borderRadius }}
       >
         Invalid Vimeo URL
@@ -83,10 +83,7 @@ function VideoContent({ obj }: { obj: FreeVideoObject }) {
   });
 
   return (
-    <div
-      className="overflow-hidden bg-neutral-900"
-      style={{ aspectRatio, borderRadius }}
-    >
+    <div className="overflow-hidden bg-neutral-900" style={{ aspectRatio, borderRadius }}>
       <iframe
         src={embedUrl}
         title="Video"
@@ -102,9 +99,7 @@ function VideoContent({ obj }: { obj: FreeVideoObject }) {
 
 function TextContent({ obj }: { obj: FreeTextObject }) {
   if (!obj.content?.length) {
-    return (
-      <div className="text-neutral-400 text-sm italic">No text content</div>
-    );
+    return <div className="text-sm text-neutral-400 italic">No text content</div>;
   }
   const fontSize = fontSizeMap[obj.fontSize ?? "base"] ?? "text-base";
   return (
@@ -187,10 +182,8 @@ export default function EditableFreeObject({
       const onMouseMove = (me: MouseEvent) => {
         if (!dragState.current || !canvasRef.current) return;
         const rect = canvasRef.current.getBoundingClientRect();
-        const dx =
-          ((me.clientX - dragState.current.startX) / rect.width) * 100;
-        const dy =
-          ((me.clientY - dragState.current.startY) / rect.height) * 100;
+        const dx = ((me.clientX - dragState.current.startX) / rect.width) * 100;
+        const dy = ((me.clientY - dragState.current.startY) / rect.height) * 100;
 
         if (dragState.current.type === "move") {
           const newYPct = dragState.current.startYPct + dy;
@@ -252,20 +245,12 @@ export default function EditableFreeObject({
         userSelect: "none",
       }}
       onClick={onSelect}
-      onMouseDown={
-        isSelected ? (e) => startInteraction(e, "move") : undefined
-      }
+      onMouseDown={isSelected ? (e) => startInteraction(e, "move") : undefined}
     >
       {/* Actual content — identical rendering to the public page */}
-      {obj._type === "freeImageObject" && (
-        <ImageContent obj={obj as FreeImageObject} />
-      )}
-      {obj._type === "freeVideoObject" && (
-        <VideoContent obj={obj as FreeVideoObject} />
-      )}
-      {obj._type === "freeTextObject" && (
-        <TextContent obj={obj as FreeTextObject} />
-      )}
+      {obj._type === "freeImageObject" && <ImageContent obj={obj as FreeImageObject} />}
+      {obj._type === "freeVideoObject" && <VideoContent obj={obj as FreeVideoObject} />}
+      {obj._type === "freeTextObject" && <TextContent obj={obj as FreeTextObject} />}
 
       {/* Editor chrome — only visible when selected */}
       {isSelected && (
@@ -297,9 +282,7 @@ export default function EditableFreeObject({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <span
-              style={{ color: "white", fontSize: 11, fontWeight: 600 }}
-            >
+            <span style={{ color: "white", fontSize: 11, fontWeight: 600 }}>
               {freeObjectLabel(obj._type)}
             </span>
             <button

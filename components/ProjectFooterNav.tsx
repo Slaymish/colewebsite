@@ -14,8 +14,7 @@ export default function ProjectFooterNav({
 }: ProjectFooterNavProps) {
   const ix = projects.findIndex((p) => p.slug.current === currentSlug);
   const prev = ix > 0 ? projects[ix - 1] : null;
-  const next =
-    ix >= 0 && ix < projects.length - 1 ? projects[ix + 1] : null;
+  const next = ix >= 0 && ix < projects.length - 1 ? projects[ix + 1] : null;
 
   return (
     <footer className="mt-14 flex flex-col gap-5 border-t border-black pt-8">

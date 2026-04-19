@@ -1,5 +1,5 @@
-import { project } from './schemas/project'
-import { siteSettings } from './schemas/siteSettings'
+import { project } from "./schemas/project";
+import { siteSettings } from "./schemas/siteSettings";
 import {
   heroSection,
   textSection,
@@ -11,7 +11,7 @@ import {
   freeImageObject,
   freeVideoObject,
   freeTextObject,
-} from './schemas/sections'
+} from "./schemas/sections";
 
 export const schemaTypes = [
   // Documents
@@ -29,4 +29,4 @@ export const schemaTypes = [
   freeImageObject,
   freeVideoObject,
   freeTextObject,
-]
+];

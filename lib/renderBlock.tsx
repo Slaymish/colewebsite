@@ -16,10 +16,8 @@ export function renderBlock(
 
   const text = block.children.map((child) => {
     let content: React.ReactNode = child.text;
-    if (child.marks.includes("strong"))
-      content = <strong key={child._key}>{content}</strong>;
-    if (child.marks.includes("em"))
-      content = <em key={child._key}>{content}</em>;
+    if (child.marks.includes("strong")) content = <strong key={child._key}>{content}</strong>;
+    if (child.marks.includes("em")) content = <em key={child._key}>{content}</em>;
 
     const linkMark = block.markDefs.find(
       (def) => child.marks.includes(def._key) && def._type === "link",
@@ -31,7 +29,7 @@ export function renderBlock(
           href={linkMark.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+          className="underline underline-offset-2 transition-opacity hover:opacity-70"
         >
           {content}
         </a>
@@ -58,9 +56,7 @@ export function renderBlock(
       return (
         <h3
           key={block._key}
-          className={
-            compact ? "text-xl font-medium" : "mt-6 text-xl font-medium"
-          }
+          className={compact ? "text-xl font-medium" : "mt-6 text-xl font-medium"}
         >
           {text}
         </h3>
@@ -74,10 +70,7 @@ export function renderBlock(
         );
       }
       return (
-        <blockquote
-          key={block._key}
-          className="border-l-2 border-black pl-4 italic text-black/50"
-        >
+        <blockquote key={block._key} className="border-l-2 border-black pl-4 text-black/50 italic">
           {text}
         </blockquote>
       );
