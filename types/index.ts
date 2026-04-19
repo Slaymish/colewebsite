@@ -181,6 +181,8 @@ export interface Project {
   category?: string;
   tags?: string[];
   sidebarMode?: "auto" | "hidden";
+  isSelectedOnHome?: boolean;
+  homeOrder?: number;
   meta_description?: string;
   cover_image?: SanityImage;
   og_image?: SanityImage;
@@ -197,6 +199,8 @@ export interface ProjectSummary {
   category?: string;
   tags?: string[];
   sidebarMode?: "auto" | "hidden";
+  isSelectedOnHome?: boolean;
+  homeOrder?: number;
   cover_image?: SanityImage;
 }
 

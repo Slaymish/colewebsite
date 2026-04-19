@@ -2,12 +2,26 @@ import Image from "next/image";
 import Link from "next/link";
 import BackToTopButton from "../components/BackToTopButton";
 import Header from "../components/Header";
-import { getAllPublishedProjects, getSiteSettings } from "../lib/queries";
+import {
+  getAllPublishedProjects,
+  getSelectedProjectsForHome,
+  getSiteSettings,
+} from "../lib/queries";
 import { urlFor } from "../lib/sanity";
 import { personJsonLd, websiteJsonLd } from "../lib/structured-data";
 
 export default async function HomePage() {
-  const [projects, settings] = await Promise.all([getAllPublishedProjects(), getSiteSettings()]);
+  // `allProjects` feeds the sidebar project list; `homeProjects` is the
+  // "Selected Work" list in the main column (only those flagged isSelectedOnHome).
+  // Falls back to all published projects when none are explicitly selected,
+  // so the home page isn't empty before the selection has been configured.
+  const [allProjects, homeProjectsRaw, settings] = await Promise.all([
+    getAllPublishedProjects(),
+    getSelectedProjectsForHome(),
+    getSiteSettings(),
+  ]);
+  const projects = allProjects;
+  const homeProjects = homeProjectsRaw.length > 0 ? homeProjectsRaw : allProjects;
 
   const name = settings?.name ?? "Cole Anderson";
   const bio = settings?.bio ?? "Designer and creative.";
@@ -40,7 +54,7 @@ export default async function HomePage() {
               </section>
 
               <section className="flex flex-col gap-12" aria-label={`${name} projects`}>
-                {projects.map((project, index) => {
+                {homeProjects.map((project, index) => {
                   const cover = project.cover_image
                     ? urlFor(project.cover_image).width(1600).auto("format").url()
                     : null;
@@ -54,6 +68,7 @@ export default async function HomePage() {
                       key={project._id}
                       href={`/project/${project.slug.current}`}
                       className="flex flex-col gap-2"
+                      aria-label={project.title}
                     >
                       {cover && (
                         <div className="w-full overflow-hidden bg-black/[0.03]">
@@ -70,16 +85,6 @@ export default async function HomePage() {
                           />
                         </div>
                       )}
-                      <div className="flex items-baseline justify-between gap-4">
-                        <h2 className="text-sm font-normal tracking-[0.05em] uppercase">
-                          {project.title}
-                        </h2>
-                        {project.created_at && (
-                          <span className="text-xs whitespace-nowrap text-black/40">
-                            {new Date(project.created_at).getFullYear()}
-                          </span>
-                        )}
-                      </div>
                     </Link>
                   );
                 })}

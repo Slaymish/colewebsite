@@ -23,8 +23,10 @@ Primary goal: present projects with a clean, flexible layout that is easy for Co
 - `/` — Hero then project list (home).
 - `/project/:slug` — Individual project page (deep linkable).
 - `/admin`
-  - `/admin/edit` — Visual project editor (optional modules, not freeform DnD unless explicitly requested).
-  - `/admin/cms` — CMS management (create projects, upload media, edit copy).
+  - `/admin/edit` — Project list, page shortcuts, and entry to the visual editor.
+  - `/admin/edit/[slug]` — Visual project editor (sections, free objects, page settings, autosave, drag reorder).
+  - `/admin/edit/home` — Homepage editor — choose Selected Work and drag to reorder.
+  - `/admin/edit/about`, `/admin/edit/contact` — Scoped Site Settings editors.
 
 Notes
 
@@ -194,10 +196,10 @@ Specific target
 
 ## How you update content (short)
 
-1. Log in to `/admin/cms`.
-2. Create or open a project.
-3. Add sections using modules. Fill alt and OG fields.
-4. Save as draft. Use preview.
+1. Log in to `/admin/edit`.
+2. Create or open a project (or use the Home / About / Contact shortcuts).
+3. Add sections using the editor modules. Fill alt and OG fields.
+4. Save as draft (autosave runs in the background) and use Preview.
 5. Publish. Confirm project page loads at `/project/:slug`. Check sitemap and analytics.
 
 ---

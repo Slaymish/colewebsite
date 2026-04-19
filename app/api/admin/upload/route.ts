@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       "video/mp4",
       "video/webm",
       "video/quicktime",
+      "application/pdf",
     ]);
 
     const formData = await request.formData();
@@ -32,7 +33,9 @@ export async function POST(request: NextRequest) {
     }
 
     const client = getWriteClient();
-    const type = file.type.startsWith("video/") ? "file" : "image";
+    // Images go to the image pipeline (gets LQIP metadata); everything else
+    // (videos, PDFs) goes to the generic file asset type.
+    const type = file.type.startsWith("image/") ? "image" : "file";
     const buffer = Buffer.from(await file.arrayBuffer());
     const asset = await client.assets.upload(type, buffer, {
       filename: file.name,

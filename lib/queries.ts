@@ -12,6 +12,8 @@ const PROJECT_SUMMARY_FIELDS = `
   category,
   tags,
   sidebarMode,
+  isSelectedOnHome,
+  homeOrder,
   cover_image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
 `;
 
@@ -35,7 +37,7 @@ const PROJECT_FULL_FIELDS = `
     },
     _type == 'videoSection' => {
       poster { ..., asset->{ _id, url, metadata { dimensions } } },
-      videoFile { asset->{ url } }
+      videoFile { asset->{ _id, url } }
     }
   },
   freeObjects[] {
@@ -44,7 +46,7 @@ const PROJECT_FULL_FIELDS = `
       image { ..., asset->{ _id, url, metadata { dimensions, lqip } } }
     },
     _type == 'freeVideoObject' => {
-      videoFile { asset->{ url } }
+      videoFile { asset->{ _id, url } }
     }
   }
 `;
@@ -53,6 +55,18 @@ export async function getAllPublishedProjects(): Promise<ProjectSummary[]> {
   if (!isSanityConfigured()) return [];
   return getClient().fetch(
     `*[_type == "project" && status == "published"] | order(created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
+  );
+}
+
+/**
+ * Projects explicitly flagged as "selected on home" for the home page.
+ * Ordered by `homeOrder` ascending, falling back to newest created_at.
+ */
+export async function getSelectedProjectsForHome(): Promise<ProjectSummary[]> {
+  if (!isSanityConfigured()) return [];
+  return getClient().fetch(
+    `*[_type == "project" && status == "published" && isSelectedOnHome == true]
+      | order(coalesce(homeOrder, 9999) asc, created_at desc) { ${PROJECT_SUMMARY_FIELDS} }`,
   );
 }
 
@@ -75,7 +89,16 @@ export async function getAllProjectSlugs(): Promise<string[]> {
 
 export async function getSiteSettings(): Promise<SiteSettings | null> {
   if (!isSanityConfigured()) return null;
-  return getClient().fetch(`*[_type == "siteSettings"][0]`);
+  // Expand asset references so consumers can read `url` directly for:
+  //  - logo (image)
+  //  - cv.file (PDF uploaded via the admin editor)
+  return getClient().fetch(
+    `*[_type == "siteSettings"][0] {
+      ...,
+      logo { ..., asset->{ _id, url, metadata { dimensions, lqip } } },
+      cv { url, file { asset->{ _id, url } } }
+    }`,
+  );
 }
 
 // Admin queries — fetch all projects regardless of status

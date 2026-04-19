@@ -7,12 +7,15 @@ interface ProjectSidebarProps {
   activeSlug?: string;
   /** Softer typography on project pages so the main column reads as primary. */
   muted?: boolean;
+  /** When true, project links point at the /admin/edit routes. */
+  editMode?: boolean;
 }
 
 export default function ProjectSidebar({
   projects,
   activeSlug,
   muted = false,
+  editMode = false,
 }: ProjectSidebarProps) {
   const uncategorized = projects.filter((project) => {
     const category = project.category?.trim();
@@ -49,6 +52,7 @@ export default function ProjectSidebar({
                     key={project._id}
                     project={project}
                     isActive={project.slug.current === activeSlug}
+                    editMode={editMode}
                   />
                 ))}
               </div>
@@ -63,6 +67,7 @@ export default function ProjectSidebar({
                     key={project._id}
                     project={project}
                     isActive={project.slug.current === activeSlug}
+                    editMode={editMode}
                   />
                 ))}
               </div>

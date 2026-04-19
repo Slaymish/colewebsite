@@ -22,7 +22,21 @@ export default function ImageUploadField({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [hotspotEditing, setHotspotEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const hotspot = image?.hotspot;
+
+  const setHotspot = (x: number, y: number) => {
+    if (!image) return;
+    onChange({
+      ...image,
+      // Sanity's hotspot format: x/y are the focal point (0-1), width/height
+      // describe a focal region. We keep w/h at 1 so urlFor treats the whole
+      // image as the focal region with a focal point at x,y.
+      hotspot: { x, y, width: 1, height: 1 },
+    });
+  };
 
   const thumbUrl = image?.asset
     ? (() => {
@@ -113,23 +127,88 @@ export default function ImageUploadField({
               className="h-auto w-full object-cover"
               sizes="300px"
             />
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+
+            {/* Hotspot editor overlay — click anywhere on the image to set
+                the focal point. Active only while `hotspotEditing` is true. */}
+            {hotspotEditing && (
               <button
                 type="button"
-                onClick={() => inputRef.current?.click()}
-                disabled={uploading}
-                className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow hover:bg-neutral-50"
-              >
-                Replace
-              </button>
-              <button
-                type="button"
-                onClick={() => onChange(undefined)}
-                className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-red-600 shadow hover:bg-red-50"
-              >
-                Remove
-              </button>
-            </div>
+                aria-label="Click to set focal point"
+                className="absolute inset-0 cursor-crosshair bg-black/10"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = (e.clientX - rect.left) / rect.width;
+                  const y = (e.clientY - rect.top) / rect.height;
+                  setHotspot(Math.min(1, Math.max(0, x)), Math.min(1, Math.max(0, y)));
+                }}
+              />
+            )}
+
+            {/* Existing focal point indicator (always visible when set) */}
+            {hotspot && (
+              <div
+                className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-blue-500 shadow"
+                style={{
+                  left: `${(hotspot.x ?? 0.5) * 100}%`,
+                  top: `${(hotspot.y ?? 0.5) * 100}%`,
+                }}
+                aria-hidden="true"
+              />
+            )}
+
+            {!hotspotEditing && (
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  disabled={uploading}
+                  className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow hover:bg-neutral-50"
+                >
+                  Replace
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHotspotEditing(true)}
+                  className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow hover:bg-neutral-50"
+                >
+                  {hotspot ? "Move focus" : "Set focus"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChange(undefined)}
+                  className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-red-600 shadow hover:bg-red-50"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            {/* Exit hotspot editing — shown above the image */}
+            {hotspotEditing && (
+              <div className="absolute top-2 right-2 flex items-center gap-2">
+                {hotspot && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!image) return;
+                      const rest = { ...image };
+                      delete (rest as { hotspot?: unknown }).hotspot;
+                      onChange(rest);
+                    }}
+                    className="rounded-md bg-white px-2 py-1 text-xs font-medium text-red-600 shadow hover:bg-red-50"
+                  >
+                    Clear focus
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setHotspotEditing(false)}
+                  className="rounded-md bg-white px-2 py-1 text-xs font-medium text-neutral-700 shadow hover:bg-neutral-50"
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <button

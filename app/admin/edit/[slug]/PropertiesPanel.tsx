@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type {
   Project,
   Section,
@@ -527,7 +528,9 @@ function ImagePanel({
   );
 }
 
-// Gallery images editor — add, remove, reorder
+// Gallery images editor — add, remove, reorder (drag-and-drop + arrow buttons)
+const GALLERY_DRAG_MIME = "application/x-gallery-image-key";
+
 function GalleryImagesEditor({
   images,
   onChange,
@@ -535,6 +538,10 @@ function GalleryImagesEditor({
   images: (SanityImage & { _key: string })[];
   onChange: (images: (SanityImage & { _key: string })[]) => void;
 }) {
+  const [draggingKey, setDraggingKey] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+  const [dropPlacement, setDropPlacement] = useState<"before" | "after">("before");
+
   const addImage = (img: SanityImage | undefined) => {
     if (!img) return;
     const withKey = { ...img, _key: `img-${Date.now()}` } as SanityImage & { _key: string };
@@ -555,6 +562,22 @@ function GalleryImagesEditor({
     onChange(arr);
   };
 
+  const reorderByDrop = (sourceKey: string, targetKey: string, placement: "before" | "after") => {
+    if (sourceKey === targetKey) return;
+    const arr = [...images];
+    const fromIdx = arr.findIndex((i) => i._key === sourceKey);
+    if (fromIdx === -1) return;
+    const [moved] = arr.splice(fromIdx, 1);
+    let toIdx = arr.findIndex((i) => i._key === targetKey);
+    if (toIdx === -1) {
+      arr.push(moved);
+    } else {
+      if (placement === "after") toIdx += 1;
+      arr.splice(toIdx, 0, moved);
+    }
+    onChange(arr);
+  };
+
   return (
     <div className="space-y-2">
       {images.map((img, idx) => {
@@ -565,11 +588,78 @@ function GalleryImagesEditor({
           const asset = img.asset as { url?: string };
           thumbUrl = asset.url ?? null;
         }
+
+        const isDraggedItem = draggingKey === img._key;
+        const isDropTarget = dragOverKey === img._key && draggingKey !== img._key;
+
         return (
           <div
             key={img._key}
-            className="flex items-center gap-2 rounded border border-neutral-200 p-1.5"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData(GALLERY_DRAG_MIME, img._key);
+              e.dataTransfer.setData("text/plain", img._key);
+              setDraggingKey(img._key);
+            }}
+            onDragEnd={() => {
+              setDraggingKey(null);
+              setDragOverKey(null);
+            }}
+            onDragOver={(e) => {
+              if (!e.dataTransfer.types.includes(GALLERY_DRAG_MIME)) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              const rect = e.currentTarget.getBoundingClientRect();
+              const midY = rect.top + rect.height / 2;
+              setDragOverKey(img._key);
+              setDropPlacement(e.clientY < midY ? "before" : "after");
+            }}
+            onDragLeave={(e) => {
+              // Only clear if we're leaving the row itself, not crossing into a child
+              if (e.currentTarget === e.target) {
+                if (dragOverKey === img._key) setDragOverKey(null);
+              }
+            }}
+            onDrop={(e) => {
+              const sourceKey = e.dataTransfer.getData(GALLERY_DRAG_MIME);
+              if (!sourceKey) return;
+              e.preventDefault();
+              reorderByDrop(sourceKey, img._key, dropPlacement);
+              setDragOverKey(null);
+              setDraggingKey(null);
+            }}
+            className={`relative flex items-center gap-2 rounded border p-1.5 transition-colors ${
+              isDraggedItem
+                ? "border-blue-300 opacity-40"
+                : isDropTarget
+                  ? "border-blue-400 bg-blue-50/40"
+                  : "border-neutral-200"
+            }`}
           >
+            {isDropTarget && dropPlacement === "before" && (
+              <div className="pointer-events-none absolute -top-[2px] right-0 left-0 h-[2px] bg-blue-500" />
+            )}
+            {isDropTarget && dropPlacement === "after" && (
+              <div className="pointer-events-none absolute right-0 -bottom-[2px] left-0 h-[2px] bg-blue-500" />
+            )}
+
+            {/* Drag grip */}
+            <span
+              className="flex shrink-0 cursor-grab items-center text-neutral-400 active:cursor-grabbing"
+              title="Drag to reorder"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 6 10" width="8" height="12" fill="currentColor">
+                <circle cx="1" cy="1" r="1" />
+                <circle cx="5" cy="1" r="1" />
+                <circle cx="1" cy="5" r="1" />
+                <circle cx="5" cy="5" r="1" />
+                <circle cx="1" cy="9" r="1" />
+                <circle cx="5" cy="9" r="1" />
+              </svg>
+            </span>
+
             <div className="h-10 w-14 shrink-0 overflow-hidden rounded bg-neutral-100">
               {thumbUrl ? (
                 <img src={thumbUrl} alt="" className="h-full w-full object-cover" />
@@ -579,7 +669,33 @@ function GalleryImagesEditor({
                 </div>
               )}
             </div>
-            <div className="flex flex-1 items-center gap-1">
+            <div className="flex flex-1 flex-col gap-1">
+              <input
+                type="text"
+                value={img.alt ?? ""}
+                onChange={(e) =>
+                  onChange(
+                    images.map((i) => (i._key === img._key ? { ...i, alt: e.target.value } : i)),
+                  )
+                }
+                placeholder="Alt text (for accessibility)"
+                className="w-full rounded border border-neutral-200 bg-white px-2 py-1 text-xs focus:border-neutral-400 focus:outline-none"
+              />
+              <input
+                type="text"
+                value={img.caption ?? ""}
+                onChange={(e) =>
+                  onChange(
+                    images.map((i) =>
+                      i._key === img._key ? { ...i, caption: e.target.value } : i,
+                    ),
+                  )
+                }
+                placeholder="Caption (optional)"
+                className="w-full rounded border border-neutral-200 bg-white px-2 py-1 text-xs focus:border-neutral-400 focus:outline-none"
+              />
+            </div>
+            <div className="flex shrink-0 flex-col items-center gap-0">
               <button
                 onClick={() => moveImage(img._key, "up")}
                 disabled={idx === 0}
@@ -597,7 +713,7 @@ function GalleryImagesEditor({
             </div>
             <button
               onClick={() => removeImage(img._key)}
-              className="px-1 text-xs text-neutral-400 hover:text-red-500"
+              className="shrink-0 px-1 text-xs text-neutral-400 hover:text-red-500"
               title="Remove"
             >
               ✕
@@ -1016,6 +1132,15 @@ function PageSettingsPanel({
         label="Cover"
       />
 
+      <SectionDivider label="Social preview (OG image)" />
+
+      <ImageUploadField
+        image={project.og_image}
+        onChange={(img) => onChange({ og_image: img })}
+        label="OG image (1200×630 recommended)"
+      />
+      <p className="-mt-2 text-xs text-neutral-400">Falls back to the cover image when empty.</p>
+
       <SectionDivider label="Taxonomy" />
 
       <Field label="Category">
@@ -1053,6 +1178,18 @@ function PageSettingsPanel({
           ]}
         />
       </Field>
+
+      <SectionDivider label="Home page" />
+
+      <ToggleInput
+        value={project.isSelectedOnHome ?? false}
+        onChange={(v) => onChange({ isSelectedOnHome: v })}
+        label="Show on home page"
+      />
+      <p className="-mt-2 text-xs text-neutral-400">
+        Only projects flagged here appear in the Selected Work list. Reorder them from the Home page
+        editor.
+      </p>
     </div>
   );
 }

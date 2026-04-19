@@ -66,6 +66,20 @@ export const project = defineType({
       },
     },
     {
+      name: "isSelectedOnHome",
+      title: "Show on home page",
+      type: "boolean",
+      initialValue: false,
+      description: "When true, this project appears in the Selected Work list on the home page.",
+    },
+    {
+      name: "homeOrder",
+      title: "Home order",
+      type: "number",
+      description:
+        "Ordering index for the home page. Lower numbers appear first. Managed from the homepage editor.",
+    },
+    {
       name: "meta_description",
       title: "Meta Description",
       type: "text",
