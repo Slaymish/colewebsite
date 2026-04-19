@@ -4,9 +4,7 @@ import type { Section, FreeObject } from "../types";
 export function getWriteClient() {
   const token = process.env.SANITY_API_TOKEN;
   if (!token) {
-    throw new Error(
-      "SANITY_API_TOKEN is not set. Add it to your .env.local file.",
-    );
+    throw new Error("SANITY_API_TOKEN is not set. Add it to your .env.local file.");
   }
   return createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -64,9 +62,7 @@ export async function saveProject(payload: SaveProjectPayload): Promise<void> {
   // Strip expanded asset data before writing — Sanity only accepts plain references
   const cleanSections = stripExpandedAssets(payload.sections) as Section[];
 
-  const cleanFreeObjects = stripExpandedAssets(
-    payload.freeObjects ?? [],
-  ) as FreeObject[];
+  const cleanFreeObjects = stripExpandedAssets(payload.freeObjects ?? []) as FreeObject[];
 
   const patch: Record<string, unknown> = {
     sections: cleanSections,
@@ -75,8 +71,7 @@ export async function saveProject(payload: SaveProjectPayload): Promise<void> {
 
   if (payload.status !== undefined) patch.status = payload.status;
   if (payload.title !== undefined) patch.title = payload.title;
-  if (payload.meta_description !== undefined)
-    patch.meta_description = payload.meta_description;
+  if (payload.meta_description !== undefined) patch.meta_description = payload.meta_description;
   if (payload.category !== undefined) patch.category = payload.category || null;
   if (payload.tags !== undefined) patch.tags = payload.tags;
 

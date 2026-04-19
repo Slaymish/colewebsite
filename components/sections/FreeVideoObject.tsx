@@ -9,9 +9,7 @@ interface FreeVideoObjectProps {
   obj: FreeVideoObject;
 }
 
-export default function FreeVideoObjectComponent({
-  obj,
-}: FreeVideoObjectProps) {
+export default function FreeVideoObjectComponent({ obj }: FreeVideoObjectProps) {
   const x = obj.xPercent ?? 10;
   const y = obj.yPercent ?? 10;
   const width = obj.widthPercent ?? 40;

@@ -6,9 +6,7 @@ interface GallerySectionProps {
   section: GallerySection;
 }
 
-export default function GallerySectionComponent({
-  section,
-}: GallerySectionProps) {
+export default function GallerySectionComponent({ section }: GallerySectionProps) {
   if (!section.images?.length) return null;
 
   const cols = section.columns ?? 2;
@@ -30,19 +28,14 @@ export default function GallerySectionComponent({
 
   return (
     <section className="px-5 py-4 md:px-8 md:py-6">
-      <div
-        className={`grid ${gridClass}`}
-        style={{ gap }}
-        role="list"
-        aria-label="Image gallery"
-      >
+      <div className={`grid ${gridClass}`} style={{ gap }} role="list" aria-label="Image gallery">
         {validImages.map((image, galleryIndex) => {
           const src = galleryImages[galleryIndex].src;
           const thumb = urlFor(image).width(40).blur(10).url();
 
           const imageAspectRatio = image.aspectRatio || aspectRatio;
 
-        return (
+          return (
             <figure key={image._key} role="listitem">
               <div
                 className="overflow-hidden bg-black/[0.03]"
@@ -64,9 +57,7 @@ export default function GallerySectionComponent({
                 />
               </div>
               {image.caption && (
-                <figcaption className="mt-1 text-xs text-black/40">
-                  {image.caption}
-                </figcaption>
+                <figcaption className="mt-1 text-xs text-black/40">{image.caption}</figcaption>
               )}
             </figure>
           );

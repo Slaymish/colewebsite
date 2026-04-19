@@ -32,11 +32,7 @@ async function ProjectList() {
     <ul className="divide-y divide-neutral-100">
       {projects.map((project) => {
         const thumbUrl = project.cover_image
-          ? urlFor(project.cover_image)
-              .width(120)
-              .height(80)
-              .auto("format")
-              .url()
+          ? urlFor(project.cover_image).width(120).height(80).auto("format").url()
           : null;
 
         return (
@@ -63,9 +59,7 @@ async function ProjectList() {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="truncate font-medium text-neutral-900">
-                    {project.title}
-                  </span>
+                  <span className="truncate font-medium text-neutral-900">{project.title}</span>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
                       project.status === "published"
@@ -116,12 +110,8 @@ export default async function AdminEditPage() {
       <div className="mx-auto max-w-3xl px-6 py-12">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-neutral-900">
-              Edit Projects
-            </h1>
-            <p className="mt-1 text-sm text-neutral-500">
-              Select a project to edit its layout
-            </p>
+            <h1 className="text-2xl font-semibold text-neutral-900">Edit Projects</h1>
+            <p className="mt-1 text-sm text-neutral-500">Select a project to edit its layout</p>
           </div>
           <LogoutButton />
         </div>
@@ -129,9 +119,7 @@ export default async function AdminEditPage() {
         <div className="rounded-2xl border border-neutral-100 bg-white px-4 shadow-sm">
           <Suspense
             fallback={
-              <div className="py-8 text-center text-sm text-neutral-400">
-                Loading projects…
-              </div>
+              <div className="py-8 text-center text-sm text-neutral-400">Loading projects…</div>
             }
           >
             <ProjectList />

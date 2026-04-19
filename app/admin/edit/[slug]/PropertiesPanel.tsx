@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import type {
   Project,
@@ -15,43 +15,43 @@ import type {
   FreeImageObject,
   FreeVideoObject,
   FreeTextObject,
-} from '../../../../types'
-import { urlFor } from '../../../../lib/sanity'
-import ImageUploadField from './ImageUploadField'
+} from "../../../../types";
+import { urlFor } from "../../../../lib/sanity";
+import ImageUploadField from "./ImageUploadField";
 
 type PropsPanelProps =
   | {
-      section: Section
-      freeObject?: undefined
-      project?: undefined
-      onChange: (patch: Partial<Section>) => void
-      onClose: () => void
+      section: Section;
+      freeObject?: undefined;
+      project?: undefined;
+      onChange: (patch: Partial<Section>) => void;
+      onClose: () => void;
     }
   | {
-      section?: undefined
-      freeObject: FreeObject
-      project?: undefined
-      onChange: (patch: Partial<FreeObject>) => void
-      onClose: () => void
+      section?: undefined;
+      freeObject: FreeObject;
+      project?: undefined;
+      onChange: (patch: Partial<FreeObject>) => void;
+      onClose: () => void;
     }
   | {
-      section?: undefined
-      freeObject?: undefined
-      project: Project
-      onChange: (patch: Partial<Project>) => void
-      onClose: () => void
-    }
+      section?: undefined;
+      freeObject?: undefined;
+      project: Project;
+      onChange: (patch: Partial<Project>) => void;
+      onClose: () => void;
+    };
 
 // Shared input components
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <label className="block text-xs font-medium text-neutral-500 uppercase tracking-wide">
+      <label className="block text-xs font-medium tracking-wide text-neutral-500 uppercase">
         {label}
       </label>
       {children}
     </div>
-  )
+  );
 }
 
 function TextInput({
@@ -59,9 +59,9 @@ function TextInput({
   onChange,
   placeholder,
 }: {
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <input
@@ -71,7 +71,7 @@ function TextInput({
       placeholder={placeholder}
       className="w-full rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 placeholder-neutral-400 focus:border-neutral-400 focus:outline-none"
     />
-  )
+  );
 }
 
 function NumberInput({
@@ -81,11 +81,11 @@ function NumberInput({
   max,
   step = 1,
 }: {
-  value: number
-  onChange: (v: number) => void
-  min?: number
-  max?: number
-  step?: number
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ function NumberInput({
         max={max}
         step={step}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="flex-1 h-1.5 accent-blue-500"
+        className="h-1.5 flex-1 accent-blue-500"
       />
       <input
         type="number"
@@ -106,15 +106,15 @@ function NumberInput({
         step={step}
         onChange={(e) => onChange(Number(e.target.value))}
         onBlur={(e) => {
-          let v = Number(e.target.value)
-          if (min !== undefined) v = Math.max(min, v)
-          if (max !== undefined) v = Math.min(max, v)
-          onChange(v)
+          let v = Number(e.target.value);
+          if (min !== undefined) v = Math.max(min, v);
+          if (max !== undefined) v = Math.min(max, v);
+          onChange(v);
         }}
-        className="w-16 rounded border border-neutral-200 bg-white px-2 py-1 text-xs text-neutral-900 text-right focus:border-neutral-400 focus:outline-none"
+        className="w-16 rounded border border-neutral-200 bg-white px-2 py-1 text-right text-xs text-neutral-900 focus:border-neutral-400 focus:outline-none"
       />
     </div>
-  )
+  );
 }
 
 function ToggleInput({
@@ -122,23 +122,23 @@ function ToggleInput({
   onChange,
   label,
 }: {
-  value: boolean
-  onChange: (v: boolean) => void
-  label: string
+  value: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
 }) {
   return (
-    <label className="flex items-center gap-2 cursor-pointer">
+    <label className="flex cursor-pointer items-center gap-2">
       <div
-        className={`relative w-9 h-5 rounded-full transition-colors ${value ? 'bg-blue-500' : 'bg-neutral-200'}`}
+        className={`relative h-5 w-9 rounded-full transition-colors ${value ? "bg-blue-500" : "bg-neutral-200"}`}
         onClick={() => onChange(!value)}
       >
         <div
-          className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-4' : 'translate-x-0.5'}`}
+          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`}
         />
       </div>
       <span className="text-sm text-neutral-700">{label}</span>
     </label>
-  )
+  );
 }
 
 function SelectInput({
@@ -146,9 +146,9 @@ function SelectInput({
   onChange,
   options,
 }: {
-  value: string
-  onChange: (v: string) => void
-  options: { label: string; value: string }[]
+  value: string;
+  onChange: (v: string) => void;
+  options: { label: string; value: string }[];
 }) {
   return (
     <select
@@ -162,18 +162,18 @@ function SelectInput({
         </option>
       ))}
     </select>
-  )
+  );
 }
 
 function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 pt-2">
-      <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+      <span className="text-xs font-semibold tracking-wider text-neutral-400 uppercase">
         {label}
       </span>
-      <div className="flex-1 h-px bg-neutral-100" />
+      <div className="h-px flex-1 bg-neutral-100" />
     </div>
-  )
+  );
 }
 
 // === Shared free position controls ===
@@ -182,8 +182,8 @@ function FreePositionControls({
   obj,
   onChange,
 }: {
-  obj: FreeObject
-  onChange: (patch: Partial<FreeObject>) => void
+  obj: FreeObject;
+  onChange: (patch: Partial<FreeObject>) => void;
 }) {
   return (
     <>
@@ -244,7 +244,7 @@ function FreePositionControls({
         />
       </Field>
     </>
-  )
+  );
 }
 
 // === Per-type panels (sections) ===
@@ -253,14 +253,14 @@ function HeroPanel({
   section,
   onChange,
 }: {
-  section: HeroSection
-  onChange: (patch: Partial<HeroSection>) => void
+  section: HeroSection;
+  onChange: (patch: Partial<HeroSection>) => void;
 }) {
   return (
     <div className="space-y-4">
       <Field label="Heading">
         <TextInput
-          value={section.heading ?? ''}
+          value={section.heading ?? ""}
           onChange={(v) => onChange({ heading: v })}
           placeholder="Hero heading\u2026"
         />
@@ -268,7 +268,7 @@ function HeroPanel({
 
       <Field label="Subheading">
         <TextInput
-          value={section.subheading ?? ''}
+          value={section.subheading ?? ""}
           onChange={(v) => onChange({ subheading: v })}
           placeholder="Subheading\u2026"
         />
@@ -278,37 +278,37 @@ function HeroPanel({
 
       <Field label="Minimum Height">
         <SelectInput
-          value={section.minHeight ?? '60vh'}
-          onChange={(v) => onChange({ minHeight: v as HeroSection['minHeight'] })}
+          value={section.minHeight ?? "60vh"}
+          onChange={(v) => onChange({ minHeight: v as HeroSection["minHeight"] })}
           options={[
-            { label: '40vh', value: '40vh' },
-            { label: '60vh', value: '60vh' },
-            { label: '80vh', value: '80vh' },
-            { label: '100vh (full screen)', value: '100vh' },
+            { label: "40vh", value: "40vh" },
+            { label: "60vh", value: "60vh" },
+            { label: "80vh", value: "80vh" },
+            { label: "100vh (full screen)", value: "100vh" },
           ]}
         />
       </Field>
 
       <Field label="Text Position">
         <SelectInput
-          value={section.textPosition ?? 'bottom'}
-          onChange={(v) => onChange({ textPosition: v as HeroSection['textPosition'] })}
+          value={section.textPosition ?? "bottom"}
+          onChange={(v) => onChange({ textPosition: v as HeroSection["textPosition"] })}
           options={[
-            { label: 'Top', value: 'top' },
-            { label: 'Center', value: 'center' },
-            { label: 'Bottom', value: 'bottom' },
+            { label: "Top", value: "top" },
+            { label: "Center", value: "center" },
+            { label: "Bottom", value: "bottom" },
           ]}
         />
       </Field>
 
       <Field label="Text Alignment">
         <SelectInput
-          value={section.textAlign ?? 'left'}
-          onChange={(v) => onChange({ textAlign: v as HeroSection['textAlign'] })}
+          value={section.textAlign ?? "left"}
+          onChange={(v) => onChange({ textAlign: v as HeroSection["textAlign"] })}
           options={[
-            { label: 'Left', value: 'left' },
-            { label: 'Center', value: 'center' },
-            { label: 'Right', value: 'right' },
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
           ]}
         />
       </Field>
@@ -333,92 +333,92 @@ function HeroPanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 function TextPanel({
   section,
   onChange,
 }: {
-  section: TextSection
-  onChange: (patch: Partial<TextSection>) => void
+  section: TextSection;
+  onChange: (patch: Partial<TextSection>) => void;
 }) {
   return (
     <div className="space-y-4">
       <Field label="Max Width">
         <SelectInput
-          value={section.maxWidth ?? 'md'}
-          onChange={(v) => onChange({ maxWidth: v as TextSection['maxWidth'] })}
+          value={section.maxWidth ?? "md"}
+          onChange={(v) => onChange({ maxWidth: v as TextSection["maxWidth"] })}
           options={[
-            { label: 'Small (640px)', value: 'sm' },
-            { label: 'Medium (768px)', value: 'md' },
-            { label: 'Large (1024px)', value: 'lg' },
-            { label: 'Extra Large (1280px)', value: 'xl' },
-            { label: 'Full Width', value: 'full' },
+            { label: "Small (640px)", value: "sm" },
+            { label: "Medium (768px)", value: "md" },
+            { label: "Large (1024px)", value: "lg" },
+            { label: "Extra Large (1280px)", value: "xl" },
+            { label: "Full Width", value: "full" },
           ]}
         />
       </Field>
 
       <Field label="Text Alignment">
         <SelectInput
-          value={section.textAlign ?? 'left'}
-          onChange={(v) => onChange({ textAlign: v as TextSection['textAlign'] })}
+          value={section.textAlign ?? "left"}
+          onChange={(v) => onChange({ textAlign: v as TextSection["textAlign"] })}
           options={[
-            { label: 'Left', value: 'left' },
-            { label: 'Center', value: 'center' },
-            { label: 'Right', value: 'right' },
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
           ]}
         />
       </Field>
 
       <Field label="Font Size">
         <SelectInput
-          value={section.fontSize ?? 'base'}
-          onChange={(v) => onChange({ fontSize: v as TextSection['fontSize'] })}
+          value={section.fontSize ?? "base"}
+          onChange={(v) => onChange({ fontSize: v as TextSection["fontSize"] })}
           options={[
-            { label: 'Small', value: 'sm' },
-            { label: 'Normal', value: 'base' },
-            { label: 'Large', value: 'lg' },
+            { label: "Small", value: "sm" },
+            { label: "Normal", value: "base" },
+            { label: "Large", value: "lg" },
           ]}
         />
       </Field>
 
       <Field label="Line Height">
         <SelectInput
-          value={section.lineHeight ?? 'relaxed'}
-          onChange={(v) => onChange({ lineHeight: v as TextSection['lineHeight'] })}
+          value={section.lineHeight ?? "relaxed"}
+          onChange={(v) => onChange({ lineHeight: v as TextSection["lineHeight"] })}
           options={[
-            { label: 'Tight', value: 'tight' },
-            { label: 'Normal', value: 'normal' },
-            { label: 'Relaxed', value: 'relaxed' },
-            { label: 'Loose', value: 'loose' },
+            { label: "Tight", value: "tight" },
+            { label: "Normal", value: "normal" },
+            { label: "Relaxed", value: "relaxed" },
+            { label: "Loose", value: "loose" },
           ]}
         />
       </Field>
 
       <Field label="Letter Spacing">
         <SelectInput
-          value={section.letterSpacing ?? 'normal'}
-          onChange={(v) => onChange({ letterSpacing: v as TextSection['letterSpacing'] })}
+          value={section.letterSpacing ?? "normal"}
+          onChange={(v) => onChange({ letterSpacing: v as TextSection["letterSpacing"] })}
           options={[
-            { label: 'Tighter', value: 'tighter' },
-            { label: 'Tight', value: 'tight' },
-            { label: 'Normal', value: 'normal' },
-            { label: 'Wide', value: 'wide' },
-            { label: 'Wider', value: 'wider' },
+            { label: "Tighter", value: "tighter" },
+            { label: "Tight", value: "tight" },
+            { label: "Normal", value: "normal" },
+            { label: "Wide", value: "wide" },
+            { label: "Wider", value: "wider" },
           ]}
         />
       </Field>
     </div>
-  )
+  );
 }
 
 function SpacingPanel({
   section,
   onChange,
 }: {
-  section: SpacingSection
-  onChange: (patch: Partial<SpacingSection>) => void
+  section: SpacingSection;
+  onChange: (patch: Partial<SpacingSection>) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -431,26 +431,23 @@ function SpacingPanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 function ImagePanel({
   section,
   onChange,
 }: {
-  section: ImageSection
-  onChange: (patch: Partial<ImageSection>) => void
+  section: ImageSection;
+  onChange: (patch: Partial<ImageSection>) => void;
 }) {
   return (
     <div className="space-y-4">
-      <ImageUploadField
-        image={section.image}
-        onChange={(img) => onChange({ image: img })}
-      />
+      <ImageUploadField image={section.image} onChange={(img) => onChange({ image: img })} />
 
       <Field label="Caption">
         <TextInput
-          value={section.caption ?? ''}
+          value={section.caption ?? ""}
           onChange={(v) => onChange({ caption: v })}
           placeholder="Image caption\u2026"
         />
@@ -466,27 +463,27 @@ function ImagePanel({
 
       <Field label="Aspect Ratio">
         <SelectInput
-          value={section.aspectRatio ?? '16/10'}
+          value={section.aspectRatio ?? "16/10"}
           onChange={(v) => onChange({ aspectRatio: v })}
           options={[
-            { label: '16:10', value: '16/10' },
-            { label: '16:9 (Widescreen)', value: '16/9' },
-            { label: '4:3', value: '4/3' },
-            { label: '3:2', value: '3/2' },
-            { label: '1:1 (Square)', value: '1/1' },
-            { label: '21:9 (Ultrawide)', value: '21/9' },
+            { label: "16:10", value: "16/10" },
+            { label: "16:9 (Widescreen)", value: "16/9" },
+            { label: "4:3", value: "4/3" },
+            { label: "3:2", value: "3/2" },
+            { label: "1:1 (Square)", value: "1/1" },
+            { label: "21:9 (Ultrawide)", value: "21/9" },
           ]}
         />
       </Field>
 
       <Field label="Image Fit">
         <SelectInput
-          value={section.objectFit ?? 'cover'}
-          onChange={(v) => onChange({ objectFit: v as ImageSection['objectFit'] })}
+          value={section.objectFit ?? "cover"}
+          onChange={(v) => onChange({ objectFit: v as ImageSection["objectFit"] })}
           options={[
-            { label: 'Cover (fill frame)', value: 'cover' },
-            { label: 'Contain (show all)', value: 'contain' },
-            { label: 'Fill (stretch)', value: 'fill' },
+            { label: "Cover (fill frame)", value: "cover" },
+            { label: "Contain (show all)", value: "contain" },
+            { label: "Fill (stretch)", value: "fill" },
           ]}
         />
       </Field>
@@ -527,7 +524,7 @@ function ImagePanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 // Gallery images editor — add, remove, reorder
@@ -535,41 +532,44 @@ function GalleryImagesEditor({
   images,
   onChange,
 }: {
-  images: (SanityImage & { _key: string })[]
-  onChange: (images: (SanityImage & { _key: string })[]) => void
+  images: (SanityImage & { _key: string })[];
+  onChange: (images: (SanityImage & { _key: string })[]) => void;
 }) {
   const addImage = (img: SanityImage | undefined) => {
-    if (!img) return
-    const withKey = { ...img, _key: `img-${Date.now()}` } as SanityImage & { _key: string }
-    onChange([...images, withKey])
-  }
+    if (!img) return;
+    const withKey = { ...img, _key: `img-${Date.now()}` } as SanityImage & { _key: string };
+    onChange([...images, withKey]);
+  };
 
   const removeImage = (key: string) => {
-    onChange(images.filter((i) => i._key !== key))
-  }
+    onChange(images.filter((i) => i._key !== key));
+  };
 
-  const moveImage = (key: string, dir: 'up' | 'down') => {
-    const arr = [...images]
-    const idx = arr.findIndex((i) => i._key === key)
-    if (idx === -1) return
-    const newIdx = dir === 'up' ? idx - 1 : idx + 1
-    if (newIdx < 0 || newIdx >= arr.length) return
-    ;[arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]]
-    onChange(arr)
-  }
+  const moveImage = (key: string, dir: "up" | "down") => {
+    const arr = [...images];
+    const idx = arr.findIndex((i) => i._key === key);
+    if (idx === -1) return;
+    const newIdx = dir === "up" ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= arr.length) return;
+    [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+    onChange(arr);
+  };
 
   return (
     <div className="space-y-2">
       {images.map((img, idx) => {
-        let thumbUrl: string | null = null
+        let thumbUrl: string | null = null;
         try {
-          thumbUrl = urlFor(img).width(120).auto('format').url()
+          thumbUrl = urlFor(img).width(120).auto("format").url();
         } catch {
-          const asset = img.asset as { url?: string }
-          thumbUrl = asset.url ?? null
+          const asset = img.asset as { url?: string };
+          thumbUrl = asset.url ?? null;
         }
         return (
-          <div key={img._key} className="flex items-center gap-2 rounded border border-neutral-200 p-1.5">
+          <div
+            key={img._key}
+            className="flex items-center gap-2 rounded border border-neutral-200 p-1.5"
+          >
             <div className="h-10 w-14 shrink-0 overflow-hidden rounded bg-neutral-100">
               {thumbUrl ? (
                 <img src={thumbUrl} alt="" className="h-full w-full object-cover" />
@@ -581,45 +581,41 @@ function GalleryImagesEditor({
             </div>
             <div className="flex flex-1 items-center gap-1">
               <button
-                onClick={() => moveImage(img._key, 'up')}
+                onClick={() => moveImage(img._key, "up")}
                 disabled={idx === 0}
-                className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 text-xs px-1"
+                className="px-1 text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-30"
               >
                 ↑
               </button>
               <button
-                onClick={() => moveImage(img._key, 'down')}
+                onClick={() => moveImage(img._key, "down")}
                 disabled={idx === images.length - 1}
-                className="text-neutral-400 hover:text-neutral-700 disabled:opacity-30 text-xs px-1"
+                className="px-1 text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-30"
               >
                 ↓
               </button>
             </div>
             <button
               onClick={() => removeImage(img._key)}
-              className="text-neutral-400 hover:text-red-500 text-xs px-1"
+              className="px-1 text-xs text-neutral-400 hover:text-red-500"
               title="Remove"
             >
               ✕
             </button>
           </div>
-        )
+        );
       })}
-      <ImageUploadField
-        onChange={(img) => addImage(img)}
-        label="Add image"
-        showAlt={false}
-      />
+      <ImageUploadField onChange={(img) => addImage(img)} label="Add image" showAlt={false} />
     </div>
-  )
+  );
 }
 
 function GalleryPanel({
   section,
   onChange,
 }: {
-  section: GallerySection
-  onChange: (patch: Partial<GallerySection>) => void
+  section: GallerySection;
+  onChange: (patch: Partial<GallerySection>) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -635,8 +631,8 @@ function GalleryPanel({
           value={String(section.columns ?? 2)}
           onChange={(v) => onChange({ columns: Number(v) as 2 | 3 })}
           options={[
-            { label: '2 columns', value: '2' },
-            { label: '3 columns', value: '3' },
+            { label: "2 columns", value: "2" },
+            { label: "3 columns", value: "3" },
           ]}
         />
       </Field>
@@ -652,24 +648,24 @@ function GalleryPanel({
 
       <Field label="Aspect Ratio">
         <SelectInput
-          value={section.aspectRatio ?? '3/2'}
+          value={section.aspectRatio ?? "3/2"}
           onChange={(v) => onChange({ aspectRatio: v })}
           options={[
-            { label: '3:2', value: '3/2' },
-            { label: '4:3', value: '4/3' },
-            { label: '1:1 (Square)', value: '1/1' },
-            { label: '16:9', value: '16/9' },
+            { label: "3:2", value: "3/2" },
+            { label: "4:3", value: "4/3" },
+            { label: "1:1 (Square)", value: "1/1" },
+            { label: "16:9", value: "16/9" },
           ]}
         />
       </Field>
 
       <Field label="Image Fit">
         <SelectInput
-          value={section.objectFit ?? 'cover'}
-          onChange={(v) => onChange({ objectFit: v as GallerySection['objectFit'] })}
+          value={section.objectFit ?? "cover"}
+          onChange={(v) => onChange({ objectFit: v as GallerySection["objectFit"] })}
           options={[
-            { label: 'Cover', value: 'cover' },
-            { label: 'Contain', value: 'contain' },
+            { label: "Cover", value: "cover" },
+            { label: "Contain", value: "contain" },
           ]}
         />
       </Field>
@@ -683,21 +679,21 @@ function GalleryPanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 function VideoPanel({
   section,
   onChange,
 }: {
-  section: VideoSection
-  onChange: (patch: Partial<VideoSection>) => void
+  section: VideoSection;
+  onChange: (patch: Partial<VideoSection>) => void;
 }) {
   return (
     <div className="space-y-4">
       <Field label="Vimeo URL">
         <TextInput
-          value={section.vimeoUrl ?? ''}
+          value={section.vimeoUrl ?? ""}
           onChange={(v) => onChange({ vimeoUrl: v })}
           placeholder="https://vimeo.com/\u2026"
         />
@@ -705,7 +701,7 @@ function VideoPanel({
 
       <Field label="Caption">
         <TextInput
-          value={section.caption ?? ''}
+          value={section.caption ?? ""}
           onChange={(v) => onChange({ caption: v })}
           placeholder="Video caption\u2026"
         />
@@ -729,13 +725,13 @@ function VideoPanel({
 
       <Field label="Aspect Ratio">
         <SelectInput
-          value={section.aspectRatio ?? '16/9'}
+          value={section.aspectRatio ?? "16/9"}
           onChange={(v) => onChange({ aspectRatio: v })}
           options={[
-            { label: '16:9 (Widescreen)', value: '16/9' },
-            { label: '4:3', value: '4/3' },
-            { label: '1:1 (Square)', value: '1/1' },
-            { label: '9:16 (Vertical)', value: '9/16' },
+            { label: "16:9 (Widescreen)", value: "16/9" },
+            { label: "4:3", value: "4/3" },
+            { label: "1:1 (Square)", value: "1/1" },
+            { label: "9:16 (Vertical)", value: "9/16" },
           ]}
         />
       </Field>
@@ -749,26 +745,23 @@ function VideoPanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 function SplitPanel({
   section,
   onChange,
 }: {
-  section: SplitSection
-  onChange: (patch: Partial<SplitSection>) => void
+  section: SplitSection;
+  onChange: (patch: Partial<SplitSection>) => void;
 }) {
   return (
     <div className="space-y-4">
-      <ImageUploadField
-        image={section.image}
-        onChange={(img) => onChange({ image: img })}
-      />
+      <ImageUploadField image={section.image} onChange={(img) => onChange({ image: img })} />
 
       <Field label="Caption">
         <TextInput
-          value={section.caption ?? ''}
+          value={section.caption ?? ""}
           onChange={(v) => onChange({ caption: v })}
           placeholder="Image caption\u2026"
         />
@@ -778,23 +771,23 @@ function SplitPanel({
 
       <Field label="Image Position">
         <SelectInput
-          value={section.imagePosition ?? 'left'}
-          onChange={(v) => onChange({ imagePosition: v as SplitSection['imagePosition'] })}
+          value={section.imagePosition ?? "left"}
+          onChange={(v) => onChange({ imagePosition: v as SplitSection["imagePosition"] })}
           options={[
-            { label: 'Left', value: 'left' },
-            { label: 'Right', value: 'right' },
+            { label: "Left", value: "left" },
+            { label: "Right", value: "right" },
           ]}
         />
       </Field>
 
       <Field label="Vertical Alignment">
         <SelectInput
-          value={section.verticalAlign ?? 'center'}
-          onChange={(v) => onChange({ verticalAlign: v as SplitSection['verticalAlign'] })}
+          value={section.verticalAlign ?? "center"}
+          onChange={(v) => onChange({ verticalAlign: v as SplitSection["verticalAlign"] })}
           options={[
-            { label: 'Top', value: 'start' },
-            { label: 'Center', value: 'center' },
-            { label: 'Bottom', value: 'end' },
+            { label: "Top", value: "start" },
+            { label: "Center", value: "center" },
+            { label: "Bottom", value: "end" },
           ]}
         />
       </Field>
@@ -812,25 +805,25 @@ function SplitPanel({
 
       <Field label="Aspect Ratio">
         <SelectInput
-          value={section.imageAspectRatio ?? '4/3'}
+          value={section.imageAspectRatio ?? "4/3"}
           onChange={(v) => onChange({ imageAspectRatio: v })}
           options={[
-            { label: '4:3', value: '4/3' },
-            { label: '1:1 (Square)', value: '1/1' },
-            { label: '3:2', value: '3/2' },
-            { label: '16:9', value: '16/9' },
-            { label: '3:4 (Portrait)', value: '3/4' },
+            { label: "4:3", value: "4/3" },
+            { label: "1:1 (Square)", value: "1/1" },
+            { label: "3:2", value: "3/2" },
+            { label: "16:9", value: "16/9" },
+            { label: "3:4 (Portrait)", value: "3/4" },
           ]}
         />
       </Field>
 
       <Field label="Image Fit">
         <SelectInput
-          value={section.objectFit ?? 'cover'}
-          onChange={(v) => onChange({ objectFit: v as SplitSection['objectFit'] })}
+          value={section.objectFit ?? "cover"}
+          onChange={(v) => onChange({ objectFit: v as SplitSection["objectFit"] })}
           options={[
-            { label: 'Cover', value: 'cover' },
-            { label: 'Contain', value: 'contain' },
+            { label: "Cover", value: "cover" },
+            { label: "Contain", value: "contain" },
           ]}
         />
       </Field>
@@ -844,7 +837,7 @@ function SplitPanel({
         />
       </Field>
     </div>
-  )
+  );
 }
 
 // === Free object panels ===
@@ -853,8 +846,8 @@ function FreeImagePanel({
   obj,
   onChange,
 }: {
-  obj: FreeImageObject
-  onChange: (patch: Partial<FreeObject>) => void
+  obj: FreeImageObject;
+  onChange: (patch: Partial<FreeObject>) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -880,21 +873,21 @@ function FreeImagePanel({
 
       <FreePositionControls obj={obj} onChange={onChange} />
     </div>
-  )
+  );
 }
 
 function FreeVideoPanel({
   obj,
   onChange,
 }: {
-  obj: FreeVideoObject
-  onChange: (patch: Partial<FreeObject>) => void
+  obj: FreeVideoObject;
+  onChange: (patch: Partial<FreeObject>) => void;
 }) {
   return (
     <div className="space-y-4">
       <Field label="Vimeo URL">
         <TextInput
-          value={obj.vimeoUrl ?? ''}
+          value={obj.vimeoUrl ?? ""}
           onChange={(v) => onChange({ vimeoUrl: v })}
           placeholder="https://vimeo.com/\u2026"
         />
@@ -902,11 +895,7 @@ function FreeVideoPanel({
 
       <SectionDivider label="Playback" />
 
-      <ToggleInput
-        value={obj.loop ?? false}
-        onChange={(v) => onChange({ loop: v })}
-        label="Loop"
-      />
+      <ToggleInput value={obj.loop ?? false} onChange={(v) => onChange({ loop: v })} label="Loop" />
 
       <ToggleInput
         value={obj.autoplay ?? false}
@@ -918,13 +907,13 @@ function FreeVideoPanel({
 
       <Field label="Aspect Ratio">
         <SelectInput
-          value={obj.aspectRatio ?? '16/9'}
+          value={obj.aspectRatio ?? "16/9"}
           onChange={(v) => onChange({ aspectRatio: v })}
           options={[
-            { label: '16:9', value: '16/9' },
-            { label: '4:3', value: '4/3' },
-            { label: '1:1', value: '1/1' },
-            { label: '9:16 (Vertical)', value: '9/16' },
+            { label: "16:9", value: "16/9" },
+            { label: "4:3", value: "4/3" },
+            { label: "1:1", value: "1/1" },
+            { label: "9:16 (Vertical)", value: "9/16" },
           ]}
         />
       </Field>
@@ -940,46 +929,46 @@ function FreeVideoPanel({
 
       <FreePositionControls obj={obj} onChange={onChange} />
     </div>
-  )
+  );
 }
 
 function FreeTextPanel({
   obj,
   onChange,
 }: {
-  obj: FreeTextObject
-  onChange: (patch: Partial<FreeObject>) => void
+  obj: FreeTextObject;
+  onChange: (patch: Partial<FreeObject>) => void;
 }) {
   return (
     <div className="space-y-4">
       <Field label="Font Size">
         <SelectInput
-          value={obj.fontSize ?? 'base'}
-          onChange={(v) => onChange({ fontSize: v as FreeTextObject['fontSize'] })}
+          value={obj.fontSize ?? "base"}
+          onChange={(v) => onChange({ fontSize: v as FreeTextObject["fontSize"] })}
           options={[
-            { label: 'Small', value: 'sm' },
-            { label: 'Normal', value: 'base' },
-            { label: 'Large', value: 'lg' },
-            { label: 'XL', value: 'xl' },
+            { label: "Small", value: "sm" },
+            { label: "Normal", value: "base" },
+            { label: "Large", value: "lg" },
+            { label: "XL", value: "xl" },
           ]}
         />
       </Field>
 
       <Field label="Text Alignment">
         <SelectInput
-          value={obj.textAlign ?? 'left'}
-          onChange={(v) => onChange({ textAlign: v as FreeTextObject['textAlign'] })}
+          value={obj.textAlign ?? "left"}
+          onChange={(v) => onChange({ textAlign: v as FreeTextObject["textAlign"] })}
           options={[
-            { label: 'Left', value: 'left' },
-            { label: 'Center', value: 'center' },
-            { label: 'Right', value: 'right' },
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
           ]}
         />
       </Field>
 
       <Field label="Text Color">
         <TextInput
-          value={obj.color ?? '#171717'}
+          value={obj.color ?? "#171717"}
           onChange={(v) => onChange({ color: v })}
           placeholder="#171717"
         />
@@ -987,7 +976,7 @@ function FreeTextPanel({
 
       <FreePositionControls obj={obj} onChange={onChange} />
     </div>
-  )
+  );
 }
 
 // === Page Settings panel ===
@@ -996,8 +985,8 @@ function PageSettingsPanel({
   project,
   onChange,
 }: {
-  project: Project
-  onChange: (patch: Partial<Project>) => void
+  project: Project;
+  onChange: (patch: Partial<Project>) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -1011,11 +1000,11 @@ function PageSettingsPanel({
 
       <Field label="Meta Description">
         <textarea
-          value={project.meta_description ?? ''}
+          value={project.meta_description ?? ""}
           onChange={(e) => onChange({ meta_description: e.target.value })}
           placeholder="SEO description…"
           rows={3}
-          className="w-full rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 placeholder-neutral-400 focus:border-neutral-400 focus:outline-none resize-none"
+          className="w-full resize-none rounded border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-900 placeholder-neutral-400 focus:border-neutral-400 focus:outline-none"
         />
       </Field>
 
@@ -1031,7 +1020,7 @@ function PageSettingsPanel({
 
       <Field label="Category">
         <TextInput
-          value={project.category ?? ''}
+          value={project.category ?? ""}
           onChange={(v) => onChange({ category: v })}
           placeholder="e.g. Film, Design…"
         />
@@ -1039,11 +1028,11 @@ function PageSettingsPanel({
 
       <Field label="Tags (comma-separated)">
         <TextInput
-          value={(project.tags ?? []).join(', ')}
+          value={(project.tags ?? []).join(", ")}
           onChange={(v) =>
             onChange({
               tags: v
-                .split(',')
+                .split(",")
                 .map((t) => t.trim())
                 .filter(Boolean),
             })
@@ -1056,38 +1045,38 @@ function PageSettingsPanel({
 
       <Field label="Sidebar Mode">
         <SelectInput
-          value={project.sidebarMode ?? 'auto'}
-          onChange={(v) => onChange({ sidebarMode: v as Project['sidebarMode'] })}
+          value={project.sidebarMode ?? "auto"}
+          onChange={(v) => onChange({ sidebarMode: v as Project["sidebarMode"] })}
           options={[
-            { label: 'Auto (show sidebar)', value: 'auto' },
-            { label: 'Hidden (minimal)', value: 'hidden' },
+            { label: "Auto (show sidebar)", value: "auto" },
+            { label: "Hidden (minimal)", value: "hidden" },
           ]}
         />
       </Field>
     </div>
-  )
+  );
 }
 
 // === Main panel ===
 
 export default function PropertiesPanel(props: PropsPanelProps) {
-  const { onClose, onChange } = props
+  const { onClose, onChange } = props;
 
   const typeLabels: Record<string, string> = {
-    heroSection: 'Hero',
-    textSection: 'Text',
-    imageSection: 'Image',
-    gallerySection: 'Gallery',
-    videoSection: 'Video',
-    splitSection: 'Split',
-    spacingSection: 'Spacing',
-    freeImageObject: 'Free Image',
-    freeVideoObject: 'Free Video',
-    freeTextObject: 'Free Text',
-  }
+    heroSection: "Hero",
+    textSection: "Text",
+    imageSection: "Image",
+    gallerySection: "Gallery",
+    videoSection: "Video",
+    splitSection: "Split",
+    spacingSection: "Spacing",
+    freeImageObject: "Free Image",
+    freeVideoObject: "Free Video",
+    freeTextObject: "Free Text",
+  };
 
-  const itemType = props.section?._type ?? props.freeObject?._type ?? ''
-  const panelTitle = props.project ? 'Page Settings' : (typeLabels[itemType] ?? itemType)
+  const itemType = props.section?._type ?? props.freeObject?._type ?? "";
+  const panelTitle = props.project ? "Page Settings" : (typeLabels[itemType] ?? itemType);
 
   function renderPanel() {
     if (props.project) {
@@ -1096,63 +1085,90 @@ export default function PropertiesPanel(props: PropsPanelProps) {
           project={props.project}
           onChange={onChange as (patch: Partial<Project>) => void}
         />
-      )
+      );
     }
 
     if (props.section) {
-      const section = props.section
-      const sectionOnChange = onChange as (patch: Partial<Section>) => void
+      const section = props.section;
+      const sectionOnChange = onChange as (patch: Partial<Section>) => void;
       switch (section._type) {
-        case 'heroSection':
-          return <HeroPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'textSection':
-          return <TextPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'imageSection':
-          return <ImagePanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'gallerySection':
-          return <GalleryPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'videoSection':
-          return <VideoPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'splitSection':
-          return <SplitPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
-        case 'spacingSection':
-          return <SpacingPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+        case "heroSection":
+          return (
+            <HeroPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+          );
+        case "textSection":
+          return (
+            <TextPanel section={section} onChange={(p) => sectionOnChange(p as Partial<Section>)} />
+          );
+        case "imageSection":
+          return (
+            <ImagePanel
+              section={section}
+              onChange={(p) => sectionOnChange(p as Partial<Section>)}
+            />
+          );
+        case "gallerySection":
+          return (
+            <GalleryPanel
+              section={section}
+              onChange={(p) => sectionOnChange(p as Partial<Section>)}
+            />
+          );
+        case "videoSection":
+          return (
+            <VideoPanel
+              section={section}
+              onChange={(p) => sectionOnChange(p as Partial<Section>)}
+            />
+          );
+        case "splitSection":
+          return (
+            <SplitPanel
+              section={section}
+              onChange={(p) => sectionOnChange(p as Partial<Section>)}
+            />
+          );
+        case "spacingSection":
+          return (
+            <SpacingPanel
+              section={section}
+              onChange={(p) => sectionOnChange(p as Partial<Section>)}
+            />
+          );
         default:
-          return <p className="text-sm text-neutral-400">No properties available.</p>
+          return <p className="text-sm text-neutral-400">No properties available.</p>;
       }
     }
 
     if (props.freeObject) {
-      const obj = props.freeObject
-      const freeOnChange = onChange as (patch: Partial<FreeObject>) => void
+      const obj = props.freeObject;
+      const freeOnChange = onChange as (patch: Partial<FreeObject>) => void;
       switch (obj._type) {
-        case 'freeImageObject':
-          return <FreeImagePanel obj={obj} onChange={freeOnChange} />
-        case 'freeVideoObject':
-          return <FreeVideoPanel obj={obj} onChange={freeOnChange} />
-        case 'freeTextObject':
-          return <FreeTextPanel obj={obj} onChange={freeOnChange} />
+        case "freeImageObject":
+          return <FreeImagePanel obj={obj} onChange={freeOnChange} />;
+        case "freeVideoObject":
+          return <FreeVideoPanel obj={obj} onChange={freeOnChange} />;
+        case "freeTextObject":
+          return <FreeTextPanel obj={obj} onChange={freeOnChange} />;
         default:
-          return <p className="text-sm text-neutral-400">No properties available.</p>
+          return <p className="text-sm text-neutral-400">No properties available.</p>;
       }
     }
 
-    return null
+    return null;
   }
 
   return (
-    <div className="w-80 shrink-0 bg-white border-l border-neutral-200 shadow-2xl flex flex-col overflow-hidden h-full">
+    <div className="flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-neutral-200 bg-white shadow-2xl">
       {/* Panel header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
+      <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
         <div>
-          <span className="text-xs text-neutral-400 uppercase tracking-wide">Properties</span>
-          <h3 className="text-sm font-semibold text-neutral-900">
-            {panelTitle}
-          </h3>
+          <span className="text-xs tracking-wide text-neutral-400 uppercase">Properties</span>
+          <h3 className="text-sm font-semibold text-neutral-900">{panelTitle}</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-neutral-400 hover:text-neutral-700 text-lg leading-none p-1"
+          className="p-1 text-lg leading-none text-neutral-400 hover:text-neutral-700"
           aria-label="Close properties"
         >
           ✕
@@ -1163,13 +1179,12 @@ export default function PropertiesPanel(props: PropsPanelProps) {
       <div className="flex-1 overflow-y-auto px-4 py-4">{renderPanel()}</div>
 
       {/* Footer hint */}
-      <div className="px-4 py-3 border-t border-neutral-100 bg-neutral-50">
+      <div className="border-t border-neutral-100 bg-neutral-50 px-4 py-3">
         <p className="text-xs text-neutral-400">
-          Changes preview instantly.{' '}
-          <span className="font-medium">Save draft</span> or{' '}
+          Changes preview instantly. <span className="font-medium">Save draft</span> or{" "}
           <span className="font-medium">publish</span> to apply.
         </p>
       </div>
     </div>
-  )
+  );
 }

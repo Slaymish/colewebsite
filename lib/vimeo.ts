@@ -8,10 +8,7 @@ interface VimeoEmbedOptions {
   loop?: boolean;
 }
 
-export function buildVimeoEmbedUrl(
-  videoId: string,
-  options: VimeoEmbedOptions = {},
-): string {
+export function buildVimeoEmbedUrl(videoId: string, options: VimeoEmbedOptions = {}): string {
   const params = new URLSearchParams({
     autoplay: options.autoplay ? "1" : "0",
     muted: "1",

@@ -45,17 +45,12 @@ export default function LoginForm() {
       <div className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-neutral-900">Admin</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Sign in to edit your portfolio
-          </p>
+          <p className="mt-1 text-sm text-neutral-500">Sign in to edit your portfolio</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-neutral-700"
-            >
+            <label htmlFor="password" className="mb-1 block text-sm font-medium text-neutral-700">
               Password
             </label>
             <Input
@@ -75,21 +70,14 @@ export default function LoginForm() {
             </p>
           )}
 
-          <Button
-            type="submit"
-            disabled={loading || !password}
-            className="w-full"
-          >
+          <Button type="submit" disabled={loading || !password} className="w-full">
             {loading ? "Signing in…" : "Sign in"}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-xs text-neutral-400">
-          Set{" "}
-          <code className="rounded bg-neutral-100 px-1 font-mono">
-            ADMIN_PASSWORD
-          </code>{" "}
-          in your environment variables.
+          Set <code className="rounded bg-neutral-100 px-1 font-mono">ADMIN_PASSWORD</code> in your
+          environment variables.
         </p>
       </div>
     </div>

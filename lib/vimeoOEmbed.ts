@@ -6,9 +6,7 @@
 const memCache = new Map<string, string>();
 const LS_PREFIX = "vimeo-aspect:";
 
-export async function fetchVimeoAspectRatio(
-  vimeoUrl: string,
-): Promise<string | null> {
+export async function fetchVimeoAspectRatio(vimeoUrl: string): Promise<string | null> {
   // 1. In-memory cache
   if (memCache.has(vimeoUrl)) return memCache.get(vimeoUrl)!;
 

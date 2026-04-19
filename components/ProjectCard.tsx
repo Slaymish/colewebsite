@@ -12,23 +12,19 @@ interface ProjectCardProps {
  * @param param0
  * @returns
  */
-export default function ProjectCard({
-  project,
-  isActive = false,
-}: ProjectCardProps) {
+export default function ProjectCard({ project, isActive = false }: ProjectCardProps) {
   const slug = project.slug.current;
 
   return (
     <Link
       href={`/project/${slug}`}
       className={cn(
-        "group block border-l-2 border-transparent py-1 pl-2 text-sm font-normal leading-snug text-black/60 transition-colors duration-100 hover:text-black",
-        isActive &&
-          "border-black font-medium text-black",
+        "group block border-l-2 border-transparent py-1 pl-2 text-sm leading-snug font-normal text-black/60 transition-colors duration-100 hover:text-black",
+        isActive && "border-black font-medium text-black",
       )}
       aria-current={isActive ? "page" : undefined}
     >
-      <span className="text-sm font-normal leading-snug">{project.title}</span>
+      <span className="text-sm leading-snug font-normal">{project.title}</span>
     </Link>
   );
 }

@@ -16,11 +16,7 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
   const objectFit = (section.objectFit as "cover" | "contain") ?? "cover";
   const borderRadius = section.borderRadius ?? 2;
 
-  const imageUrl = urlFor(section.image)
-    .width(800)
-    .height(600)
-    .auto("format")
-    .url();
+  const imageUrl = urlFor(section.image).width(800).height(600).auto("format").url();
   const thumbUrl = urlFor(section.image).width(40).blur(10).url();
   const imageLeft = section.imagePosition !== "right";
 
@@ -43,17 +39,12 @@ export default function SplitSectionComponent({ section }: SplitSectionProps) {
           loading="lazy"
         />
       </div>
-      {section.caption && (
-        <p className="mt-1 text-xs text-black/40">{section.caption}</p>
-      )}
+      {section.caption && <p className="mt-1 text-xs text-black/40">{section.caption}</p>}
     </div>
   );
 
   const textEl = (
-    <div
-      className="flex flex-col gap-4 text-base"
-      style={{ justifyContent: verticalAlign }}
-    >
+    <div className="flex flex-col gap-4 text-base" style={{ justifyContent: verticalAlign }}>
       {section.content?.map((block) => renderBlock(block, { variant: "compact" }))}
     </div>
   );

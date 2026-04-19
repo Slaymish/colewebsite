@@ -35,11 +35,9 @@ export default function Header({
   const [mobileOpen, setMobileOpen] = useState(false);
   const name = settings?.name ?? "Cole Anderson";
   const cvUrl =
-    settings?.cv?.url ||
-    (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
+    settings?.cv?.url || (settings?.cv?.file as { asset?: { url?: string } })?.asset?.url;
   const copyright =
-    settings?.copyright ||
-    `© ${new Date().getFullYear()} ${name}. All rights reserved.`;
+    settings?.copyright || `© ${new Date().getFullYear()} ${name}. All rights reserved.`;
 
   const logoUrl =
     settings?.logo?.asset && "_id" in settings.logo.asset
@@ -55,8 +53,7 @@ export default function Header({
     .slice(0, 2)
     .toUpperCase();
 
-  const nav =
-    activeSlug !== undefined ? "project" : currentPage;
+  const nav = activeSlug !== undefined ? "project" : currentPage;
 
   const onProjectPage = activeSlug !== undefined;
 
@@ -67,19 +64,10 @@ export default function Header({
         onProjectPage && "md:py-6",
       )}
     >
-      <div
-        className={cn(
-          "flex h-full flex-col gap-5",
-          onProjectPage && "md:gap-4",
-        )}
-      >
+      <div className={cn("flex h-full flex-col gap-5", onProjectPage && "md:gap-4")}>
         {/* Mobile: name row + hamburger */}
         <div className="flex items-start justify-between gap-3">
-          <Link
-            href="/"
-            className="flex items-start gap-3"
-            aria-label={`${name} — home`}
-          >
+          <Link href="/" className="flex items-start gap-3" aria-label={`${name} — home`}>
             {logoUrl ? (
               <span className="relative mt-1 h-11 w-11 shrink-0 overflow-hidden border border-black bg-white md:hidden">
                 <Image
@@ -98,7 +86,7 @@ export default function Header({
                 {initials || "—"}
               </span>
             )}
-            <span className="text-[clamp(2.5rem,5vw,3.7rem)] font-bold leading-[0.92] tracking-[-0.06em]">
+            <span className="text-[clamp(2.5rem,5vw,3.7rem)] leading-[0.92] font-bold tracking-[-0.06em]">
               {name}
             </span>
           </Link>
@@ -136,9 +124,7 @@ export default function Header({
           className={cn(
             "flex flex-col gap-5 overflow-hidden transition-all duration-300 md:!flex md:!max-h-none md:!opacity-100",
             onProjectPage && "md:gap-4",
-            mobileOpen
-              ? "max-h-[2000px] opacity-100"
-              : "max-h-0 opacity-0 md:opacity-100",
+            mobileOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 md:opacity-100",
           )}
         >
           {settings?.bio && (
@@ -187,11 +173,7 @@ export default function Header({
           {projects.length > 0 && (
             <>
               <Separator className="hidden md:block" />
-              <ProjectSidebar
-                projects={projects}
-                activeSlug={activeSlug}
-                muted={onProjectPage}
-              />
+              <ProjectSidebar projects={projects} activeSlug={activeSlug} muted={onProjectPage} />
             </>
           )}
 

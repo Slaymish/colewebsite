@@ -6,10 +6,6 @@
       "Bash(node -e ':*)"
     ]
   },
-  "enabledMcpjsonServers": [
-    "trello"
-  ],
-  "disabledMcpjsonServers": [
-    "shadcn"
-  ]
+  "enabledMcpjsonServers": ["trello"],
+  "disabledMcpjsonServers": ["shadcn"]
 }

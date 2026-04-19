@@ -2,7 +2,11 @@ export interface SanityImage {
   _type: "image";
   asset:
     | { _ref: string; _type: "reference" }
-    | { _id: string; url: string; metadata?: { dimensions?: { width: number; height: number }; lqip?: string } };
+    | {
+        _id: string;
+        url: string;
+        metadata?: { dimensions?: { width: number; height: number }; lqip?: string };
+      };
   hotspot?: {
     x: number;
     y: number;

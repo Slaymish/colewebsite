@@ -32,22 +32,12 @@ export default function ProjectSidebar({
 
   const groups = categoryNames.map((category) => ({
     category,
-    projects: projects.filter(
-      (project) => project.category?.trim() === category,
-    ),
+    projects: projects.filter((project) => project.category?.trim() === category),
   }));
 
   return (
-    <aside
-      className={cn("w-full max-w-sm", muted && "md:opacity-75")}
-      aria-label="Project list"
-    >
-      <div
-        className={cn(
-          "max-h-80 overflow-y-auto md:max-h-none",
-          muted && "text-[0.8125rem]",
-        )}
-      >
+    <aside className={cn("w-full max-w-sm", muted && "md:opacity-75")} aria-label="Project list">
+      <div className={cn("max-h-80 overflow-y-auto md:max-h-none", muted && "text-[0.8125rem]")}>
         {projects.length === 0 ? (
           <p className="px-4 py-6 text-sm text-neutral-400">No projects yet.</p>
         ) : (
@@ -65,7 +55,7 @@ export default function ProjectSidebar({
             )}
             {groups.map((group) => (
               <div key={group.category} className="space-y-1">
-                <h3 className="mb-1 w-full bg-black px-2 py-1.5 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-white">
+                <h3 className="mb-1 w-full bg-black px-2 py-1.5 text-[0.6rem] font-semibold tracking-[0.25em] text-white uppercase">
                   {group.category}
                 </h3>
                 {group.projects.map((project) => (
