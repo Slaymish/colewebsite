@@ -1,0 +1,21 @@
+---
+/** Horizontal gutters and a max width. The only place either is decided. */
+/** 'measure' caps at a readable line length; 'page' is the full layout width. */
+type Width = 'measure' | 'page';
+
+interface Props {
+  width?: Width;
+  class?: string;
+}
+
+const { width = 'page', class: className = '' } = Astro.props as Props;
+
+const WIDTH_CLASS: Record<Width, string> = {
+  measure: 'max-w-measure',
+  page: 'max-w-page',
+};
+---
+
+<div class:list={['mx-auto w-full px-6 md:px-10', WIDTH_CLASS[width], className]}>
+  <slot />
+</div>

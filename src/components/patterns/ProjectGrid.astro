@@ -1,0 +1,20 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import type { Project } from '~/lib/content-types';
+
+interface Props {
+  projects: readonly Project[];
+}
+
+const { projects } = Astro.props;
+---
+
+<ul class="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
+  {
+    projects.map((project, index) => (
+      <li>
+        <ProjectCard project={project} priority={index === 0} />
+      </li>
+    ))
+  }
+</ul>

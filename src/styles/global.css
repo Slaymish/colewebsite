@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/*
+ * Utilities for the §3 tokens — the ones with no Tailwind namespace to live in.
+ * Tailwind v4 has no --duration- or --z- theme namespace, so a token declared
+ * there generates no CSS at all and the component silently falls back to
+ * Tailwind's default. Declaring them here as static utilities is what makes the
+ * token real.
+ */
+
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-normal {
+  transition-duration: var(--duration-normal);
+}
+
+@utility z-header {
+  z-index: var(--z-header);
+}
+
+@utility z-skip-link {
+  z-index: var(--z-skip-link);
+}
+
+/* Tailwind ships no text-decoration-skip-ink utility, and the property is what
+   stops an underline breaking into fragments around every descender. */
+@utility decoration-skip-none {
+  text-decoration-skip-ink: none;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Every focusable thing, once, rather than per component — the ring is the
+     only signal a keyboard user gets and it is easy to forget on a new element. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+}

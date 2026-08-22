@@ -1,0 +1,32 @@
+---
+/**
+ * Heading level and heading size are separate props on purpose. A page whose
+ * second section needs smaller type must not answer that by demoting an <h2> to
+ * an <h3>: the level is the document outline a screen reader navigates by, and
+ * the size is how loud it looks.
+ */
+type Size = 'display' | 'xl' | 'lg' | 'base';
+
+interface Props {
+  /** The document level. Pick it from the outline, never from the size. */
+  level?: 1 | 2 | 3 | 4;
+  size?: Size;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { level = 2, size = 'lg', class: className = '', ...rest } = Astro.props as Props;
+
+const Tag = `h${level}`;
+
+const SIZE_CLASS: Record<Size, string> = {
+  display: 'text-display leading-[0.95] tracking-tight',
+  xl: 'text-xl leading-tight tracking-tight',
+  lg: 'text-lg leading-snug',
+  base: 'text-base leading-snug',
+};
+---
+
+<Tag class:list={['text-ink text-balance', SIZE_CLASS[size], className]} {...rest}>
+  <slot />
+</Tag>

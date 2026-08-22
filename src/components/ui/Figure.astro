@@ -1,0 +1,62 @@
+---
+import type { ImageAsset, Ratio } from '~/lib/ui';
+import Placeholder from './Placeholder.astro';
+
+/**
+ * One image from the CMS, or the placeholder box when there is none.
+ *
+ * Contentful's image CDN does the resizing and format negotiation, so the srcset
+ * is built from query parameters rather than by processing files at build time.
+ * `width` and `height` come from the asset so the browser reserves the space
+ * before the bytes arrive — without them every image on the page is a layout
+ * shift.
+ */
+interface Props {
+  image: ImageAsset | null;
+  /** The one image above the fold loads eagerly; everything else waits. */
+  priority?: boolean;
+  sizes?: string;
+  ratio?: Ratio;
+  class?: string;
+}
+
+const {
+  image,
+  priority = false,
+  sizes = '(min-width: 768px) 50vw, 100vw',
+  ratio = 'landscape',
+  class: className = '',
+} = Astro.props as Props;
+
+const WIDTHS = [480, 768, 1024, 1440, 1920, 2560];
+
+/** Contentful serves AVIF/WebP by content negotiation when asked for `fm=avif`. */
+function variant(url: string, width: number): string {
+  return `${url}?w=${width}&fm=avif&q=70`;
+}
+
+const srcset = image
+  ? WIDTHS.filter((width) => width <= image.width * 2)
+      .map((width) => `${variant(image.url, width)} ${width}w`)
+      .join(', ')
+  : '';
+---
+
+{
+  image ? (
+    <img
+      src={variant(image.url, 1440)}
+      srcset={srcset}
+      sizes={sizes}
+      width={image.width}
+      height={image.height}
+      alt={image.alt}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding={priority ? 'sync' : 'async'}
+      fetchpriority={priority ? 'high' : undefined}
+      class:list={['h-auto w-full', className]}
+    />
+  ) : (
+    <Placeholder ratio={ratio} class={className} />
+  )
+}

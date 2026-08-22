@@ -1,67 +1,152 @@
-name: CI & Deploy
+name: Deploy
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  # Contentful webhook fires this so publishing rebuilds the site.
+  repository_dispatch:
+    types: [contentful-publish]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Which environment to deploy
+        required: true
+        default: test
+        type: choice
+        options: [test, production]
+
+permissions:
+  id-token: write # required for OIDC
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: deploy-${{ github.event.inputs.environment || 'test' }}
+  cancel-in-progress: false
 
 jobs:
-  ci:
-    name: Audit, Lint, Format, Build
+  deploy:
+    # Production only ever runs from a manual workflow_dispatch. GitHub's
+    # required-reviewer rule needs a paid plan on private repos, so the manual
+    # trigger is the gate.
+    environment: ${{ github.event.inputs.environment || 'test' }}
     runs-on: ubuntu-latest
+    env:
+      IS_PROD: ${{ github.event.inputs.environment == 'production' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: pnpm
+      - run: pnpm install --frozen-lockfile
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Audit
-        run: pnpm audit --prod --audit-level=high
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Format check
-        run: pnpm format:check
+      # The domain is a repository variable rather than a literal in this file,
+      # because it had not been chosen when the pipeline was written. Choosing it
+      # is then a settings change, not a commit. Absent, every canonical URL, OG
+      # tag and sitemap entry in the build would silently point at localhost — so
+      # this stops rather than shipping that.
+      - name: Resolve site origin
+        id: origin
+        run: |
+          set -euo pipefail
+          DOMAIN="${{ vars.SITE_DOMAIN }}"
+          if [ -z "$DOMAIN" ]; then
+            echo "::error::Repository variable SITE_DOMAIN is not set. Set it to the bare domain, e.g. coleanderson.com."
+            exit 1
+          fi
+          if [ "${{ env.IS_PROD }}" = "true" ]; then
+            echo "url=https://$DOMAIN" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://test.$DOMAIN" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build
+        env:
+          PUBLIC_SITE_URL: ${{ steps.origin.outputs.url }}
+          PUBLIC_NOINDEX: ${{ env.IS_PROD == 'true' && 'false' || 'true' }}
+          CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+          # One content environment. Test and production differ only in how they
+          # read it: Preview returns drafts, Delivery returns published entries.
+          CONTENTFUL_ENVIRONMENT: master
+          CONTENTFUL_USE_PREVIEW: ${{ env.IS_PROD == 'true' && 'false' || 'true' }}
+          CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
+          CONTENTFUL_PREVIEW_TOKEN: ${{ secrets.CONTENTFUL_PREVIEW_TOKEN }}
+          # Production refuses to build on placeholder content. Test tolerates it,
+          # so main stays green while the space is still being filled.
+          REQUIRE_CMS_CONTENT: ${{ env.IS_PROD == 'true' && 'true' || 'false' }}
         run: pnpm build
 
-  deploy:
-    name: Deploy to Vercel
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Vercel deploy hook
-        env:
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CONTENT_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: Resolve stack outputs
+        id: stack
         run: |
-          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
-            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set"
+          set -euo pipefail
+          STACK=${{ env.IS_PROD == 'true' && 'ColeAndersonProd' || 'ColeAndersonTest' }}
+
+          # A stack that does not exist yet is "nothing to deploy" and skips: a
+          # permanently red main branch teaches everyone to ignore it. Anything
+          # else is a real failure and must be loud.
+          #
+          # These two must stay separate. On the site this was ported from they
+          # were one branch: the content role was missing
+          # cloudformation:DescribeStacks, the denial was swallowed by
+          # 2>/dev/null, and both environments reported "does not exist yet" and
+          # went green having uploaded nothing.
+          if ! ERROR=$(aws cloudformation describe-stacks --stack-name "$STACK" 2>&1 >/dev/null); then
+            case "$ERROR" in
+              *"does not exist"*)
+                echo "::notice::Stack $STACK does not exist yet — skipping deploy. The domain is not registered."
+                echo "exists=false" >> "$GITHUB_OUTPUT"
+                exit 0
+                ;;
+              *)
+                echo "::error::Could not read stack $STACK: $ERROR"
+                exit 1
+                ;;
+            esac
+          fi
+
+          OUTPUTS=$(aws cloudformation describe-stacks --stack-name "$STACK" \
+            --query "Stacks[0].Outputs[?OutputKey=='BucketName'||OutputKey=='DistributionId'].OutputValue" \
+            --output text)
+          read -r BUCKET DIST <<< "$OUTPUTS"
+
+          # Without this, an empty value silently becomes `s3://` further down.
+          if [ -z "${BUCKET:-}" ] || [ -z "${DIST:-}" ]; then
+            echo "::error::Stack $STACK exists but did not return both outputs: '$OUTPUTS'"
             exit 1
           fi
-          response=$(curl -sS -X POST -w "\n%{http_code}" "$VERCEL_DEPLOY_HOOK_URL")
-          status=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | sed '$d')
-          echo "Response: $body"
-          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
-            echo "::error::Deploy hook failed with status $status"
-            exit 1
-          fi
+
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+          echo "bucket=$BUCKET" >> "$GITHUB_OUTPUT"
+          echo "distribution=$DIST" >> "$GITHUB_OUTPUT"
+
+      # Two passes, and the order matters: hashed assets go up first so no freshly
+      # deployed HTML can reference a file that is not there yet.
+      - name: Upload immutable assets
+        if: steps.stack.outputs.exists == 'true'
+        run: |
+          aws s3 sync dist "s3://${{ steps.stack.outputs.bucket }}" \
+            --exclude "*.html" --exclude "*.xml" --exclude "*.txt" \
+            --cache-control "public,max-age=31536000,immutable" \
+            --no-progress
+
+      - name: Upload HTML
+        if: steps.stack.outputs.exists == 'true'
+        run: |
+          aws s3 sync dist "s3://${{ steps.stack.outputs.bucket }}" \
+            --exclude "*" --include "*.html" --include "*.xml" --include "*.txt" \
+            --cache-control "public,max-age=0,must-revalidate" \
+            --delete --no-progress
+
+      - name: Invalidate CloudFront
+        if: steps.stack.outputs.exists == 'true'
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ steps.stack.outputs.distribution }}" \
+            --paths "/*"

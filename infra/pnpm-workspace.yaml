@@ -1,0 +1,15 @@
+# infra is its own pnpm project, not a package of the site's workspace.
+#
+# This file exists to stop pnpm walking up to the repo root. The root has a
+# pnpm-workspace.yaml (it carries `allowBuilds`), which made the root a
+# workspace root — so `pnpm install` run from here installed the *site's*
+# dependencies and silently left infra's untouched. It exited 0 while doing it,
+# and the CDK app then died on a missing aws-cdk-lib, which points at the app
+# rather than at the install that caused it. Deleting this file brings that back.
+packages: []
+
+# tsx pulls esbuild, whose postinstall produces its binary. The root workspace
+# allows that build and infra no longer inherits the permission, so it is
+# repeated here. Without it `pnpm install` exits 1 on ERR_PNPM_IGNORED_BUILDS.
+allowBuilds:
+  esbuild: true

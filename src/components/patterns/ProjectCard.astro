@@ -1,0 +1,43 @@
+---
+import Figure from '~/components/ui/Figure.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Text from '~/components/ui/Text.astro';
+import type { Project } from '~/lib/content-types';
+import { editable } from '~/lib/preview';
+
+interface Props {
+  project: Project;
+  /** The first card is the largest image on the homepage, so it loads eagerly. */
+  priority?: boolean;
+}
+
+const { project, priority = false } = Astro.props;
+---
+
+<article class="group">
+  <a href={`/project/${project.slug}`} class="block">
+    <Figure
+      image={project.cover}
+      priority={priority}
+      ratio="landscape"
+      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+      class="duration-normal ease-out-soft transition-opacity group-hover:opacity-80"
+    />
+    <div class="mt-4 flex flex-col gap-1">
+      <Heading level={2} size="base" {...editable('project', project.cmsId, 'title')}>
+        {project.title}
+      </Heading>
+      {
+        project.category && (
+          <Text
+            size="sm"
+            tone="muted"
+            {...editable('project', project.cmsId, 'category')}
+          >
+            {project.category}
+          </Text>
+        )
+      }
+    </div>
+  </a>
+</article>

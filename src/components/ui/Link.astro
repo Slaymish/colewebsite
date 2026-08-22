@@ -1,0 +1,39 @@
+---
+import { isExternalHref, samePath } from '~/lib/ui';
+import VisuallyHidden from './VisuallyHidden.astro';
+
+/**
+ * Every link on the site. It carries the two things easy to forget and silent
+ * when forgotten: `rel="noopener noreferrer"` plus a spoken "(opens in a new
+ * tab)" on external links, and `aria-current` when the href is the current page.
+ */
+interface Props {
+  href: string;
+  /** Forces the underline treatment off, for links that are their own affordance. */
+  plain?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, plain = false, class: className = '', ...rest } = Astro.props as Props;
+
+const external = isExternalHref(href);
+const current = !external && samePath(Astro.url.pathname, href);
+---
+
+<a
+  href={href}
+  aria-current={current ? 'page' : undefined}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  class:list={[
+    'duration-fast transition-colors',
+    plain ? '' : 'decoration-skip-none underline underline-offset-4',
+    'hover:text-ink-muted',
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+  {external && <VisuallyHidden>(opens in a new tab)</VisuallyHidden>}
+</a>

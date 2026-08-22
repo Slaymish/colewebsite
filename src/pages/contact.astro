@@ -1,0 +1,34 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Text from '~/components/ui/Text.astro';
+import PageHeader from '~/components/patterns/PageHeader.astro';
+import ContactBlock from '~/components/patterns/ContactBlock.astro';
+import { getSiteSettings } from '~/lib/contentful';
+
+const settings = await getSiteSettings();
+
+const hasDetails =
+  settings.contact.email !== null ||
+  settings.contact.phone !== null ||
+  settings.contact.cvUrl !== null ||
+  settings.seo.profiles.length > 0;
+---
+
+<BaseLayout title="Contact" path="/contact">
+  <Container width="measure">
+    <Stack gap="lg" class="py-12 md:py-16">
+      <PageHeader title="Contact" />
+      {
+        hasDetails ? (
+          <ContactBlock settings={settings} />
+        ) : (
+          <Text tone="muted">
+            [Contact details live in site settings in Contentful. Nothing is set yet.]
+          </Text>
+        )
+      }
+    </Stack>
+  </Container>
+</BaseLayout>

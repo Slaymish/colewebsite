@@ -1,0 +1,10 @@
+---
+/** Text for screen readers only. Not `display: none`, which is not announced. */
+interface Props {
+  as?: 'span' | 'div' | 'p';
+}
+
+const { as: Tag = 'span' } = Astro.props as Props;
+---
+
+<Tag class="sr-only"><slot /></Tag>

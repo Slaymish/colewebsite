@@ -1,11 +1,8 @@
-.next
-out
-build
 dist
+.astro
 node_modules
 pnpm-lock.yaml
-package-lock.json
-coverage
-.sanity
-tsconfig.tsbuildinfo
-public
+infra/cdk.out
+# Agent tooling, not site source. Its config is hand-maintained JSON with
+# $comment keys that Prettier reflows.
+.claude

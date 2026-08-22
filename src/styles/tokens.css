@@ -1,0 +1,103 @@
+/*
+ * Design tokens — the single source of truth for every value a component may use.
+ *
+ * ---------------------------------------------------------------------------
+ * NOTHING BELOW IS A DESIGN DECISION YET.
+ * ---------------------------------------------------------------------------
+ * Every value here is provisional, chosen to be neutral and legible rather than
+ * right: near-black on off-white, a system font stack, a plain modular scale.
+ * The real palette, typefaces and scale come out of the design session with Cole.
+ * Read this file as scaffolding with the correct shape, not as a look.
+ *
+ * ---------------------------------------------------------------------------
+ * THE NAMING CONTRACT
+ * ---------------------------------------------------------------------------
+ *
+ * §1  --raw-*   Raw values. Only §2 may read these; never a component.
+ * §2  @theme    Semantic aliases in Tailwind's namespaces, so each one generates
+ *               a utility class. This is the only layer components may touch.
+ * §3  :root     Tokens with no Tailwind namespace to live in. Consumed by an
+ *               `@utility` in global.css or by var() inside a <style> block.
+ *
+ * Two rules that hold regardless of what the values become:
+ *   - No colour literal exists outside this file.
+ *   - No opacity modifier (`bg-page/60`) at a use site. A tint, a translucent or
+ *     a dimmed variant means a dedicated token here.
+ *
+ * Tailwind v4 namespaces available to §2: --color-, --font-, --text-, --spacing-,
+ * --breakpoint-, --container-, --radius-, --shadow-, --ease-, --leading-,
+ * --tracking-, --aspect-. Note the absence of duration and z-index: a token
+ * declared in @theme under a namespace Tailwind does not have emits no CSS and no
+ * error, so both live in §3 and are bridged by an @utility.
+ */
+
+/* ── §1 Raw values ─────────────────────────────────────────────────────────── */
+
+:root {
+  --raw-white: #fbfbf9;
+  --raw-near-black: #131313;
+  --raw-grey-600: #6b6b68;
+  --raw-grey-300: #d6d6d1;
+  --raw-grey-200: #e6e6e1;
+
+  --raw-font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --raw-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* A plain scale. Replace wholesale once the type is chosen. */
+  --raw-text-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
+  --raw-text-sm: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
+  --raw-text-base: clamp(1rem, 0.97rem + 0.2vw, 1.0625rem);
+  --raw-text-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --raw-text-xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  --raw-text-display: clamp(2.5rem, 1.6rem + 4vw, 5rem);
+
+  --raw-measure: 62ch;
+  --raw-container: 82rem;
+
+  --raw-duration-fast: 120ms;
+  --raw-duration-normal: 240ms;
+  --raw-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── §2 Semantic aliases, in Tailwind's namespaces ─────────────────────────── */
+
+@theme inline {
+  --color-page: var(--raw-white);
+  --color-ink: var(--raw-near-black);
+  --color-ink-muted: var(--raw-grey-600);
+  --color-rule: var(--raw-grey-300);
+  --color-placeholder: var(--raw-grey-200);
+  --color-inverse-page: var(--raw-near-black);
+  --color-inverse-ink: var(--raw-white);
+
+  --font-sans: var(--raw-font-sans);
+  --font-mono: var(--raw-font-mono);
+
+  --text-xs: var(--raw-text-xs);
+  --text-sm: var(--raw-text-sm);
+  --text-base: var(--raw-text-base);
+  --text-lg: var(--raw-text-lg);
+  --text-xl: var(--raw-text-xl);
+  --text-display: var(--raw-text-display);
+
+  --container-measure: var(--raw-measure);
+  --container-page: var(--raw-container);
+
+  --ease-out-soft: var(--raw-ease-out);
+
+  /* Crops. Provisional — the real ratios follow the work they hold. */
+  --aspect-portrait: 3 / 4;
+  --aspect-landscape: 3 / 2;
+  --aspect-wide: 16 / 9;
+}
+
+/* ── §3 Tokens with no Tailwind namespace ──────────────────────────────────── */
+
+:root {
+  --duration-fast: var(--raw-duration-fast);
+  --duration-normal: var(--raw-duration-normal);
+
+  --z-header: 40;
+  --z-skip-link: 60;
+}

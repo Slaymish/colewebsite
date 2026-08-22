@@ -1,0 +1,100 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Figure from '~/components/ui/Figure.astro';
+import Prose from '~/components/ui/Prose.astro';
+import Text from '~/components/ui/Text.astro';
+import Link from '~/components/ui/Link.astro';
+import PageHeader from '~/components/patterns/PageHeader.astro';
+import { getProjects } from '~/lib/contentful';
+import { creativeWorkJsonLd } from '~/lib/seo';
+import { editable } from '~/lib/preview';
+import type { Project } from '~/lib/content-types';
+
+/**
+ * One page per project, built from the same memoised list the index reads. The
+ * entry travels in `props` rather than being re-fetched per page: `getStaticPaths`
+ * already has it, and Astro runs this module once for the whole route.
+ */
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props as { project: Project };
+
+const path = `/project/${project.slug}`;
+const description = project.metaDescription ?? project.body[0] ?? '';
+const share = project.shareImage ?? project.cover;
+---
+
+<BaseLayout
+  title={project.title}
+  description={description}
+  image={share?.url}
+  path={path}
+  preloadImage={project.cover?.url}
+  jsonLd={creativeWorkJsonLd({
+    title: project.title,
+    description,
+    path,
+    image: share?.url,
+  })}
+>
+  <Container>
+    <Stack gap="lg" class="py-12 md:py-16">
+      <PageHeader
+        title={project.title}
+        eyebrow={project.category}
+        titleEditable={editable('project', project.cmsId, 'title')}
+        eyebrowEditable={editable('project', project.cmsId, 'category')}
+      />
+
+      <Figure
+        image={project.cover}
+        priority
+        ratio="landscape"
+        sizes="(min-width: 1024px) 80vw, 100vw"
+      />
+
+      <div class="flex flex-col gap-8 md:flex-row md:gap-16">
+        <div {...editable('project', project.cmsId, 'body')} class="md:flex-1">
+          <Prose paragraphs={project.body} />
+        </div>
+        {
+          project.tags.length > 0 && (
+            <ul
+              class="flex flex-wrap gap-x-4 gap-y-1 md:w-48 md:flex-none md:flex-col"
+              {...editable('project', project.cmsId, 'tags')}
+            >
+              {project.tags.map((tag) => (
+                <li>
+                  <Text size="sm" tone="muted" as="span">
+                    {tag}
+                  </Text>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+
+      {
+        project.gallery.length > 0 && (
+          <Stack gap="md" as="section" {...editable('project', project.cmsId, 'gallery')}>
+            {project.gallery.map((image) => (
+              <Figure image={image} sizes="(min-width: 1024px) 80vw, 100vw" />
+            ))}
+          </Stack>
+        )
+      }
+
+      <Link href="/" class="text-sm">← All work</Link>
+    </Stack>
+  </Container>
+</BaseLayout>

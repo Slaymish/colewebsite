@@ -1,0 +1,71 @@
+---
+import '~/styles/global.css';
+import { buildSeo, type SeoInput } from '~/lib/seo';
+import { SITE } from '~/lib/site';
+import SiteHeader from '~/components/patterns/SiteHeader.astro';
+import SiteFooter from '~/components/patterns/SiteFooter.astro';
+import SkipLink from '~/components/ui/SkipLink.astro';
+import { getSiteSettings } from '~/lib/contentful';
+
+interface Props extends SeoInput {
+  jsonLd?: Record<string, unknown>;
+  /** The LCP image, preloaded so it is requested before the CSS resolves it. */
+  preloadImage?: string;
+}
+
+const { jsonLd, preloadImage, ...seoInput } = Astro.props;
+
+/**
+ * The one fetch every page makes. `getSiteSettings` memoises, so this is a
+ * single request per build rather than one per page.
+ */
+const settings = await getSiteSettings();
+
+const seo = buildSeo(seoInput, {
+  description: settings.seo.description,
+  image: settings.seo.shareImage?.url,
+});
+---
+
+<html lang="en-NZ">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <link rel="canonical" href={seo.canonical} />
+    {seo.noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:url" content={seo.canonical} />
+    {seo.image && <meta property="og:image" content={seo.image} />}
+    <meta name="twitter:card" content={seo.image ? 'summary_large_image' : 'summary'} />
+
+    {
+      preloadImage && (
+        <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
+      )
+    }
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+      )
+    }
+  </head>
+  <body class="bg-page text-ink flex min-h-screen flex-col">
+    <SkipLink />
+    <SiteHeader />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

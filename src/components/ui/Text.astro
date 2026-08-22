@@ -1,0 +1,31 @@
+---
+type Size = 'xs' | 'sm' | 'base';
+type Tone = 'ink' | 'muted';
+
+interface Props {
+  size?: Size;
+  tone?: Tone;
+  as?: 'p' | 'span' | 'div' | 'li' | 'dd';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  size = 'base',
+  tone = 'ink',
+  as: Tag = 'p',
+  class: className = '',
+  ...rest
+} = Astro.props as Props;
+
+const SIZE_CLASS: Record<Size, string> = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  base: 'text-base',
+};
+const TONE_CLASS: Record<Tone, string> = { ink: 'text-ink', muted: 'text-ink-muted' };
+---
+
+<Tag class:list={[SIZE_CLASS[size], TONE_CLASS[tone], className]} {...rest}>
+  <slot />
+</Tag>

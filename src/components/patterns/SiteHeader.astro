@@ -1,0 +1,26 @@
+---
+import Container from '~/components/ui/Container.astro';
+import Link from '~/components/ui/Link.astro';
+import { NAV, SITE } from '~/lib/site';
+---
+
+<header class="border-rule bg-page z-header sticky top-0 border-b">
+  <Container>
+    <div class="flex items-baseline justify-between gap-8 py-5">
+      <Link href="/" plain class="text-base tracking-tight">{SITE.name}</Link>
+      <nav aria-label="Primary">
+        <ul class="flex gap-6">
+          {
+            NAV.map((item) => (
+              <li>
+                <Link href={item.href} plain class="text-sm">
+                  {item.label}
+                </Link>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </Container>
+</header>

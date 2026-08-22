@@ -1,0 +1,57 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Text from '~/components/ui/Text.astro';
+import ProjectGrid from '~/components/patterns/ProjectGrid.astro';
+import { getFeaturedProjects, getSiteSettings } from '~/lib/contentful';
+import { personJsonLd } from '~/lib/seo';
+import { SITE } from '~/lib/site';
+import { editable } from '~/lib/preview';
+
+const [projects, settings] = await Promise.all([
+  getFeaturedProjects(),
+  getSiteSettings(),
+]);
+
+const jobTitle = settings.seo.jobTitle ?? SITE.jobTitle;
+const description = settings.seo.description ?? SITE.description;
+---
+
+<BaseLayout
+  title="Selected work"
+  path="/"
+  jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
+>
+  <Container>
+    <Stack gap="xl" class="py-16 md:py-24">
+      <Stack gap="sm">
+        <Heading level={1} size="display">{SITE.name}</Heading>
+        {
+          settings.bio && (
+            <Text
+              tone="muted"
+              class="max-w-measure"
+              {...editable('siteSettings', settings.cmsId, 'bio')}
+            >
+              {settings.bio}
+            </Text>
+          )
+        }
+      </Stack>
+
+      <section aria-labelledby="selected-work">
+        <Heading
+          level={2}
+          size="base"
+          id="selected-work"
+          class="mb-8 font-mono uppercase"
+        >
+          Selected work
+        </Heading>
+        <ProjectGrid projects={projects} />
+      </section>
+    </Stack>
+  </Container>
+</BaseLayout>

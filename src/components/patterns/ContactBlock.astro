@@ -1,0 +1,74 @@
+---
+import Link from '~/components/ui/Link.astro';
+import Text from '~/components/ui/Text.astro';
+import type { SiteSettings } from '~/lib/content-types';
+import { editable } from '~/lib/preview';
+
+interface Props {
+  settings: SiteSettings;
+}
+
+const { settings } = Astro.props;
+const { contact, seo } = settings;
+---
+
+<dl class="flex flex-col gap-6">
+  {
+    contact.email && (
+      <div class="flex flex-col gap-1">
+        <dt>
+          <Text size="sm" tone="muted" as="span">
+            Email
+          </Text>
+        </dt>
+        <dd {...editable('siteSettings', settings.cmsId, 'contactEmail')}>
+          <Link href={`mailto:${contact.email}`}>{contact.email}</Link>
+        </dd>
+      </div>
+    )
+  }
+  {
+    contact.phone && (
+      <div class="flex flex-col gap-1">
+        <dt>
+          <Text size="sm" tone="muted" as="span">
+            Phone
+          </Text>
+        </dt>
+        <dd {...editable('siteSettings', settings.cmsId, 'contactPhone')}>
+          <Link href={`tel:${contact.phone.replace(/\s+/g, '')}`}>{contact.phone}</Link>
+        </dd>
+      </div>
+    )
+  }
+  {
+    contact.cvUrl && (
+      <div class="flex flex-col gap-1">
+        <dt>
+          <Text size="sm" tone="muted" as="span">
+            CV
+          </Text>
+        </dt>
+        <dd>
+          <Link href={contact.cvUrl}>Download CV</Link>
+        </dd>
+      </div>
+    )
+  }
+  {
+    seo.profiles.length > 0 && (
+      <div class="flex flex-col gap-1">
+        <dt>
+          <Text size="sm" tone="muted" as="span">
+            Elsewhere
+          </Text>
+        </dt>
+        <dd class="flex flex-wrap gap-x-6 gap-y-2">
+          {seo.profiles.map((profile) => (
+            <Link href={profile}>{new URL(profile).hostname.replace(/^www\./, '')}</Link>
+          ))}
+        </dd>
+      </div>
+    )
+  }
+</dl>

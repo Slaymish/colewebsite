@@ -1,0 +1,17 @@
+<!--
+  Placeholder mark: Cole's initials, set in whatever the browser has. It exists so
+  the tab is not an empty page icon, and it is the first thing the design session
+  should replace.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#131313" />
+  <text
+    x="32"
+    y="43"
+    fill="#fbfbf9"
+    font-family="ui-sans-serif, system-ui, sans-serif"
+    font-size="30"
+    font-weight="500"
+    text-anchor="middle"
+  >CA</text>
+</svg>

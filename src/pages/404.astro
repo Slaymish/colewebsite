@@ -1,0 +1,18 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Text from '~/components/ui/Text.astro';
+import Link from '~/components/ui/Link.astro';
+import PageHeader from '~/components/patterns/PageHeader.astro';
+---
+
+<BaseLayout title="Page not found" path="/404" noindex>
+  <Container width="measure">
+    <Stack gap="md" class="py-24">
+      <PageHeader title="Page not found" />
+      <Text tone="muted">That page has moved or never existed.</Text>
+      <Link href="/">Back to the work</Link>
+    </Stack>
+  </Container>
+</BaseLayout>

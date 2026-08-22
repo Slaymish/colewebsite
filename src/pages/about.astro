@@ -1,0 +1,54 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Figure from '~/components/ui/Figure.astro';
+import Prose from '~/components/ui/Prose.astro';
+import Link from '~/components/ui/Link.astro';
+import PageHeader from '~/components/patterns/PageHeader.astro';
+import { getAbout, getSiteSettings } from '~/lib/contentful';
+import { personJsonLd } from '~/lib/seo';
+import { SITE } from '~/lib/site';
+import { editable } from '~/lib/preview';
+
+const [about, settings] = await Promise.all([getAbout(), getSiteSettings()]);
+
+const jobTitle = settings.seo.jobTitle ?? SITE.jobTitle;
+const email = about.email ?? settings.contact.email;
+---
+
+<BaseLayout
+  title="About"
+  path="/about"
+  jsonLd={personJsonLd(
+    jobTitle,
+    settings.seo.description ?? SITE.description,
+    settings.seo.profiles,
+  )}
+>
+  <Container>
+    <Stack gap="lg" class="py-12 md:py-16">
+      <PageHeader title="About" eyebrow={jobTitle} />
+
+      <div class="flex flex-col gap-12 md:flex-row md:gap-16">
+        <div {...editable('about', about.cmsId, 'body')} class="md:flex-1">
+          <Prose paragraphs={about.body} />
+          {
+            email && (
+              <p class="mt-8">
+                <Link href={`mailto:${email}`}>{email}</Link>
+              </p>
+            )
+          }
+        </div>
+        <div class="md:w-80 md:flex-none" {...editable('about', about.cmsId, 'portrait')}>
+          <Figure
+            image={about.portrait}
+            ratio="portrait"
+            sizes="(min-width: 768px) 20rem, 100vw"
+          />
+        </div>
+      </div>
+    </Stack>
+  </Container>
+</BaseLayout>

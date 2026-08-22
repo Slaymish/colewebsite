@@ -1,0 +1,16 @@
+---
+import Text from './Text.astro';
+
+/** A run of paragraphs from one long-text CMS field, at a readable measure. */
+interface Props {
+  paragraphs: readonly string[];
+  size?: 'sm' | 'base';
+  class?: string;
+}
+
+const { paragraphs, size = 'base', class: className = '' } = Astro.props as Props;
+---
+
+<div class:list={['max-w-measure flex flex-col gap-4', className]}>
+  {paragraphs.map((paragraph) => <Text size={size}>{paragraph}</Text>)}
+</div>

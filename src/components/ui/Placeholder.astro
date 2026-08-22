@@ -1,0 +1,38 @@
+---
+import type { Ratio } from '~/lib/ui';
+
+/**
+ * A dashed grey box where a picture is missing.
+ *
+ * It is deliberately ugly. An empty div would let a page with no images look
+ * finished, and this site is reviewed by people who cannot see the CMS.
+ */
+interface Props {
+  ratio?: Ratio;
+  label?: string;
+  class?: string;
+}
+
+const {
+  ratio = 'landscape',
+  label = 'Image',
+  class: className = '',
+} = Astro.props as Props;
+
+const RATIO_CLASS: Record<Ratio, string> = {
+  portrait: 'aspect-portrait',
+  landscape: 'aspect-landscape',
+  wide: 'aspect-wide',
+  square: 'aspect-square',
+};
+---
+
+<div
+  class:list={[
+    'border-rule text-ink-muted bg-placeholder flex items-center justify-center border border-dashed',
+    RATIO_CLASS[ratio],
+    className,
+  ]}
+>
+  <span class="font-mono text-xs">[{label}]</span>
+</div>
