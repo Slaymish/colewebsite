@@ -1,0 +1,101 @@
+{
+  "$comment": "Written by the agent-setup skill. Every hook in this directory reads this file; the hook scripts themselves need no editing.",
+
+  "commands": {
+    "verify": "pnpm verify",
+    "build": "pnpm build",
+    "check": "pnpm check",
+    "lint": "pnpm lint",
+    "format:check": "pnpm format:check"
+  },
+
+  "commitPolicy": "ask",
+  "protectedBranches": ["main"],
+
+  "bannedCommands": [
+    {
+      "pattern": "\\b(npm|yarn)\\s+(i|install|add|remove|run|ci)\\b",
+      "reason": "This repo is pnpm (packageManager pnpm@11.9.0, and every CI job uses it). Run the pnpm equivalent."
+    },
+    {
+      "pattern": "\\bnpx\\s",
+      "reason": "Use `pnpm exec` instead. npx fetches a package from the registry when the local install is broken, so the run dies on a missing dependency rather than on the install that actually failed — see the comment in .github/workflows/infra.yml."
+    },
+    {
+      "pattern": "\\bcdk\\s+(deploy|destroy|bootstrap)\\b",
+      "reason": "Infrastructure is deployed only by the Infrastructure workflow (.github/workflows/infra.yml), which assumes the OIDC role and passes the context values the stacks need. `cdk diff` and `cdk synth` locally are fine."
+    },
+    {
+      "pattern": "\\baws\\s+s3\\s+(sync|cp)\\b[^;&|]*s3://",
+      "reason": "Uploading to the site bucket by hand skips the two-pass ordering in deploy.yml (immutable assets first, then HTML) and the CloudFront invalidation. Deploy through the workflow."
+    }
+  ],
+
+  "protectedPaths": [
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.test",
+    ".env.production",
+    "*.pem",
+    "dist/**",
+    ".astro/**",
+    "node_modules/**",
+    "infra/cdk.out/**",
+    "infra/cdk.context.json"
+  ],
+
+  "fileChecks": [
+    {
+      "name": "prettier",
+      "paths": ["**/*.ts", "**/*.js", "**/*.mjs", "**/*.astro", "**/*.css", "**/*.json", "**/*.md"],
+      "command": "pnpm exec prettier --write {file}",
+      "timeout": 40
+    },
+    {
+      "name": "eslint",
+      "paths": ["**/*.ts", "**/*.js", "**/*.mjs", "**/*.astro"],
+      "command": "pnpm exec eslint {file}",
+      "timeout": 60
+    }
+  ],
+
+  "pairedPaths": [
+    {
+      "name": "content model",
+      "paths": ["src/lib/content-model.ts"],
+      "reminder": "src/lib/content-model.ts is the shared vocabulary: migrations/definitions/*.ts and src/lib/contentful-map.ts both read from it. Check whether this change needs a matching migration in migrations/definitions/, and remember Contentful validates on write — an entry published before a new rule is never revisited, so a build-time guard is usually needed too."
+    },
+    {
+      "paths": ["migrations/definitions/*.ts"],
+      "name": "migration",
+      "reminder": "Migrations declare desired state against the ids and limits in src/lib/content-model.ts — never a bare string literal. If this adds or renames a field, src/lib/content-types.ts and src/lib/contentful-map.ts need the other half, and src/lib/fallback-content.ts must still satisfy the type."
+    },
+    {
+      "name": "site stack",
+      "paths": ["infra/lib/site-stack.ts"],
+      "reminder": "infra/README.md records why the choices in this stack exist (price class, real-404 behaviour, OIDC provider import, role-name suffixes). Read it before changing them. A CSP change here also constrains astro.config.mjs — both deployed environments send script-src 'self' with no 'unsafe-inline', which is why assetsInlineLimit is 0."
+    }
+  ],
+
+  "stopGate": {
+    "enabled": true,
+    "run": ["format:check", "lint"],
+    "watchPaths": [
+      "src/**",
+      "migrations/**",
+      "scripts/**",
+      "infra/bin/**",
+      "infra/lib/**",
+      "infra/functions/**",
+      "astro.config.mjs",
+      "eslint.config.js"
+    ],
+    "timeout": 120
+  },
+
+  "sessionNote": "Two pnpm projects: the site at the root and the CDK app in infra/ (own lockfile, own tsconfig). Install and run each from its own directory."
+}
