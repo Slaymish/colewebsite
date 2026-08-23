@@ -87,6 +87,17 @@ function defineSiteStacks(
     noindex: true,
   });
 
+  // www 301s at the apex rather than serving it, so one hostname carries every
+  // search signal. The wildcard half of the shared certificate already covers
+  // www, so this needs no certificate of its own.
+  new RedirectStack(app, 'ColeAndersonWww', {
+    env,
+    fromDomain: `www.${hostedZone.zoneName}`,
+    toOrigin: `https://${hostedZone.zoneName}`,
+    hostedZone,
+    certificateArn,
+  });
+
   const secondaryDomain = optional('secondaryDomain');
   if (secondaryDomain) {
     new RedirectStack(app, 'ColeAndersonRedirect', {

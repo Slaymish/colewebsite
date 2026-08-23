@@ -69,13 +69,14 @@ No colour literals outside `tokens.css`, and no opacity modifiers
 
 ### Infrastructure
 
-Four CDK stacks in `infra/`. The site stacks declare themselves only when
+Five CDK stacks in `infra/`. The site stacks declare themselves only when
 `zoneName`, `hostedZoneId` and `certificateArn` are all in context, so the app
-still synthesises with none of them set — which is the state today, because the
-hosted zone and certificate have not been made yet. Read `infra/README.md`
-before changing anything there — `PRICE_CLASS_ALL`, the real-404 behaviour, the
-OIDC provider import and the role-name suffixes each exist for a reason recorded
-in it.
+still synthesises with none of them set. All three exist now, but the certificate
+is still `PENDING_VALIDATION` — the domain has not been delegated off the
+registrar's parking nameservers, so nothing but `ColeAndersonOidc` can deploy
+yet. Read `infra/README.md` before changing anything there — `PRICE_CLASS_ALL`,
+the real-404 behaviour, the OIDC provider import and the role-name suffixes each
+exist for a reason recorded in it.
 
 ### Comments
 
