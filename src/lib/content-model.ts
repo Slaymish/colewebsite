@@ -12,6 +12,7 @@
 /** Every content type in the space, so nothing is addressed by a bare string. */
 export const CONTENT_TYPE = {
   project: 'project',
+  note: 'note',
   about: 'about',
   siteSettings: 'siteSettings',
 } as const;
@@ -39,7 +40,9 @@ export const SLUG_MESSAGE =
  */
 export const LIMIT = {
   projectBody: 2000,
-  category: 40,
+  // Contentful's Symbol type is hard-capped at 256 characters; anything above
+  // that is rejected at migrate time, not caught here.
+  noteCaption: 200,
   metaDescription: 160,
   bio: 400,
   aboutBody: 3000,
@@ -65,15 +68,17 @@ export const FIELDS = {
     'title',
     'slug',
     'body',
-    'category',
+    'tier',
     'tags',
     'cover',
     'gallery',
+    'process',
     'shareImage',
     'metaDescription',
     'featured',
     'order',
   ],
+  note: ['image', 'caption', 'date'],
   about: ['internalName', 'body', 'portrait', 'email'],
   siteSettings: [
     'internalName',
@@ -90,3 +95,17 @@ export const FIELDS = {
 } as const satisfies Record<ContentTypeId, readonly string[]>;
 
 export type FieldOf<K extends ContentTypeId> = (typeof FIELDS)[K][number];
+
+/**
+ * What kind of thing an entry is. `play` is unfinished work and experiments —
+ * shown, but never mistaken for a finished project. A play item can be promoted
+ * by changing this field alone, which is why the tier is not in the URL.
+ */
+export const TIER = {
+  project: 'project',
+  play: 'play',
+} as const;
+
+export type Tier = (typeof TIER)[keyof typeof TIER];
+
+export const TIERS = [TIER.project, TIER.play] as const;

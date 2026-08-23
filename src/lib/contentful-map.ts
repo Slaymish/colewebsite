@@ -5,8 +5,14 @@
  * see a CMS shape and swapping CMS later touches one module. The field ids below
  * must stay in step with the definitions in migrations/definitions/.
  */
-import { SLUG_REGEX } from './content-model';
-import type { About, ImageAsset, Project, SiteSettings } from './content-types';
+import { SLUG_REGEX, TIER, type Tier } from './content-model';
+import type {
+  About,
+  ImageAsset,
+  ProcessNote,
+  Project,
+  SiteSettings,
+} from './content-types';
 
 /** Minimal shapes for what we actually read, rather than the SDK's full generics. */
 interface RawAsset {
@@ -99,14 +105,43 @@ function usableSlug(slug: unknown, title: unknown, kind: string): slug is string
   return true;
 }
 
+interface NoteFields {
+  image?: unknown;
+  caption?: string;
+  date?: string;
+}
+
+/**
+ * A note with no usable image is dropped rather than rendered captionless — the
+ * picture is the point of a process note.
+ */
+export function toProcessNote(entry: unknown): ProcessNote | null {
+  const raw = entry as RawEntry<NoteFields> | undefined;
+  const image = toImage(raw?.fields?.image);
+  const caption = orNull(raw?.fields?.caption);
+  if (!raw || !image || !caption) return null;
+
+  return { cmsId: raw.sys.id, image, caption, date: orNull(raw.fields.date) };
+}
+
+/**
+ * Anything unset reads as a project. The field arrived after entries already
+ * existed, and those entries are projects — see the comment on `tier` in
+ * migrations/definitions/01-project.ts.
+ */
+function toTier(value: unknown): Tier {
+  return value === TIER.play ? TIER.play : TIER.project;
+}
+
 interface ProjectFields {
   title?: string;
   slug?: string;
   body?: string;
-  category?: string;
+  tier?: string;
   tags?: unknown[];
   cover?: unknown;
   gallery?: unknown[];
+  process?: unknown[];
   shareImage?: unknown;
   metaDescription?: string;
   featured?: boolean;
@@ -124,12 +159,15 @@ export function toProject(entry: unknown): Project | null {
     slug: fields.slug,
     title: fields.title,
     body: toParagraphs(fields.body),
-    category: orNull(fields.category),
+    tier: toTier(fields.tier),
     tags: toStrings(fields.tags),
     cover: toImage(fields.cover),
     gallery: (fields.gallery ?? [])
       .map(toImage)
       .filter((image): image is ImageAsset => image !== null),
+    process: (fields.process ?? [])
+      .map(toProcessNote)
+      .filter((note): note is ProcessNote => note !== null),
     shareImage: toImage(fields.shareImage),
     metaDescription: orNull(fields.metaDescription),
     featured: fields.featured === true,

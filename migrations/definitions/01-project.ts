@@ -1,17 +1,27 @@
 /**
- * Project — one piece of work. The homepage shows the ones marked as selected.
+ * Project — one piece of work, finished or not. `tier` separates real projects
+ * from play, so promoting a play piece never means a new entry or a new URL.
  *
  * Field help is written to Cole in second person, because a description under
  * the field is the only guidance he gets while editing — anything written in
  * this repo he will never see.
  */
 import type { MigrationFunction } from 'contentful-migration';
-import { CONTENT_TYPE, LIMIT, SLUG_MESSAGE, SLUG_PATTERN } from '~/lib/content-model';
+import {
+  CONTENT_TYPE,
+  LIMIT,
+  SLUG_MESSAGE,
+  SLUG_PATTERN,
+  TIER,
+  TIERS,
+} from '~/lib/content-model';
 
 const definition: MigrationFunction = (migration) => {
   const project = migration.createContentType(CONTENT_TYPE.project, {
     name: 'Project',
-    description: 'One piece of work. The selected ones appear on the homepage.',
+    description:
+      'One piece of work — a project, or something from Play. The selected ones ' +
+      'appear on the homepage.',
   });
 
   project.createField('title', { name: 'Title', type: 'Symbol', required: true });
@@ -49,15 +59,20 @@ const definition: MigrationFunction = (migration) => {
       'blank line between paragraphs and they stay separate on the page.',
   });
 
-  project.createField('category', {
-    name: 'Category',
+  // Not required, and deliberately: making it required would mark every entry
+  // published before this field arrived as invalid. Anything unset reads as a
+  // project, which is what those entries already are. See toProject().
+  project.createField('tier', {
+    name: 'Kind',
     type: 'Symbol',
-    validations: [{ size: { max: LIMIT.category } }],
+    defaultValue: { 'en-US': TIER.project },
+    validations: [{ in: [...TIERS] }],
   });
-  project.changeFieldControl('category', 'builtin', 'singleLine', {
+  project.changeFieldControl('tier', 'builtin', 'radio', {
     helpText:
-      'One word or two for the kind of work this is — Film, Photography, Design. ' +
-      'It groups projects on the site, so reuse the same spelling each time.',
+      'Play is for the unfinished and the experimental — things worth showing ' +
+      'that you do not want read as finished work. You can switch a play piece ' +
+      'to a project later without changing its web address.',
   });
 
   project.createField('tags', {
@@ -66,7 +81,10 @@ const definition: MigrationFunction = (migration) => {
     items: { type: 'Symbol', validations: [] },
   });
   project.changeFieldControl('tags', 'builtin', 'tagEditor', {
-    helpText: 'Roles, clients, techniques — anything worth listing beside the project.',
+    helpText:
+      'What this piece is made of or made with — wool, charcoal, photography. ' +
+      'Tags are how work is grouped on the site, so reuse the same spelling ' +
+      'each time. A piece can carry several.',
   });
 
   project.createField('cover', {
@@ -92,6 +110,22 @@ const definition: MigrationFunction = (migration) => {
   });
   project.changeFieldControl('gallery', 'builtin', 'assetGalleryEditor', {
     helpText: 'Everything else shown on the project’s page, in order.',
+  });
+
+  project.createField('process', {
+    name: 'Process',
+    type: 'Array',
+    items: {
+      type: 'Link',
+      linkType: 'Entry',
+      validations: [{ linkContentType: [CONTENT_TYPE.note] }],
+    },
+  });
+  project.changeFieldControl('process', 'builtin', 'entryLinksEditor', {
+    helpText:
+      'Pictures from partway through, each with a line about it. Leave it empty ' +
+      'on anything where there is nothing to show — most projects have some, a ' +
+      'few have none.',
   });
 
   project.createField('shareImage', {

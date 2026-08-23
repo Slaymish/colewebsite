@@ -9,6 +9,7 @@
  * A production build refuses to ship any of it. See REQUIRE_CMS_CONTENT in
  * contentful.ts.
  */
+import { TIER } from './content-model';
 import type { About, Project, SiteSettings } from './content-types';
 
 export const FALLBACK_PROJECTS: Project[] = [
@@ -20,10 +21,13 @@ export const FALLBACK_PROJECTS: Project[] = [
       '[Two or three paragraphs about the project — what it was, what Cole did on it, ' +
         'and what it was for. This is placeholder text: nothing here comes from the CMS.]',
     ],
-    category: '[Category]',
+    tier: TIER.project,
     tags: [],
     cover: null,
     gallery: [],
+    // Empty rather than invented: a ProcessNote requires a real image, and
+    // there are none here on purpose.
+    process: [],
     shareImage: null,
     metaDescription: null,
     featured: true,
@@ -34,14 +38,30 @@ export const FALLBACK_PROJECTS: Project[] = [
     slug: 'second-project',
     title: '[Second project]',
     body: ['[Another project. Add real ones in Contentful and these disappear.]'],
-    category: '[Category]',
+    tier: TIER.project,
     tags: [],
     cover: null,
     gallery: [],
+    process: [],
     shareImage: null,
     metaDescription: null,
     featured: true,
     order: 2,
+  },
+  {
+    cmsId: '',
+    slug: 'first-play-piece',
+    title: '[Something from Play]',
+    body: ['[An experiment, or something unfinished. It is not a project.]'],
+    tier: TIER.play,
+    tags: [],
+    cover: null,
+    gallery: [],
+    process: [],
+    shareImage: null,
+    metaDescription: null,
+    featured: false,
+    order: 3,
   },
 ];
 
