@@ -44,16 +44,10 @@ Routes are `/`, `/about`, `/contact`, `/project/<slug>` and a real `/404`.
 
 ## What is not decided yet
 
-Two things are deliberately provisional, and both are marked where they live:
-
-- **The design.** Everything in `src/styles/tokens.css` is scaffolding with the
-  right shape — near-black on off-white, a system font stack, a plain scale.
-  Nobody has chosen a palette, a typeface or a type scale. The components are a
-  neutral base to redesign against, not a look.
-- **The domain.** Nothing hardcodes one. The build reads `PUBLIC_SITE_URL`, and
-  `deploy.yml` builds that from the `SITE_DOMAIN` repository variable, so
-  choosing the domain is a settings change rather than a commit. The CDK site
-  stacks skip themselves until a zone and certificate exist.
+**The design.** Everything in `src/styles/tokens.css` is scaffolding with the
+right shape — near-black on off-white, a system font stack, a plain scale. Nobody
+has chosen a palette, a typeface or a type scale. The components are a neutral
+base to redesign against, not a look.
 
 ## Rules that bite
 
@@ -63,6 +57,11 @@ Two things are deliberately provisional, and both are marked where they live:
 - **A token only goes in `@theme` if Tailwind has that namespace.** It has no
   `--duration-` or `--z-`; those live in `tokens.css` §3 and are bridged by an
   `@utility` in `global.css`. Getting this wrong emits no CSS and no error.
+- **The domain lives in settings, not in a file.** It is `coleanderson.nz`, and
+  no code path reads it from this repo: the build reads `PUBLIC_SITE_URL`,
+  `deploy.yml` builds that from the `SITE_DOMAIN` repository variable, and the
+  CDK site stacks take theirs from context. Deciding it was a settings change;
+  changing it should be one too.
 - **Content is the CMS's job.** No copy about Cole gets invented in this repo.
 - **Contentful shapes stop at `contentful-map.ts`.** Templates see the types in
   `content-types.ts` and never a raw entry, so swapping CMS touches one module.

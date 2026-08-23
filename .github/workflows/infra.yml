@@ -46,7 +46,8 @@ jobs:
       #
       # zoneName, hostedZoneId, certificateArn and basicAuthHeader may all be
       # empty: bin/infra.ts then declares the OIDC stack alone and skips the
-      # site stacks, which is the correct state until the domain exists.
+      # site stacks, which is the correct state until the hosted zone and the
+      # certificate exist.
       #
       # --all is a deploy-only option. `cdk diff` already diffs every stack in the
       # app, and passing it there earns "Unknown option(s): --all" and nothing else.

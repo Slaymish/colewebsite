@@ -69,11 +69,14 @@ No colour literals outside `tokens.css`, and no opacity modifiers
 
 ### Infrastructure
 
-Four CDK stacks in `infra/`. The site stacks declare themselves only when
+Five CDK stacks in `infra/`. The site stacks declare themselves only when
 `zoneName`, `hostedZoneId` and `certificateArn` are all in context, so the app
-synthesises today with no domain. Read `infra/README.md` before changing
-anything there — `PRICE_CLASS_ALL`, the real-404 behaviour, the OIDC provider
-import and the role-name suffixes each exist for a reason recorded in it.
+still synthesises with none of them set. All three exist now, but the certificate
+is still `PENDING_VALIDATION` — the domain has not been delegated off the
+registrar's parking nameservers, so nothing but `ColeAndersonOidc` can deploy
+yet. Read `infra/README.md` before changing anything there — `PRICE_CLASS_ALL`,
+the real-404 behaviour, the OIDC provider import and the role-name suffixes each
+exist for a reason recorded in it.
 
 ### Comments
 
@@ -96,8 +99,13 @@ PUBLIC_SITE_URL                 # canonical origin for this build
 PUBLIC_NOINDEX                  # 'true' noindexes every page (test only)
 ```
 
+## The domain
+
+`coleanderson.nz`, registered at domainsdirect.nz. No code path reads it from
+this repo: `deploy.yml` reads the `SITE_DOMAIN` repository variable and the CDK
+stacks read `zoneName` from context. Do not write the domain into the code to
+"fix" a build or a stack that will not synthesise without it.
+
 ## Not decided yet
 
 - **The design.** Tokens and components are a neutral base to redesign against.
-- **The domain.** Nothing hardcodes one; `deploy.yml` reads the `SITE_DOMAIN`
-  repository variable. Do not write a domain into the code to "fix" this.

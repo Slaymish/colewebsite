@@ -1,18 +1,20 @@
 # Infrastructure
 
-CDK app defining four stacks:
+CDK app defining five stacks:
 
 | Stack                  | What it is                                              |
 | ---------------------- | ------------------------------------------------------- |
 | `ColeAndersonOidc`     | The infra and content deploy roles, federated to GitHub |
 | `ColeAndersonProd`     | Bucket, distribution and DNS for the canonical domain   |
 | `ColeAndersonTest`     | Same, plus basic auth and `X-Robots-Tag: noindex`       |
+| `ColeAndersonWww`      | 301s `www` at the apex, on the shared wildcard cert     |
 | `ColeAndersonRedirect` | 301s a secondary domain at the canonical one            |
 
-Only `ColeAndersonOidc` can be deployed today. The site stacks need a hosted zone
-and a certificate, so `bin/infra.ts` declares them only once `zoneName`,
-`hostedZoneId` and `certificateArn` are all supplied and prints a line saying it
-skipped them otherwise. No domain has been chosen yet.
+The site stacks need a hosted zone and a certificate, so `bin/infra.ts` declares
+them only once `zoneName`, `hostedZoneId` and `certificateArn` are all supplied
+and prints a line saying it skipped them otherwise. All three exist now, so the
+whole app synthesises — but the certificate cannot validate until the domain is
+delegated, so the site stacks cannot deploy yet. See "Before the first deploy".
 
 ## infra is its own pnpm project
 
@@ -35,7 +37,7 @@ pnpm exec cdk diff \
   -c account=025513282486 \
   -c repository=Slaymish/colewebsite \
   -c oidcProviderArn=arn:aws:iam::025513282486:oidc-provider/token.actions.githubusercontent.com \
-  -c zoneName=example.com \
+  -c zoneName=coleanderson.nz \
   -c hostedZoneId=Z0123456789ABCDEFGHIJ \
   -c certificateArn=arn:aws:acm:us-east-1:025513282486:certificate/... \
   -c basicAuthHeader="Basic $(printf 'cole:somepassword' | base64)"
@@ -69,15 +71,30 @@ and `github-content-deploy`.
 
 ## Before the first deploy
 
-1. Deploy `ColeAndersonOidc`, then put its two role ARNs into the repository
-   secrets `AWS_INFRA_ROLE_ARN` and `AWS_CONTENT_ROLE_ARN`.
-2. Register the domain and create its Route 53 hosted zone.
-3. Issue **one ACM certificate in us-east-1** covering the apex and the wildcard.
-   CloudFront will not accept a certificate from any other region, and both site
-   stacks share this one. Validation is DNS, so the hosted zone must exist first.
-4. Set the repository variable `SITE_DOMAIN` to the bare domain and the secrets
-   `HOSTED_ZONE_ID`, `CERTIFICATE_ARN` and `TEST_BASIC_AUTH_HEADER`.
-5. Run the Infrastructure workflow with `deploy`.
+1. ~~Deploy `ColeAndersonOidc`, then put its two role ARNs into the repository
+   secrets `AWS_INFRA_ROLE_ARN` and `AWS_CONTENT_ROLE_ARN`.~~ **Done** —
+   `ColeAndersonOidc` is `CREATE_COMPLETE` and both secrets are set.
+2. ~~Create the Route 53 hosted zone for `coleanderson.nz`~~ **Done** —
+   `Z06561742DYXOK4WGBYM8`. **Still outstanding: replace the nameservers at
+   domainsdirect.nz** — where the domain is registered — with the four the zone
+   reports. It is still on the registrar's parking nameservers
+   (`ns1.secureparkme.com`, `ns2.secureparkme.com`). Nothing after this works
+   until that delegation has propagated: check with
+   `dig NS coleanderson.nz @ns1.dns.net.nz` before moving on.
+3. ~~Issue **one ACM certificate in us-east-1** covering the apex and the
+   wildcard.~~ **Requested, not yet issued** —
+   `arn:aws:acm:us-east-1:025513282486:certificate/12a7d52a-abb3-4e2c-8a23-83e5126700ae`.
+   CloudFront will not accept a certificate from any other region, and every site
+   stack shares this one. Validation is DNS and its CNAME is already in the zone,
+   so the certificate issues on its own once step 2 propagates — an undelegated
+   zone leaves it sitting at `PENDING_VALIDATION` with no error to read. **ACM
+   gives up 72 hours after the request**, which was 2026-08-23 16:22 NZST; past
+   that the request has to be made again.
+4. ~~Set the repository variable `SITE_DOMAIN`, the variable `ZONE_NAME`, and the
+   secrets `HOSTED_ZONE_ID`, `CERTIFICATE_ARN` and
+   `TEST_BASIC_AUTH_HEADER`.~~ **Done.**
+5. Run the Infrastructure workflow with `deploy`, once the certificate reads
+   `ISSUED`.
 6. Set an AWS Budgets alarm at US$10/month.
 
 ## The test gate, and the Contentful iframe
