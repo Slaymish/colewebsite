@@ -2,6 +2,7 @@
 import Figure from '~/components/ui/Figure.astro';
 import Heading from '~/components/ui/Heading.astro';
 import Text from '~/components/ui/Text.astro';
+import { TIER } from '~/lib/content-model';
 import type { Project } from '~/lib/content-types';
 import { editable } from '~/lib/preview';
 
@@ -12,6 +13,10 @@ interface Props {
 }
 
 const { project, priority = false } = Astro.props;
+
+// The only thing marking a play piece in a list. Finished work carries no label,
+// so the fence reads as "this one is unfinished" rather than as a category system.
+const isPlay = project.tier === TIER.play;
 ---
 
 <article class="group">
@@ -28,13 +33,14 @@ const { project, priority = false } = Astro.props;
         {project.title}
       </Heading>
       {
-        project.category && (
+        isPlay && (
           <Text
             size="sm"
             tone="muted"
-            {...editable('project', project.cmsId, 'category')}
+            class="font-mono uppercase"
+            {...editable('project', project.cmsId, 'tier')}
           >
-            {project.category}
+            Play
           </Text>
         )
       }

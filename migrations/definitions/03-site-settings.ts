@@ -63,7 +63,7 @@ const definition: MigrationFunction = (migration) => {
   });
   settings.changeFieldControl('jobTitle', 'builtin', 'singleLine', {
     helpText:
-      'A few words — “Director and Photographer”. It goes in the page title and ' +
+      'A few words — “Object maker and photographer”. It goes in the page title and ' +
       'in the data search engines read about you.',
   });
 

@@ -2,9 +2,19 @@
  * The content model. These types are the contract the Contentful migrations in
  * migrations/definitions/ must satisfy.
  */
+import type { Tier } from './content-model';
 import type { ImageAsset } from './ui';
 
 export type { ImageAsset };
+
+/** One moment of process — a picture from partway through, and a line about it. */
+export interface ProcessNote {
+  cmsId: string;
+  image: ImageAsset;
+  caption: string;
+  /** ISO date, or null. Notes without one keep their authored order. */
+  date: string | null;
+}
 
 export interface Project {
   /** Contentful entry id. Empty for placeholder content. See lib/preview.ts. */
@@ -13,11 +23,18 @@ export interface Project {
   title: string;
   /** Plain strings, one per paragraph. Blank lines in the CMS separate them. */
   body: string[];
-  /** Groups projects in the index, e.g. 'Film', 'Photography'. */
-  category: string | null;
+  /**
+   * Project or play. Play is unfinished work and experiments — shown, but never
+   * ranked alongside finished projects. Promotion is a change to this field and
+   * nothing else, which is why the slug does not encode it.
+   */
+  tier: Tier;
+  /** What the piece is made of or made with. This is what groups work. */
   tags: string[];
   cover: ImageAsset | null;
   gallery: ImageAsset[];
+  /** Empty on anything with no process worth showing. */
+  process: ProcessNote[];
   /** 1200x630 card for link previews. Falls back to the cover, then the site default. */
   shareImage: ImageAsset | null;
   metaDescription: string | null;
@@ -54,7 +71,7 @@ export interface SiteSettings {
     shareImage: ImageAsset | null;
     /** Drives the Person JSON-LD. */
     jobTitle: string | null;
-    /** Each becomes a sameAs link — Instagram, Vimeo, anything public. */
+    /** Each becomes a sameAs link — Instagram, anything public. */
     profiles: string[];
   };
   contact: {

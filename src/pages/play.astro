@@ -1,0 +1,38 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Container from '~/components/ui/Container.astro';
+import Stack from '~/components/ui/Stack.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Text from '~/components/ui/Text.astro';
+import ProjectGrid from '~/components/patterns/ProjectGrid.astro';
+import { getPlay } from '~/lib/contentful';
+
+/**
+ * Play — unfinished things and experiments, kept off the work index on purpose.
+ *
+ * Deliberately not hidden when empty: the page still renders and says so, because
+ * a 404 on a link in the nav is worse than an honest empty section.
+ */
+const play = await getPlay();
+---
+
+<BaseLayout title="Play" path="/play">
+  <Container>
+    <Stack gap="xl" class="py-16 md:py-24">
+      <Stack gap="sm">
+        <Heading level={1} size="display">Play</Heading>
+        <Text tone="muted" class="max-w-measure">
+          Experiments and things still in progress. Not finished work.
+        </Text>
+      </Stack>
+
+      {
+        play.length > 0 ? (
+          <ProjectGrid projects={play} />
+        ) : (
+          <Text tone="muted">Nothing here yet.</Text>
+        )
+      }
+    </Stack>
+  </Container>
+</BaseLayout>

@@ -3,7 +3,7 @@
  * browser. Falls back to placeholder content while the space does not exist yet.
  */
 import { createClient, type ContentfulClientApi } from 'contentful';
-import { CONTENT_TYPE } from './content-model';
+import { CONTENT_TYPE, TIER } from './content-model';
 import type { About, Project, SiteSettings } from './content-types';
 import { toAbout, toProject, toSiteSettings } from './contentful-map';
 import { DEFAULT_SETTINGS, FALLBACK_ABOUT, FALLBACK_PROJECTS } from './fallback-content';
@@ -98,9 +98,13 @@ function isUnknownContentType(error: unknown): boolean {
 }
 
 /**
- * Every project, ordered by the CMS field rather than in a template, so Cole
- * controls the order without a deploy. Memoised: the index, every project page
- * and the sitemap all ask for the same list.
+ * Every entry of both tiers, ordered by the CMS field rather than in a template,
+ * so Cole controls the order without a deploy. Memoised: the index, every project
+ * page and the sitemap all ask for the same list.
+ *
+ * Play is included — play pieces get real pages and real URLs, which is what
+ * makes promoting one a change to `tier` and nothing else. Use `getWork()` for
+ * the finished-work index.
  */
 let projectsPromise: Promise<Project[]> | null = null;
 
@@ -117,11 +121,34 @@ async function fetchProjects(): Promise<Project[]> {
   return projects.length > 0 ? projects : missing('projects', FALLBACK_PROJECTS);
 }
 
-/** The selected work on the homepage. Everything, if Cole has marked nothing. */
+/**
+ * Finished work — the main index. Play is deliberately absent, which is the whole
+ * point of the tier.
+ */
+export async function getWork(): Promise<Project[]> {
+  const projects = await getProjects();
+  return projects.filter((project) => project.tier === TIER.project);
+}
+
+/** The play section: unfinished things and experiments. */
+export async function getPlay(): Promise<Project[]> {
+  const projects = await getProjects();
+  return projects.filter((project) => project.tier === TIER.play);
+}
+
+/**
+ * The selected work on the homepage.
+ *
+ * Play is not filtered out here, and that is deliberate: a featured play piece is
+ * a wanted state — see docs/design/brief.md on not everything shown being a
+ * finished product. It only reaches the homepage because Cole switched it on.
+ * With nothing switched on the fallback shows finished work only, because
+ * defaulting play onto the homepage would be a decision nobody made.
+ */
 export async function getFeaturedProjects(): Promise<Project[]> {
   const projects = await getProjects();
   const featured = projects.filter((project) => project.featured);
-  return featured.length > 0 ? featured : projects;
+  return featured.length > 0 ? featured : getWork();
 }
 
 export async function getProject(slug: string): Promise<Project | null> {

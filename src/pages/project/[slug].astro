@@ -4,6 +4,7 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import Container from '~/components/ui/Container.astro';
 import Stack from '~/components/ui/Stack.astro';
 import Figure from '~/components/ui/Figure.astro';
+import Heading from '~/components/ui/Heading.astro';
 import Prose from '~/components/ui/Prose.astro';
 import Text from '~/components/ui/Text.astro';
 import Link from '~/components/ui/Link.astro';
@@ -11,6 +12,7 @@ import PageHeader from '~/components/patterns/PageHeader.astro';
 import { getProjects } from '~/lib/contentful';
 import { creativeWorkJsonLd } from '~/lib/seo';
 import { editable } from '~/lib/preview';
+import { TIER } from '~/lib/content-model';
 import type { Project } from '~/lib/content-types';
 
 /**
@@ -50,9 +52,9 @@ const share = project.shareImage ?? project.cover;
     <Stack gap="lg" class="py-12 md:py-16">
       <PageHeader
         title={project.title}
-        eyebrow={project.category}
+        eyebrow={project.tier === TIER.play ? 'Play' : null}
         titleEditable={editable('project', project.cmsId, 'title')}
-        eyebrowEditable={editable('project', project.cmsId, 'category')}
+        eyebrowEditable={editable('project', project.cmsId, 'tier')}
       />
 
       <Figure
@@ -94,7 +96,29 @@ const share = project.shareImage ?? project.cover;
         )
       }
 
-      <Link href="/" class="text-sm">← All work</Link>
+      {
+        project.process.length > 0 && (
+          <Stack gap="md" as="section" {...editable('project', project.cmsId, 'process')}>
+            <Heading level={2} size="base" class="font-mono uppercase">
+              Process
+            </Heading>
+            {project.process.map((note) => (
+              <figure class="flex flex-col gap-2">
+                <Figure image={note.image} sizes="(min-width: 1024px) 80vw, 100vw" />
+                <figcaption>
+                  <Text size="sm" tone="muted">
+                    {note.caption}
+                  </Text>
+                </figcaption>
+              </figure>
+            ))}
+          </Stack>
+        )
+      }
+
+      <Link href={project.tier === TIER.play ? '/play' : '/'} class="text-sm">
+        {project.tier === TIER.play ? '← All play' : '← All work'}
+      </Link>
     </Stack>
   </Container>
 </BaseLayout>
