@@ -16,6 +16,16 @@
  *
  * Idempotent: matches the existing webhook by name and updates it in place.
  */
+import path from 'node:path';
+
+// Node reads .env for `astro dev` but not for a script run directly, so without
+// this the check below rejects credentials that are sitting in .env all along.
+try {
+  process.loadEnvFile(path.resolve(import.meta.dirname, '../.env'));
+} catch {
+  // No .env — the variables may already be exported, so let the check below rule.
+}
+
 const API = 'https://api.contentful.com';
 
 const args = process.argv.slice(2);
