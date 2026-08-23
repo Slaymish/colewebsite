@@ -12,7 +12,8 @@ CDK app defining four stacks:
 Only `ColeAndersonOidc` can be deployed today. The site stacks need a hosted zone
 and a certificate, so `bin/infra.ts` declares them only once `zoneName`,
 `hostedZoneId` and `certificateArn` are all supplied and prints a line saying it
-skipped them otherwise. No domain has been chosen yet.
+skipped them otherwise. The domain is now `coleanderson.nz`, but its hosted zone
+and certificate have not been made — see "Before the first deploy".
 
 ## infra is its own pnpm project
 
@@ -35,7 +36,7 @@ pnpm exec cdk diff \
   -c account=025513282486 \
   -c repository=Slaymish/colewebsite \
   -c oidcProviderArn=arn:aws:iam::025513282486:oidc-provider/token.actions.githubusercontent.com \
-  -c zoneName=example.com \
+  -c zoneName=coleanderson.nz \
   -c hostedZoneId=Z0123456789ABCDEFGHIJ \
   -c certificateArn=arn:aws:acm:us-east-1:025513282486:certificate/... \
   -c basicAuthHeader="Basic $(printf 'cole:somepassword' | base64)"
@@ -71,12 +72,18 @@ and `github-content-deploy`.
 
 1. Deploy `ColeAndersonOidc`, then put its two role ARNs into the repository
    secrets `AWS_INFRA_ROLE_ARN` and `AWS_CONTENT_ROLE_ARN`.
-2. Register the domain and create its Route 53 hosted zone.
+2. Create the Route 53 hosted zone for `coleanderson.nz`, then replace the
+   nameservers at domainsdirect.nz — where the domain is registered — with the
+   four the zone reports. Nothing after this works until that delegation has
+   propagated: check with `dig NS coleanderson.nz` before moving on.
 3. Issue **one ACM certificate in us-east-1** covering the apex and the wildcard.
    CloudFront will not accept a certificate from any other region, and both site
-   stacks share this one. Validation is DNS, so the hosted zone must exist first.
-4. Set the repository variable `SITE_DOMAIN` to the bare domain and the secrets
-   `HOSTED_ZONE_ID`, `CERTIFICATE_ARN` and `TEST_BASIC_AUTH_HEADER`.
+   stacks share this one. Validation is DNS, so the hosted zone must exist first
+   and be the one the world resolves to — an undelegated zone leaves the
+   certificate sitting at `PENDING_VALIDATION` with no error to read.
+4. Set the repository variable `SITE_DOMAIN` to `coleanderson.nz`, the variable
+   `ZONE_NAME` to the same, and the secrets `HOSTED_ZONE_ID`, `CERTIFICATE_ARN`
+   and `TEST_BASIC_AUTH_HEADER`.
 5. Run the Infrastructure workflow with `deploy`.
 6. Set an AWS Budgets alarm at US$10/month.
 

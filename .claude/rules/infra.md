@@ -21,8 +21,10 @@ there with the reason they exist.
 
 - The site stacks declare themselves only when `zoneName`, `hostedZoneId` and
   `certificateArn` are all in context. With none of them, `bin/infra.ts`
-  synthesises the OIDC stack alone. That is the correct state until the domain
-  exists — do not hardcode a domain to "fix" a stack that will not synthesise.
+  synthesises the OIDC stack alone. That is the correct state until the hosted
+  zone and certificate exist. The domain is `coleanderson.nz` and it still
+  belongs in settings rather than a source file — do not hardcode it to "fix" a
+  stack that will not synthesise.
 - `OIDC_PROVIDER_ARN` is required: the account already holds a GitHub OIDC
   provider, one per URL is the limit, and without it CDK plans a second one and
   the deploy fails.

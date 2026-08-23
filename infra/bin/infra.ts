@@ -46,7 +46,8 @@ new GithubOidcStack(app, 'ColeAndersonOidc', {
  * The site stacks need a hosted zone and a certificate, which cannot exist until
  * the domain is registered and delegated. They are declared only once that
  * context is supplied, so the OIDC stack can deploy on its own in the meantime.
- * As of writing no domain has been chosen — see README.md, "Before the first deploy".
+ * The domain exists now, the zone and certificate do not — see README.md,
+ * "Before the first deploy".
  */
 const zoneName = optional('zoneName');
 const hostedZoneId = optional('hostedZoneId');
@@ -57,7 +58,7 @@ const certificateArn = optional('certificateArn');
 if (!zoneName || !hostedZoneId || !certificateArn) {
   console.warn(
     'Skipping the site stacks: zoneName, hostedZoneId and certificateArn are ' +
-      'not all set. The domain is not registered yet.',
+      'not all set. The hosted zone and certificate do not exist yet.',
   );
 } else {
   defineSiteStacks({ zoneName, hostedZoneId }, certificateArn);

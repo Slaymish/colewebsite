@@ -9,9 +9,9 @@
 export const SITE = {
   name: 'Cole Anderson',
   /**
-   * Canonical origin for this build, set per environment. The domain is not
-   * registered yet, so there is no production default to fall back to — a build
-   * that forgets to set it gets localhost rather than a plausible-looking lie in
+   * Canonical origin for this build, set per environment. There is deliberately
+   * no production default even now the domain exists — a build that forgets to
+   * set it gets localhost rather than stamping a plausible-looking lie into
    * every canonical tag.
    */
   origin: import.meta.env.PUBLIC_SITE_URL ?? 'http://localhost:4321',

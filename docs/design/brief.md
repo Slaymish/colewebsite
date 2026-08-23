@@ -76,9 +76,9 @@ Two accents, not one. No concept route may assume a single-signal palette.
 
 ## Domain
 
-Undecided. Likely `coleanderson.nz` or similar. Nothing is to be written into the
-code — `deploy.yml` reads the `SITE_DOMAIN` repository variable and that stays the
-only place a domain appears.
+`coleanderson.nz`, bought from domainsdirect.nz. Nothing is to be written into
+the code — `deploy.yml` reads the `SITE_DOMAIN` repository variable and that
+stays the only place a domain appears.
 
 ## Requirements this brief puts on the build
 

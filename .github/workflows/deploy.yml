@@ -42,17 +42,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # The domain is a repository variable rather than a literal in this file,
-      # because it had not been chosen when the pipeline was written. Choosing it
-      # is then a settings change, not a commit. Absent, every canonical URL, OG
-      # tag and sitemap entry in the build would silently point at localhost — so
-      # this stops rather than shipping that.
+      # so changing it stays a settings change and not a commit. Absent, every
+      # canonical URL, OG tag and sitemap entry in the build would silently point
+      # at localhost — so this stops rather than shipping that.
       - name: Resolve site origin
         id: origin
         run: |
           set -euo pipefail
           DOMAIN="${{ vars.SITE_DOMAIN }}"
           if [ -z "$DOMAIN" ]; then
-            echo "::error::Repository variable SITE_DOMAIN is not set. Set it to the bare domain, e.g. coleanderson.com."
+            echo "::error::Repository variable SITE_DOMAIN is not set. Set it to the bare domain, e.g. coleanderson.nz."
             exit 1
           fi
           if [ "${{ env.IS_PROD }}" = "true" ]; then
@@ -100,7 +99,7 @@ jobs:
           if ! ERROR=$(aws cloudformation describe-stacks --stack-name "$STACK" 2>&1 >/dev/null); then
             case "$ERROR" in
               *"does not exist"*)
-                echo "::notice::Stack $STACK does not exist yet — skipping deploy. The domain is not registered."
+                echo "::notice::Stack $STACK does not exist yet — skipping deploy. The site infrastructure has not been deployed yet."
                 echo "exists=false" >> "$GITHUB_OUTPUT"
                 exit 0
                 ;;

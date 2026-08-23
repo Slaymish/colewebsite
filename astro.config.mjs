@@ -5,9 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 /**
  * The canonical origin differs per environment, so the build reads it rather
- * than hardcoding it. The domain is not registered yet — deploy.yml builds this
- * from the SITE_DOMAIN repository variable, so choosing the domain is a settings
- * change rather than a code change. Falls back to the dev server for `astro dev`.
+ * than hardcoding it. deploy.yml builds this from the SITE_DOMAIN repository
+ * variable, which keeps changing the domain a settings change rather than a code
+ * change. Falls back to the dev server for `astro dev`.
  */
 const site = process.env.PUBLIC_SITE_URL ?? 'http://localhost:4321';
 
