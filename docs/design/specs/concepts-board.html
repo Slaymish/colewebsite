@@ -1,0 +1,1831 @@
+<title>Call Sheet / Plate / Light Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..500;1,6..96,400&family=DM+Sans:wght@400;500&family=Familjen+Grotesk:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400..600&family=Geist+Mono:wght@400;500&family=Libre+Franklin:wght@300;400;500&display=swap"
+/>
+
+<style>
+  /* ═══ Board chrome ═══════════════════════════════════════════════════════════
+   Deliberately quiet: one grotesque across every role plus a mono for spec data.
+   Three concept worlds each bring their own two faces, so the frame around them
+   has to stay out of the argument. ────────────────────────────────────────── */
+
+  :root {
+    --ground: #edeeec;
+    --surface: #f6f7f5;
+    --ink: #151816;
+    --ink-2: #5c625e;
+    --rule: #d2d6d2;
+    --rule-strong: #b6bcb7;
+
+    --font-ui: 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-data: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --t-display: clamp(2.1rem, 1.3rem + 3.2vw, 3.7rem);
+    --t-h2: clamp(1.55rem, 1.1rem + 1.6vw, 2.3rem);
+    --t-body: 1.0625rem;
+    --t-small: 0.875rem;
+    --t-label: 0.7rem;
+
+    --page: 1120px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --ground: #131614;
+      --surface: #212624;
+      --ink: #e9ebe8;
+      --ink-2: #8f9793;
+      --rule: #272c29;
+      --rule-strong: #454c48;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --ground: #131614;
+    --surface: #212624;
+    --ink: #e9ebe8;
+    --ink-2: #8f9793;
+    --rule: #272c29;
+    --rule-strong: #454c48;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: var(--t-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    font-optical-sizing: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .label {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  /* ─── Masthead ───────────────────────────────────────────────────────────── */
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: clamp(56px, 9vw, 104px) 0 clamp(40px, 6vw, 64px);
+  }
+
+  .masthead h1 {
+    margin: 0;
+    font-size: var(--t-display);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+    max-width: 16ch;
+  }
+
+  .masthead h1 span {
+    color: var(--ink-2);
+  }
+
+  .lede {
+    max-width: 62ch;
+    margin: 0;
+    color: var(--ink-2);
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.2rem);
+  }
+
+  .lede strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ─── Comparison ─────────────────────────────────────────────────────────── */
+
+  .compare-scroll {
+    overflow-x: auto;
+  }
+
+  table.compare {
+    width: 100%;
+    min-width: 660px;
+    border-collapse: collapse;
+    font-size: var(--t-small);
+  }
+
+  table.compare th,
+  table.compare td {
+    text-align: left;
+    vertical-align: top;
+    padding: 13px 20px 13px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  table.compare thead th {
+    border-bottom: 1px solid var(--rule-strong);
+    font-weight: 500;
+    font-size: var(--t-body);
+    letter-spacing: -0.01em;
+  }
+
+  table.compare tbody th {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    font-weight: 400;
+    width: 14ch;
+    padding-top: 16px;
+  }
+
+  table.compare td {
+    color: var(--ink-2);
+  }
+  table.compare tbody tr:last-child td,
+  table.compare tbody tr:last-child th {
+    border-bottom: 0;
+  }
+
+  /* ─── Concept section ────────────────────────────────────────────────────── */
+
+  .concept {
+    padding: clamp(56px, 8vw, 96px) 0 0;
+    border-top: 1px solid var(--rule);
+    margin-top: clamp(56px, 8vw, 96px);
+  }
+
+  .concept-head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .concept-head h2 {
+    margin: 0;
+    font-size: var(--t-h2);
+    font-weight: 600;
+    letter-spacing: -0.026em;
+    line-height: 1.05;
+  }
+
+  .concept-head p {
+    margin: 0;
+    max-width: 58ch;
+    color: var(--ink-2);
+  }
+
+  /* Specimen frame — a mock is a specimen, so it keeps its own committed palette
+   in both themes rather than following the board's. */
+  .frame {
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 10px;
+    overflow: hidden;
+  }
+
+  .frame-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 2px 2px 11px;
+    background: var(--surface);
+  }
+
+  .mock {
+    overflow: hidden;
+  }
+  .mock--desktop {
+    height: 620px;
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 40px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .pair {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+    }
+  }
+
+  .mock--mobile {
+    height: 600px;
+  }
+
+  .notes {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .note h3 {
+    margin: 0 0 6px;
+    font-size: var(--t-small);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .note p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: var(--t-small);
+  }
+
+  .specs {
+    display: grid;
+    grid-template-columns: 12ch minmax(0, 1fr);
+    gap: 7px 18px;
+    font-size: var(--t-small);
+  }
+
+  .specs dt {
+    font-family: var(--font-data);
+    font-size: var(--t-label);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    padding-top: 2px;
+  }
+
+  .specs dd {
+    margin: 0;
+  }
+
+  .swatches {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .sw {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--rule-strong);
+    display: block;
+  }
+
+  .risk {
+    border-left: 2px solid var(--rule-strong);
+    padding-left: 16px;
+  }
+
+  /* ─── Greybox: a lo-fi stand-in that states its own crop ─────────────────── */
+
+  .gb {
+    position: relative;
+    background: var(--gb, #ccc);
+    overflow: hidden;
+  }
+
+  .gb::after {
+    content: attr(data-crop);
+    position: absolute;
+    right: 7px;
+    bottom: 5px;
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--gb-mark, rgba(0, 0, 0, 0.32));
+  }
+
+  /* ═══ Route A — Call Sheet ═══════════════════════════════════════════════ */
+
+  .callsheet {
+    --cs-ground: #0e1113;
+    --cs-panel: #141819;
+    --cs-ink: #edf0f0;
+    --cs-muted: #7e8a8c;
+    --cs-rule: #23292b;
+    --cs-signal: #f2a33c;
+
+    height: 100%;
+    background: var(--cs-ground);
+    color: var(--cs-ink);
+    font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    font-variation-settings: 'wdth' 88;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cs-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--cs-rule);
+  }
+
+  .cs-name {
+    font-variation-settings: 'wdth' 72;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .cs-nav {
+    display: flex;
+    gap: 22px;
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+  }
+
+  .cs-nav b {
+    color: var(--cs-ink);
+    font-weight: 400;
+  }
+
+  .cs-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .cs-index {
+    border-right: 1px solid var(--cs-rule);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cs-colhead {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12ch 5ch;
+    gap: 12px;
+    padding: 10px 28px;
+    border-bottom: 1px solid var(--cs-rule);
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+  }
+
+  .cs-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12ch 5ch;
+    gap: 12px;
+    align-items: baseline;
+    width: 100%;
+    padding: 15px 28px;
+    border: 0;
+    border-bottom: 1px solid var(--cs-rule);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .cs-row-title {
+    font-variation-settings: 'wdth' 64;
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 1.06;
+    letter-spacing: -0.005em;
+    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cs-row-meta {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cs-row::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 7px;
+    height: 1px;
+    background: var(--cs-signal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cs-row[aria-current='true']::before {
+    transform: scaleX(1);
+  }
+  .cs-row[aria-current='true'] .cs-row-title {
+    transform: translateX(8px);
+  }
+  .cs-row[aria-current='true'] .cs-row-meta {
+    color: var(--cs-ink);
+  }
+  .cs-row:focus-visible {
+    outline: 1px solid var(--cs-signal);
+    outline-offset: -1px;
+  }
+
+  .cs-foot {
+    margin-top: auto;
+    padding: 12px 28px;
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cs-preview {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .cs-preview .gb {
+    aspect-ratio: 3 / 2;
+    transition: opacity 180ms linear;
+  }
+
+  .cs-cap-title {
+    font-variation-settings: 'wdth' 76;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.15;
+  }
+
+  .cs-cap-meta {
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+    margin-top: 6px;
+  }
+
+  .cs-cap-link {
+    margin-top: 14px;
+    font-family: var(--font-data);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cs-signal);
+  }
+
+  /* Route A — mobile: hover does not exist, so the layout changes rather than shrinks */
+  .csm {
+    height: 100%;
+    background: var(--cs-ground);
+    color: var(--cs-ink);
+    display: flex;
+    flex-direction: column;
+  }
+  .csm-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--cs-rule);
+  }
+  .csm-list {
+    flex: 1;
+    overflow: hidden;
+  }
+  .csm-row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--cs-rule);
+    align-items: center;
+  }
+  .csm-row .gb {
+    aspect-ratio: 1 / 1;
+  }
+  .csm-title {
+    font-variation-settings: 'wdth' 70;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.1;
+  }
+  .csm-meta {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cs-muted);
+    margin-top: 5px;
+  }
+
+  /* ═══ Route B — Plate ════════════════════════════════════════════════════ */
+
+  .plate {
+    --pl-paper: #f2f1ed;
+    --pl-ink: #171512;
+    --pl-muted: #6a665e;
+    --pl-rule: #dcdad3;
+    --pl-accent: #2a3a73;
+
+    height: 100%;
+    background: var(--pl-paper);
+    color: var(--pl-ink);
+    font-family: 'Libre Franklin', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 300;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pl-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 22px 40px;
+    border-bottom: 1px solid var(--pl-rule);
+  }
+
+  .pl-name {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: 17px;
+    letter-spacing: 0.06em;
+    font-weight: 400;
+  }
+
+  .pl-nav {
+    display: flex;
+    gap: 26px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--pl-muted);
+  }
+
+  .pl-nav b {
+    color: var(--pl-ink);
+    font-weight: 400;
+  }
+
+  .pl-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .pl-spread {
+    display: grid;
+    grid-template-columns: 25% minmax(0, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--pl-rule);
+  }
+
+  .pl-margin {
+    padding: 30px 26px 46px 40px;
+    border-right: 1px solid var(--pl-rule);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .plate {
+    position: relative;
+  }
+
+  .pl-folio {
+    position: absolute;
+    left: 40px;
+    bottom: 26px;
+    z-index: 1;
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: 13px;
+    color: var(--pl-accent);
+    letter-spacing: 0.16em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pl-cap-title {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .pl-cap-meta {
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--pl-muted);
+  }
+
+  .pl-plates {
+    max-width: 560px;
+    padding: 30px 40px 46px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pl-diptych {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .pl-pull {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: 26px;
+    line-height: 1.28;
+    letter-spacing: -0.008em;
+    max-width: 24ch;
+    margin: 8px 0;
+    text-wrap: balance;
+  }
+
+  .pl-pull em {
+    font-style: italic;
+  }
+
+  .pl-body {
+    font-size: 13px;
+    line-height: 1.72;
+    max-width: 46ch;
+    color: var(--pl-ink);
+  }
+  .pl-body a {
+    color: var(--pl-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  /* Route B — mobile: the margin folds to a pinned folio, plates go edge to edge */
+  .plm {
+    height: 100%;
+    background: var(--pl-paper);
+    color: var(--pl-ink);
+    font-family: 'Libre Franklin', system-ui, sans-serif;
+    font-weight: 300;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .plm-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--pl-rule);
+  }
+  .plm-scroll {
+    flex: 1;
+    overflow: hidden;
+  }
+  .plm-block {
+    padding: 0 0 26px;
+  }
+  .plm-cap {
+    padding: 10px 18px 0;
+  }
+  .plm-folio {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--pl-accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ═══ Route C — Light Table ══════════════════════════════════════════════ */
+
+  .table {
+    --lt-table: #c6cdc7;
+    --lt-mount: #f4f6f3;
+    --lt-ink: #1e2420;
+    --lt-muted: #5b655f;
+    --lt-china: #c4402c;
+
+    height: 100%;
+    background: var(--lt-table);
+    color: var(--lt-ink);
+    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    position: relative;
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .table.is-dragging {
+    cursor: grabbing;
+  }
+
+  .lt-plane {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .slide {
+    position: absolute;
+    background: var(--lt-mount);
+    padding: 9px 9px 0;
+    box-shadow:
+      0 1px 2px rgba(24, 34, 28, 0.16),
+      0 10px 26px -8px rgba(24, 34, 28, 0.32);
+    border-radius: 2px;
+    user-select: none;
+  }
+
+  .slide .gb {
+    display: block;
+  }
+
+  .slide-lip {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+    padding: 7px 1px 8px;
+    font-size: 9.5px;
+    letter-spacing: 0.03em;
+  }
+
+  .slide-lip b {
+    font-weight: 500;
+  }
+  .slide-lip span {
+    color: var(--lt-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .china {
+    position: absolute;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .china path {
+    fill: none;
+    stroke: var(--lt-china);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    opacity: 0.88;
+  }
+
+  .lt-fixed {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .lt-name {
+    top: 26px;
+    left: 30px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: 'opsz' 60;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+
+  .lt-name small {
+    display: block;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--lt-muted);
+    margin-top: 7px;
+  }
+
+  .lt-index {
+    top: 28px;
+    right: 30px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--lt-mount);
+    padding: 7px 13px;
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    box-shadow: 0 1px 2px rgba(24, 34, 28, 0.16);
+  }
+
+  .lt-hint {
+    left: 30px;
+    bottom: 26px;
+    font-size: 11px;
+    color: var(--lt-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .lt-selected {
+    right: 30px;
+    bottom: 26px;
+    text-align: right;
+    max-width: 30ch;
+    background: var(--lt-mount);
+    padding: 10px 14px 11px;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(24, 34, 28, 0.16);
+  }
+
+  .lt-selected b {
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: 'opsz' 30;
+    font-weight: 500;
+    font-size: 16px;
+    display: block;
+  }
+
+  .lt-selected span {
+    font-size: 11px;
+    color: var(--lt-muted);
+    letter-spacing: 0.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  .footnote {
+    border-top: 1px solid var(--rule);
+    margin-top: clamp(56px, 8vw, 96px);
+    padding: 36px 0 72px;
+    color: var(--ink-2);
+    font-size: var(--t-small);
+    max-width: 62ch;
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="label">Cole Anderson — portfolio — three routes</p>
+    <h1>Three ways to build the same&nbsp;work<span>.</span></h1>
+    <p class="lede">
+      Same twelve projects, same two disciplines, three different arguments about who Cole
+      is. These are low fidelity on purpose — the pictures are tone blocks, so what you
+      are judging is <strong>structure, type and pace</strong>, not photography. Every
+      route below is rendered live, not screenshotted, and two of the three are
+      interactive.
+    </p>
+  </header>
+
+  <div class="compare-scroll">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th scope="col"><span class="label">Axis</span></th>
+          <th scope="col">Call Sheet</th>
+          <th scope="col">Plate</th>
+          <th scope="col">Light Table</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Structure</th>
+          <td>Index of rows, one preview frame</td>
+          <td>Vertical monograph, margin column</td>
+          <td>A plane you drag. No scroll.</td>
+        </tr>
+        <tr>
+          <th scope="row">Ground</th>
+          <td>Cold near-black</td>
+          <td>Grey bone paper</td>
+          <td>Illuminated grey-green</td>
+        </tr>
+        <tr>
+          <th scope="row">Type</th>
+          <td>Archivo condensed + mono</td>
+          <td>Bodoni Moda + Libre Franklin</td>
+          <td>Fraunces + DM Sans</td>
+        </tr>
+        <tr>
+          <th scope="row">Density</th>
+          <td>Dense</td>
+          <td>Sparse to the point of severe</td>
+          <td>Spatial, not vertical</td>
+        </tr>
+        <tr>
+          <th scope="row">Motion</th>
+          <td>One crossfade</td>
+          <td>Essentially none</td>
+          <td>Drag inertia, a mark drawn on</td>
+        </tr>
+        <tr>
+          <th scope="row">Argument</th>
+          <td>A working director. Credits first.</td>
+          <td>A photographer with an archive.</td>
+          <td>Someone who makes unusual things.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ Route A ═══════════════════════════════════════════════════════ -->
+  <section class="concept">
+    <div class="concept-head">
+      <p class="label">Route A</p>
+      <h2>Call Sheet</h2>
+      <p>
+        A production index rather than a gallery. The work reads as a body of credits
+        before it reads as pictures — title, format, year, set in columns, with one still
+        on screen at a time in a frame that swaps as you move down the list.
+      </p>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar">
+        <span class="label">Home — desktop</span>
+        <span class="label">Hover or tab the rows</span>
+      </div>
+      <div class="mock mock--desktop">
+        <div class="callsheet">
+          <div class="cs-top">
+            <div class="cs-name">Cole Anderson</div>
+            <nav class="cs-nav"><b>Index</b><span>About</span><span>Contact</span></nav>
+          </div>
+          <div class="cs-body">
+            <div class="cs-index">
+              <div class="cs-colhead">
+                <span>Project</span><span>Format</span><span>Year</span>
+              </div>
+              <div id="cs-rows"></div>
+              <div class="cs-foot">12 projects — 2019—2026</div>
+            </div>
+            <div class="cs-preview">
+              <div
+                class="gb"
+                id="cs-gb"
+                data-crop="3:2"
+                style="--gb: #262e30; --gb-mark: rgba(255, 255, 255, 0.28)"
+              ></div>
+              <div>
+                <div class="cs-cap-title" id="cs-cap-title">Southerly</div>
+                <div class="cs-cap-meta" id="cs-cap-meta">Director — 16mm — 2026</div>
+                <div class="cs-cap-link">View project →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="frame">
+        <div class="frame-bar"><span class="label">Mobile 380</span></div>
+        <div class="mock mock--mobile">
+          <div class="csm">
+            <div class="csm-top">
+              <div class="cs-name">Cole Anderson</div>
+              <span class="cs-nav"><b>Menu</b></span>
+            </div>
+            <div class="csm-list" id="csm-rows"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <dl class="specs">
+          <dt>Display</dt>
+          <dd>
+            Archivo, <code>wdth</code> 64 / <code>wght</code> 700 — condensed enough to
+            set a long title on one line at 25px
+          </dd>
+          <dt>Utility</dt>
+          <dd>Geist Mono, uppercase, only ever on year / format / role</dd>
+          <dt>Palette</dt>
+          <dd class="swatches">
+            <span class="sw" style="background: #0e1113" title="#0E1113 ground"></span>
+            <span class="sw" style="background: #23292b" title="#23292B rule"></span>
+            <span class="sw" style="background: #7e8a8c" title="#7E8A8C muted"></span>
+            <span class="sw" style="background: #edf0f0" title="#EDF0F0 ink"></span>
+            <span class="sw" style="background: #f2a33c" title="#F2A33C signal"></span>
+          </dd>
+          <dt>Shape</dt>
+          <dd>No radius anywhere. Separation by hairline rule, never by card.</dd>
+        </dl>
+
+        <div class="note">
+          <h3>What makes it stick</h3>
+          <p>
+            One image on screen at a time, and it changes as you read. That is the whole
+            idea, and it is the opposite of the thumbnail grid every other portfolio opens
+            with. The amber tick is the only colour in the design and it appears on
+            exactly one row at a time.
+          </p>
+        </div>
+
+        <div class="note">
+          <h3>States</h3>
+          <p>
+            Empty index keeps its rules and column heads with a single row reading
+            “Nothing published yet”. The preview frame holds its 3:2 and shows the tone
+            block until the still decodes, so nothing jumps.
+          </p>
+        </div>
+
+        <div class="note risk">
+          <h3>The catch</h3>
+          <p>
+            Hover does not exist on touch, so mobile is a genuinely different layout
+            rather than a squeezed one — square thumbnail left, title and year right. Two
+            layouts to build and maintain.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Route B ═══════════════════════════════════════════════════════ -->
+  <section class="concept">
+    <div class="concept-head">
+      <p class="label">Route B</p>
+      <h2>Plate</h2>
+      <p>
+        An exhibition monograph. Paper, a quarter of the width given to a margin that
+        holds almost nothing, and one plate at a time. Captions sit in the margin beside
+        their plate the way they do in a printed book, never underneath it.
+      </p>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar">
+        <span class="label">Project page — desktop</span>
+        <span class="label">Scroll inside the frame — the folio counts</span>
+      </div>
+      <div class="mock mock--desktop">
+        <div class="plate">
+          <div class="pl-top">
+            <div class="pl-name">Cole Anderson</div>
+            <nav class="pl-nav"><b>Work</b><span>About</span><span>Contact</span></nav>
+          </div>
+          <div class="pl-folio" data-folio-slot>001</div>
+          <div class="pl-scroll" id="pl-scroll">
+            <div class="pl-spread" data-folio="001">
+              <div class="pl-margin">
+                <div class="pl-cap-title">Southerly</div>
+                <div class="pl-cap-meta">16mm — 2026</div>
+              </div>
+              <div class="pl-plates">
+                <div
+                  class="gb"
+                  data-crop="3:2"
+                  style="--gb: #e2e1db; aspect-ratio: 3/2"
+                ></div>
+              </div>
+            </div>
+
+            <div class="pl-spread" data-folio="002">
+              <div class="pl-margin">
+                <div class="pl-cap-meta">Note</div>
+              </div>
+              <div class="pl-plates">
+                <p class="pl-pull">
+                  Shot over four winters on the same forty&nbsp;kilometres of
+                  <em>coast</em>.
+                </p>
+                <p class="pl-body">
+                  A short film about the fishing families still working the south coast
+                  out of Island Bay. Sixteen millimetre, natural light, no crew beyond a
+                  second pair of hands. <a href="#route-b">Full credits</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="pl-spread" data-folio="003">
+              <div class="pl-margin">
+                <div class="pl-cap-title">Plates ii — iii</div>
+                <div class="pl-cap-meta">Island Bay — July</div>
+              </div>
+              <div class="pl-plates">
+                <div class="pl-diptych">
+                  <div
+                    class="gb"
+                    data-crop="1:1"
+                    style="--gb: #d9d8d1; aspect-ratio: 1/1"
+                  ></div>
+                  <div
+                    class="gb"
+                    data-crop="1:1"
+                    style="--gb: #cbcac3; aspect-ratio: 1/1"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pl-spread" data-folio="004">
+              <div class="pl-margin">
+                <div class="pl-cap-title">Plate iv</div>
+                <div class="pl-cap-meta">Ōwhiro Bay — August</div>
+              </div>
+              <div class="pl-plates">
+                <div
+                  class="gb"
+                  data-crop="3:2"
+                  style="--gb: #dededa; aspect-ratio: 3/2"
+                ></div>
+              </div>
+            </div>
+
+            <div class="pl-spread" data-folio="005">
+              <div class="pl-margin">
+                <div class="pl-cap-meta">Next</div>
+              </div>
+              <div class="pl-plates">
+                <p class="pl-pull">Cold Water Season</p>
+                <p class="pl-body">Documentary — 2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="frame">
+        <div class="frame-bar"><span class="label">Mobile 380</span></div>
+        <div class="mock mock--mobile">
+          <div class="plm">
+            <div class="plm-top">
+              <div class="pl-name">Cole Anderson</div>
+              <span class="pl-nav"><b>Menu</b></span>
+            </div>
+            <div class="plm-scroll">
+              <div class="plm-block">
+                <div
+                  class="gb"
+                  data-crop="3:2"
+                  style="--gb: #e2e1db; aspect-ratio: 3/2"
+                ></div>
+                <div class="plm-cap">
+                  <div class="pl-cap-title">Southerly</div>
+                  <div class="pl-cap-meta">16mm — 2026</div>
+                </div>
+              </div>
+              <div class="plm-block">
+                <div
+                  class="gb"
+                  data-crop="1:1"
+                  style="--gb: #d9d8d1; aspect-ratio: 1/1"
+                ></div>
+                <div class="plm-cap">
+                  <div class="pl-cap-meta">Plate ii — Island Bay</div>
+                </div>
+              </div>
+            </div>
+            <div class="plm-folio">001</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <dl class="specs">
+          <dt>Display</dt>
+          <dd>
+            Bodoni Moda, variable <code>opsz</code> — a Didone, not the humanist serif
+            every generated page reaches for
+          </dd>
+          <dt>Body</dt>
+          <dd>
+            Libre Franklin 300 at 13px/1.72 — sans captions against serif plates is the
+            art-book move
+          </dd>
+          <dt>Palette</dt>
+          <dd class="swatches">
+            <span class="sw" style="background: #f2f1ed" title="#F2F1ED paper"></span>
+            <span class="sw" style="background: #dcdad3" title="#DCDAD3 rule"></span>
+            <span class="sw" style="background: #6a665e" title="#6A665E muted"></span>
+            <span class="sw" style="background: #171512" title="#171512 ink"></span>
+            <span
+              class="sw"
+              style="background: #2a3a73"
+              title="#2A3A73 ultramarine"
+            ></span>
+          </dd>
+          <dt>Accent</dt>
+          <dd>
+            Ultramarine, and only on folios and one link. Grey bone paper, not cream.
+          </dd>
+        </dl>
+
+        <div class="note">
+          <h3>What makes it stick</h3>
+          <p>
+            The margin behaves like the gutter of a book: it carries a folio number that
+            counts up as you scroll. Small, quiet, and it makes the whole site feel like
+            an object that was printed rather than a page that was built.
+          </p>
+        </div>
+
+        <div class="note">
+          <h3>States</h3>
+          <p>
+            Empty still draws the margin, the folio and the rules; the plate area holds
+            one tone block with “No plates yet” set in the caption position, so the page
+            reads as unfinished rather than broken.
+          </p>
+        </div>
+
+        <div class="note risk">
+          <h3>The catch</h3>
+          <p>
+            Severity only works if the photography is strong and consistently cropped.
+            There is nowhere for a weak frame to hide at this size, and mixed aspect
+            ratios will fight the margin. Worth auditing the archive before committing.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Route C ═══════════════════════════════════════════════════════ -->
+  <section class="concept">
+    <div class="concept-head">
+      <p class="label">Route C</p>
+      <h2>Light Table</h2>
+      <p>
+        No page scroll at all. The site is a lit work surface with slides laid out on it,
+        and you drag the surface to move around. Selecting one draws a chinagraph loop
+        around it — the mark a photographer actually makes on a contact sheet.
+      </p>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar">
+        <span class="label">Home — desktop</span>
+        <span class="label">Drag the table</span>
+      </div>
+      <div class="mock mock--desktop">
+        <div class="table" id="lt-table">
+          <div class="lt-plane" id="lt-plane"></div>
+          <div class="lt-fixed lt-name">
+            Cole&nbsp;Anderson<small>Film and photography — Te Whanganui-a-Tara</small>
+          </div>
+          <div class="lt-fixed lt-index">Index</div>
+          <div class="lt-fixed lt-hint">Drag to move — click a frame to open</div>
+          <div class="lt-fixed lt-selected">
+            <b>Cold Water Season</b>
+            <span>Documentary — 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="frame">
+        <div class="frame-bar"><span class="label">Mobile 380</span></div>
+        <div class="mock mock--mobile">
+          <div class="table" id="lt-table-m">
+            <div class="lt-plane" id="lt-plane-m"></div>
+            <div class="lt-fixed lt-name" style="font-size: 21px; top: 18px; left: 18px">
+              Cole&nbsp;Anderson<small style="font-size: 10px"
+                >Film and photography</small
+              >
+            </div>
+            <div
+              class="lt-fixed lt-index"
+              style="top: 20px; right: 18px; font-size: 10px; padding: 6px 10px"
+            >
+              Index
+            </div>
+            <div
+              class="lt-fixed lt-hint"
+              style="left: 18px; bottom: 18px; font-size: 10px"
+            >
+              Drag to move
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <dl class="specs">
+          <dt>Display</dt>
+          <dd>
+            Fraunces, variable <code>opsz</code> — warm and slightly irregular against a
+            cool ground
+          </dd>
+          <dt>Body</dt>
+          <dd>
+            DM Sans 400/500, small — labels sit on the mount lip, not over the image
+          </dd>
+          <dt>Palette</dt>
+          <dd class="swatches">
+            <span class="sw" style="background: #c6cdc7" title="#C6CDC7 table"></span>
+            <span class="sw" style="background: #f4f6f3" title="#F4F6F3 mount"></span>
+            <span class="sw" style="background: #5b655f" title="#5B655F muted"></span>
+            <span class="sw" style="background: #1e2420" title="#1E2420 ink"></span>
+            <span
+              class="sw"
+              style="background: #c4402c"
+              title="#C4402C chinagraph"
+            ></span>
+          </dd>
+          <dt>Depth</dt>
+          <dd>
+            The only route with real shadows — the mounts are objects sitting on a surface
+          </dd>
+        </dl>
+
+        <div class="note">
+          <h3>What makes it stick</h3>
+          <p>
+            Abandoning the scroll is the risk, and the chinagraph loop is the payoff. It
+            is domain vocabulary rather than an invented accent, and it is the one moment
+            of colour in the whole design.
+          </p>
+        </div>
+
+        <div class="note">
+          <h3>States</h3>
+          <p>
+            An empty table shows a single mount reading “Nothing on the table yet”. Slides
+            render as their tone block first and resolve to the still — position never
+            depends on load order, so the layout is stable from the first frame.
+          </p>
+        </div>
+
+        <div class="note risk">
+          <h3>The catch</h3>
+          <p>
+            Easily the heaviest build. It needs a keyboard model (arrows move the
+            selection and the table pans to follow), the Index button opening a plain list
+            for anyone who wants one, and a real answer for deep links and search engines.
+            Do not pick this unless the budget covers all three.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    Tone blocks stand in for photographs throughout, and each one states its own crop.
+    Project titles, years and formats are placeholders written to be plausible — no client
+    or brand names appear anywhere, because listing a client Cole has not worked with
+    invents a credential. Full written spec:
+    <code>docs/design/specs/design-concepts.md</code>.
+  </p>
+</div>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── Shared placeholder set ───────────────────────────────────────────── */
+    var WORK = [
+      {
+        title: 'Southerly',
+        format: '16mm',
+        year: '2026',
+        role: 'Director',
+        tone: '#262e30',
+        mtone: '#2b3335',
+      },
+      {
+        title: 'Cold Water Season',
+        format: 'Documentary',
+        year: '2025',
+        role: 'Director / DoP',
+        tone: '#2a3234',
+        mtone: '#252d2f',
+      },
+      {
+        title: 'Ōwhiro, 4am',
+        format: '24 plates',
+        year: '2025',
+        role: 'Photography',
+        tone: '#232b2d',
+        mtone: '#2e3638',
+      },
+      {
+        title: 'Hollow Bones',
+        format: 'Music video',
+        year: '2024',
+        role: 'Director',
+        tone: '#30383a',
+        mtone: '#272f31',
+      },
+      {
+        title: 'Sixty Kilometres',
+        format: 'Photo essay',
+        year: '2024',
+        role: 'Photography',
+        tone: '#293133',
+        mtone: '#333b3d',
+      },
+      {
+        title: 'The Interislander',
+        format: 'Short doc',
+        year: '2023',
+        role: 'Director',
+        tone: '#2e3638',
+        mtone: '#2a3234',
+      },
+    ];
+
+    /* ── Route A: index rows drive one preview frame ──────────────────────── */
+    var rows = document.getElementById('cs-rows');
+    var gb = document.getElementById('cs-gb');
+    var capTitle = document.getElementById('cs-cap-title');
+    var capMeta = document.getElementById('cs-cap-meta');
+
+    if (rows) {
+      WORK.forEach(function (w, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cs-row';
+        b.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+        b.innerHTML =
+          '<span class="cs-row-title">' +
+          w.title +
+          '</span>' +
+          '<span class="cs-row-meta">' +
+          w.format +
+          '</span>' +
+          '<span class="cs-row-meta">' +
+          w.year +
+          '</span>';
+
+        function select() {
+          rows.querySelectorAll('.cs-row').forEach(function (r) {
+            r.setAttribute('aria-current', 'false');
+          });
+          b.setAttribute('aria-current', 'true');
+          if (!reduce) {
+            gb.style.opacity = '0';
+            window.setTimeout(function () {
+              gb.style.opacity = '1';
+            }, 90);
+          }
+          gb.style.setProperty('--gb', w.tone);
+          capTitle.textContent = w.title;
+          capMeta.textContent = w.role + ' — ' + w.format + ' — ' + w.year;
+        }
+
+        b.addEventListener('mouseenter', select);
+        b.addEventListener('focus', select);
+        rows.appendChild(b);
+      });
+    }
+
+    var mrows = document.getElementById('csm-rows');
+    if (mrows) {
+      WORK.slice(0, 5).forEach(function (w) {
+        var d = document.createElement('div');
+        d.className = 'csm-row';
+        d.innerHTML =
+          '<div class="gb" data-crop="1:1" style="--gb:' +
+          w.mtone +
+          ';--gb-mark:rgba(255,255,255,0.2)"></div>' +
+          '<div><div class="csm-title">' +
+          w.title +
+          '</div>' +
+          '<div class="csm-meta">' +
+          w.format +
+          ' — ' +
+          w.year +
+          '</div></div>';
+        mrows.appendChild(d);
+      });
+    }
+
+    /* ── Route B: the folio counts as the spread scrolls past ─────────────── */
+    var scroller = document.getElementById('pl-scroll');
+    var folioSlot = document.querySelector('[data-folio-slot]');
+    if (scroller && folioSlot) {
+      var spreads = Array.prototype.slice.call(scroller.querySelectorAll('.pl-spread'));
+      var ticking = false;
+      scroller.addEventListener(
+        'scroll',
+        function () {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(function () {
+            var top = scroller.scrollTop + 40;
+            var current = spreads[0];
+            spreads.forEach(function (s) {
+              if (s.offsetTop <= top) current = s;
+            });
+            folioSlot.textContent = current.getAttribute('data-folio');
+            ticking = false;
+          });
+        },
+        { passive: true },
+      );
+    }
+
+    /* ── Route C: slides on a draggable plane ─────────────────────────────── */
+    var SLIDES = [
+      {
+        x: 70,
+        y: 150,
+        w: 210,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#9fa9a4',
+        title: 'Southerly',
+        meta: '2026',
+        rot: -4.5,
+      },
+      {
+        x: 330,
+        y: 96,
+        w: 178,
+        crop: '1:1',
+        ar: '1/1',
+        tone: '#8b968f',
+        title: 'Ōwhiro, 4am',
+        meta: '2025',
+        rot: 3.2,
+      },
+      {
+        x: 548,
+        y: 188,
+        w: 236,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#b2bab4',
+        title: 'Cold Water Season',
+        meta: '2025',
+        rot: -1.8,
+        mark: true,
+      },
+      {
+        x: 262,
+        y: 328,
+        w: 196,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#95a09a',
+        title: 'Hollow Bones',
+        meta: '2024',
+        rot: 5.1,
+      },
+      {
+        x: 512,
+        y: 428,
+        w: 168,
+        crop: '1:1',
+        ar: '1/1',
+        tone: '#a7b0ab',
+        title: 'Sixty Kilometres',
+        meta: '2024',
+        rot: -3.4,
+      },
+      {
+        x: 806,
+        y: 322,
+        w: 202,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#8f9a94',
+        title: 'The Interislander',
+        meta: '2023',
+        rot: 2.4,
+      },
+      {
+        x: 826,
+        y: 78,
+        w: 160,
+        crop: '1:1',
+        ar: '1/1',
+        tone: '#aab3ad',
+        title: 'Kelp',
+        meta: '2022',
+        rot: -2.1,
+      },
+    ];
+
+    var SLIDES_M = [
+      {
+        x: 18,
+        y: 112,
+        w: 176,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#9fa9a4',
+        title: 'Southerly',
+        meta: '2026',
+        rot: -4,
+      },
+      {
+        x: 170,
+        y: 228,
+        w: 130,
+        crop: '1:1',
+        ar: '1/1',
+        tone: '#8b968f',
+        title: 'Ōwhiro, 4am',
+        meta: '2025',
+        rot: 3.6,
+      },
+      {
+        x: 28,
+        y: 396,
+        w: 194,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#b2bab4',
+        title: 'Cold Water Season',
+        meta: '2025',
+        rot: -2,
+        mark: true,
+      },
+      {
+        x: 140,
+        y: 548,
+        w: 160,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#95a09a',
+        title: 'Hollow Bones',
+        meta: '2024',
+        rot: 4.4,
+      },
+      {
+        x: 24,
+        y: 648,
+        w: 132,
+        crop: '1:1',
+        ar: '1/1',
+        tone: '#a7b0ab',
+        title: 'Sixty Kilometres',
+        meta: '2024',
+        rot: -3,
+      },
+      {
+        x: 130,
+        y: 726,
+        w: 172,
+        crop: '3:2',
+        ar: '3/2',
+        tone: '#8f9a94',
+        title: 'The Interislander',
+        meta: '2023',
+        rot: 1.8,
+      },
+    ];
+
+    function buildTable(planeId, tableId, slides, planeW, planeH) {
+      var scale = 1;
+      var plane = document.getElementById(planeId);
+      var surface = document.getElementById(tableId);
+      if (!plane || !surface) return;
+
+      slides.forEach(function (s) {
+        var el = document.createElement('div');
+        el.className = 'slide';
+        el.style.left = Math.round(s.x * scale) + 'px';
+        el.style.top = Math.round(s.y * scale) + 'px';
+        el.style.width = Math.round(s.w * scale) + 'px';
+        el.style.transform = 'rotate(' + s.rot + 'deg)';
+        el.innerHTML =
+          '<div class="gb" data-crop="' +
+          s.crop +
+          '" style="--gb:' +
+          s.tone +
+          ';aspect-ratio:' +
+          s.ar +
+          ';--gb-mark:rgba(255,255,255,0.42)"></div>' +
+          '<div class="slide-lip"><b>' +
+          s.title +
+          '</b><span>' +
+          s.meta +
+          '</span></div>';
+        plane.appendChild(el);
+
+        if (s.mark) {
+          var w = s.w * scale,
+            h = (s.crop === '1:1' ? w : (w * 2) / 3) + 40 * scale;
+          var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('class', 'china');
+          svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+          svg.style.left = Math.round(s.x * scale - 14) + 'px';
+          svg.style.top = Math.round(s.y * scale - 12) + 'px';
+          svg.style.width = Math.round(w + 28) + 'px';
+          svg.style.height = Math.round(h + 24) + 'px';
+          svg.style.transform = 'rotate(' + s.rot + 'deg)';
+          /* Two overlapping arcs, deliberately not closed — a grease pencil overshoots. */
+          var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          var cx = w / 2,
+            cy = h / 2,
+            rx = w / 2 - 2,
+            ry = h / 2 - 4;
+          p.setAttribute(
+            'd',
+            'M ' +
+              (cx - rx) +
+              ' ' +
+              cy +
+              ' a ' +
+              rx +
+              ' ' +
+              ry +
+              ' 0 1 1 ' +
+              rx * 2 +
+              ' 0' +
+              ' a ' +
+              rx +
+              ' ' +
+              ry +
+              ' 0 1 1 ' +
+              -rx * 2 +
+              ' 0' +
+              ' a ' +
+              rx * 0.96 +
+              ' ' +
+              ry * 0.9 +
+              ' 0 0 1 ' +
+              rx * 0.5 +
+              ' ' +
+              -ry * 0.82,
+          );
+          svg.appendChild(p);
+          plane.appendChild(svg);
+
+          if (!reduce) {
+            var len = p.getTotalLength();
+            p.style.strokeDasharray = len;
+            p.style.strokeDashoffset = len;
+            p.style.transition =
+              'stroke-dashoffset 320ms cubic-bezier(0.16, 1, 0.3, 1) 420ms';
+            window.requestAnimationFrame(function () {
+              p.style.strokeDashoffset = '0';
+            });
+          }
+        }
+      });
+
+      var ox = 0,
+        oy = 0,
+        sx = 0,
+        sy = 0,
+        dragging = false;
+      var minX = -(planeW - surface.clientWidth),
+        minY = -(planeH - surface.clientHeight);
+
+      function clamp(v, lo, hi) {
+        return Math.min(hi, Math.max(lo, v));
+      }
+
+      surface.addEventListener('pointerdown', function (e) {
+        dragging = true;
+        sx = e.clientX - ox;
+        sy = e.clientY - oy;
+        surface.classList.add('is-dragging');
+        surface.setPointerCapture(e.pointerId);
+      });
+
+      surface.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        ox = clamp(e.clientX - sx, Math.min(minX, 0), 40);
+        oy = clamp(e.clientY - sy, Math.min(minY, 0), 40);
+        plane.style.transform = 'translate3d(' + ox + 'px,' + oy + 'px,0)';
+      });
+
+      function end(e) {
+        if (!dragging) return;
+        dragging = false;
+        surface.classList.remove('is-dragging');
+        if (e.pointerId !== undefined && surface.hasPointerCapture(e.pointerId)) {
+          surface.releasePointerCapture(e.pointerId);
+        }
+      }
+
+      surface.addEventListener('pointerup', end);
+      surface.addEventListener('pointercancel', end);
+    }
+
+    buildTable('lt-plane', 'lt-table', SLIDES, 1040, 560);
+    buildTable('lt-plane-m', 'lt-table-m', SLIDES_M, 318, 890);
+  })();
+</script>
