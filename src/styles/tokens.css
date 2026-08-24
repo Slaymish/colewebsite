@@ -21,8 +21,11 @@
  * §1  --raw-*   Raw values. Only §2 may read these; never a component.
  * §2  @theme    Semantic aliases in Tailwind's namespaces, so each one generates
  *               a utility class. This is the only layer components may touch.
- * §3  :root     Tokens with no Tailwind namespace to live in. Consumed by an
- *               `@utility` in global.css or by var() inside a <style> block.
+ * §3  :root     Tokens with no Tailwind namespace to live in. Plain `:root`, so
+ *               always emitted: safe to read by var() from an `@utility` in
+ *               global.css or from a component's <style> block. A §2 name is not
+ *               — Tailwind emits one only where it sees it referenced, and it
+ *               never looks inside a component's <style>.
  *
  * Two rules that hold regardless of what the values become:
  *   - No colour literal exists outside this file.

@@ -44,9 +44,14 @@ from `siteSettings`; the type scale is still provisional.
 - A token in a namespace Tailwind v4 does not have (`--duration-`, `--z-`) emits
   no CSS and no error. Those live in §3 and are bridged by an `@utility` in
   `global.css` — add both halves or the class silently does nothing.
-- `@theme inline` compiles a utility down to the §1 variable it reads and never
-  emits the §2 name, so a runtime override has to target §1. A new CMS-settable
-  colour means a `--cms-*` fallback in §1 and an entry in `src/lib/theme.ts`.
+- `@theme inline` compiles a utility down to the §1 variable it reads —
+  `.bg-page` is `var(--raw-page)`, never `var(--color-page)` — so a runtime
+  override has to target §1. A new CMS-settable colour means a `--cms-*` fallback
+  in §1 and an entry in `src/lib/theme.ts`.
+- A §2 name only reaches `:root` when Tailwind finds it referenced in a file it
+  processes. `var(--color-accent)` in `global.css` resolves for that reason (the
+  focus ring depends on it); the same `var()` in a component `<style>` block does
+  not, because Tailwind never sees that block. Use a §1 name there.
 - The operand order in the §1 `color-mix()` neutrals is load-bearing. See the
   comment there before making them consistent.
 

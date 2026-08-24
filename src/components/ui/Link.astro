@@ -9,7 +9,11 @@ import VisuallyHidden from './VisuallyHidden.astro';
  */
 interface Props {
   href: string;
-  /** Forces the underline treatment off, for links that are their own affordance. */
+  /**
+   * For links that are their own affordance — the wordmark, the nav. Drops the
+   * underline *and* the resting accent colour, leaving the accent on hover; see
+   * the class list below for why those two travel together.
+   */
   plain?: boolean;
   class?: string;
   [key: string]: unknown;

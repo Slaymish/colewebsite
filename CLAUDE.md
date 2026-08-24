@@ -69,10 +69,11 @@ it is the one part he can change himself: five fields on `siteSettings` become a
 
 The override lands on §1 and not on the §2 names, and that is not a style
 preference. §2 uses `@theme inline`, which compiles a utility down to the raw
-variable it reads (`.bg-page` becomes `background-color: var(--raw-page)`) and
-never emits `--color-page` at all — so setting a semantic name at runtime does
-nothing, with no error. §1 reads `var(--cms-*, <default>)` so the override needs
-no cascade ordering to win; `src/lib/theme.ts` records why that matters.
+variable it reads: `.bg-page` becomes `background-color: var(--raw-page)`, never
+`var(--color-page)`. So setting a semantic name at runtime does nothing, with no
+error, whether or not that name also reaches `:root`. §1 reads
+`var(--cms-*, <default>)` so the override needs no cascade ordering to win;
+`src/lib/theme.ts` records why that matters.
 
 No colour literals outside `tokens.css`, and no opacity modifiers
 (`bg-page/60`) at a use site — a tinted variant means a new token.
