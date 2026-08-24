@@ -64,15 +64,31 @@ without a rebuild of the layout.
 
 ## Colour
 
-Cole is choosing the palette. The agreed _structure_, not the values:
+Chosen by Cole, 2026-08-24:
 
-| Slot     | What it is             | Value |
-| -------- | ---------------------- | ----- |
-| Ground   | one neutral background | TBC   |
-| Accent 1 | blue family            | TBC   |
-| Accent 2 | rusty orange           | TBC   |
+| Slot             | What it is                  | Value     | Source           |
+| ---------------- | --------------------------- | --------- | ---------------- |
+| Ground           | one neutral background      | `#F2F0F0` | agreed slot      |
+| Accent 1         | blue family                 | `#0F5C8C` | agreed slot      |
+| Accent 2         | rusty orange                | `#BF3706` | agreed slot      |
+| Ink              | the near-black text sits in | `#262626` | from the palette |
+| Accent 1, darker | the deeper blue             | `#0D518C` | from the palette |
+
+The last two are not slots Cole named. They are the remaining two values in the
+palette he sent, read against the structure above: the fourth is plainly the text
+colour, and the fifth is the blue again four percent darker.
 
 Two accents, not one. No concept route may assume a single-signal palette.
+
+**These are the values, not where they live.** The palette is five fields on the
+`siteSettings` entry in Contentful, so Cole can change it without a deploy;
+`src/styles/tokens.css` carries the same five as the fallback a build uses for a
+field left empty. The muted grey, the hairlines and the empty-picture boxes are
+deliberately not slots — they are mixed off ground and ink, so re-grounding the
+site moves all three with it.
+
+Nothing uses either accent yet. The brief fixes that there are two of them; what
+each one does is the design round's decision.
 
 ## Domain
 

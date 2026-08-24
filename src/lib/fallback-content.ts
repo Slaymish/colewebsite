@@ -86,4 +86,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   seo: { description: null, shareImage: null, jobTitle: null, profiles: [] },
   contact: { email: null, phone: null, cvUrl: null },
   copyright: null,
+  // Null throughout, and so the palette in tokens.css stands. Those values are
+  // Cole's chosen ones, so a build with no CMS is the right colours rather than
+  // placeholder ones.
+  theme: { ground: null, ink: null, accent: null, accentDeep: null, accentWarm: null },
 };

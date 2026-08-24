@@ -35,6 +35,20 @@ export const SLUG_MESSAGE =
   'No spaces, no full web addresses.';
 
 /**
+ * A colour from `siteSettings` is interpolated into a `<style>` block, so a value
+ * that is not a hex colour does not merely look wrong: a `}` or a `</style>` in
+ * the field ends the stylesheet and every page loses its styling, with no error
+ * anywhere. Checked on the way in and again on the way out, like the slug above.
+ */
+export const HEX_PATTERN = '^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$';
+
+export const HEX_REGEX = new RegExp(HEX_PATTERN);
+
+/** Shown under the field in Contentful when the rule is broken. Cole's words. */
+export const HEX_MESSAGE =
+  'A hex colour, with the # — e.g. #0F5C8C. Six characters after the hash, or three.';
+
+/**
  * Length caps, in one place because the help text quotes them. Contentful counts
  * characters, so these are characters and not words.
  */
@@ -91,6 +105,11 @@ export const FIELDS = {
     'contactPhone',
     'cv',
     'copyright',
+    'colourGround',
+    'colourInk',
+    'colourAccent',
+    'colourAccentDeep',
+    'colourAccentWarm',
   ],
 } as const satisfies Record<ContentTypeId, readonly string[]>;
 

@@ -6,6 +6,7 @@ import SiteHeader from '~/components/patterns/SiteHeader.astro';
 import SiteFooter from '~/components/patterns/SiteFooter.astro';
 import SkipLink from '~/components/ui/SkipLink.astro';
 import { getSiteSettings } from '~/lib/contentful';
+import { themeStyle } from '~/lib/theme';
 
 interface Props extends SeoInput {
   jsonLd?: Record<string, unknown>;
@@ -25,6 +26,9 @@ const seo = buildSeo(seoInput, {
   description: settings.seo.description,
   image: settings.seo.shareImage?.url,
 });
+
+/** Empty unless Cole has set a colour. See lib/theme.ts for what it overrides. */
+const themeCss = themeStyle(settings.theme);
 ---
 
 <html lang="en-NZ">
@@ -50,6 +54,12 @@ const seo = buildSeo(seoInput, {
         <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
       )
     }
+
+    {
+      /* is:inline keeps this in the document rather than bundling it into a
+        stylesheet, which is what puts the palette in the first response. */
+    }
+    {themeCss && <style is:inline set:html={themeCss} />}
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />

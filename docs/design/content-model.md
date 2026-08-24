@@ -107,8 +107,16 @@ Two consequences worth knowing before that stops being true:
 ## Applying
 
 The definitions in `migrations/definitions/` declare desired state; running them is
-separate and has **not** been done. `pnpm cf:migrate` writes to Cole's space, so it
-is his call and not something to run in passing.
+separate. `pnpm cf:migrate` writes to Cole's space, so it is his call and not
+something to run in passing.
+
+**Since written:** `01-project.ts` and `00-note.ts` have been applied — `tier`,
+`process` and the `note` type are all live on `master`, and `category` is still
+there as an orphan, as intended. `03-site-settings.ts` was applied on 2026-08-24
+to add the palette fields; that run also carried the `jobTitle` help-text fix
+below. The stale **values** Cole published are untouched and still read
+"Director and Photographer" — help text does not rewrite an entry, and that copy
+is live on the site.
 
 Folded into that same run, so there is only one: the two stale help-text strings
 that told Cole his work is film. `01-project.ts` offered "Film, Photography, Design"

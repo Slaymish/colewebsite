@@ -22,11 +22,11 @@ Cole wrote in it. `--prune --apply` is the only path that deletes.
 
 ## The three types
 
-| Type           | What it holds                                          |
-| -------------- | ------------------------------------------------------ |
-| `project`      | One piece of work. `featured` puts it on the homepage. |
-| `about`        | The about page. One entry.                             |
-| `siteSettings` | SEO defaults, contact details, links. One entry.       |
+| Type           | What it holds                                             |
+| -------------- | --------------------------------------------------------- |
+| `project`      | One piece of work. `featured` puts it on the homepage.    |
+| `about`        | The about page. One entry.                                |
+| `siteSettings` | SEO defaults, contact details, links, palette. One entry. |
 
 Field ids are declared once in `src/lib/content-model.ts` and read from there by
 both halves — the definitions here and the mapping in `src/lib/contentful-map.ts`

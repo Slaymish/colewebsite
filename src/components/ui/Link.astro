@@ -9,7 +9,11 @@ import VisuallyHidden from './VisuallyHidden.astro';
  */
 interface Props {
   href: string;
-  /** Forces the underline treatment off, for links that are their own affordance. */
+  /**
+   * For links that are their own affordance — the wordmark, the nav. Drops the
+   * underline *and* the resting accent colour, leaving the accent on hover; see
+   * the class list below for why those two travel together.
+   */
   plain?: boolean;
   class?: string;
   [key: string]: unknown;
@@ -28,8 +32,12 @@ const current = !external && samePath(Astro.url.pathname, href);
   rel={external ? 'noopener noreferrer' : undefined}
   class:list={[
     'duration-fast transition-colors',
-    plain ? '' : 'decoration-skip-none underline underline-offset-4',
-    'hover:text-ink-muted',
+    // A link that reads as body text keeps the accent for the hover alone —
+    // colouring the wordmark and the nav would put the accent on most of the
+    // header. Underlined links are the ones carrying it at rest.
+    plain
+      ? 'hover:text-accent'
+      : 'decoration-skip-none text-accent hover:text-accent-deep underline underline-offset-4',
     className,
   ]}
   {...rest}

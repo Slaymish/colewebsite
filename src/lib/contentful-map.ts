@@ -5,13 +5,14 @@
  * see a CMS shape and swapping CMS later touches one module. The field ids below
  * must stay in step with the definitions in migrations/definitions/.
  */
-import { SLUG_REGEX, TIER, type Tier } from './content-model';
+import { HEX_REGEX, SLUG_REGEX, TIER, type Tier } from './content-model';
 import type {
   About,
   ImageAsset,
   ProcessNote,
   Project,
   SiteSettings,
+  SiteTheme,
 } from './content-types';
 
 /** Minimal shapes for what we actually read, rather than the SDK's full generics. */
@@ -82,6 +83,29 @@ function toStrings(value: unknown): string[] {
 /** Empty strings are how Contentful reports a field someone cleared. */
 function orNull(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+/**
+ * A theme colour, or null.
+ *
+ * Rejecting here is what makes the `<style>` block in BaseLayout safe: the value
+ * is interpolated into a stylesheet, so anything holding a `}` or a `</style>`
+ * would silently take the styling off every page. Null falls back to the value in
+ * tokens.css, which is a working colour — so a bad hex costs Cole his change and
+ * nothing else.
+ */
+function toHexColour(value: unknown, slot: string): string | null {
+  const hex = orNull(value);
+  if (hex === null) return null;
+
+  if (!HEX_REGEX.test(hex)) {
+    console.warn(
+      `[contentful] Ignoring site settings colour "${slot}" — ${JSON.stringify(hex)} ` +
+        'is not a hex colour. Write it as #0F5C8C.',
+    );
+    return null;
+  }
+  return hex;
 }
 
 /**
@@ -206,6 +230,21 @@ interface SiteSettingsFields {
   contactPhone?: string;
   cv?: unknown;
   copyright?: string;
+  colourGround?: string;
+  colourInk?: string;
+  colourAccent?: string;
+  colourAccentDeep?: string;
+  colourAccentWarm?: string;
+}
+
+function toSiteTheme(fields: SiteSettingsFields): SiteTheme {
+  return {
+    ground: toHexColour(fields.colourGround, 'colourGround'),
+    ink: toHexColour(fields.colourInk, 'colourInk'),
+    accent: toHexColour(fields.colourAccent, 'colourAccent'),
+    accentDeep: toHexColour(fields.colourAccentDeep, 'colourAccentDeep'),
+    accentWarm: toHexColour(fields.colourAccentWarm, 'colourAccentWarm'),
+  };
 }
 
 export function toSiteSettings(entry: unknown): SiteSettings | null {
@@ -227,5 +266,6 @@ export function toSiteSettings(entry: unknown): SiteSettings | null {
       cvUrl: toFileUrl(raw.fields.cv),
     },
     copyright: orNull(raw.fields.copyright),
+    theme: toSiteTheme(raw.fields),
   };
 }

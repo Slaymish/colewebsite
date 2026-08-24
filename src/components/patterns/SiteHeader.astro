@@ -13,7 +13,14 @@ import { NAV, SITE } from '~/lib/site';
           {
             NAV.map((item) => (
               <li>
-                <Link href={item.href} plain class="text-sm">
+                {/* `Link` sets aria-current; until now nothing showed it on
+                    screen. Scoped to the nav, so the wordmark — which also
+                    matches `/` on the homepage — stays ink. */}
+                <Link
+                  href={item.href}
+                  plain
+                  class="aria-[current=page]:text-accent text-sm"
+                >
                   {item.label}
                 </Link>
               </li>

@@ -11,6 +11,12 @@ import type { EditableProps } from '~/lib/preview';
 interface Props {
   title: string;
   eyebrow?: string | null;
+  /**
+   * The eyebrow carries two unrelated things — a job title on About, the play
+   * marker on a project — so which of them the accent belongs to is the caller's
+   * to say, not this component's.
+   */
+  eyebrowTone?: 'muted' | 'accent-warm';
   titleEditable?: EditableProps;
   eyebrowEditable?: EditableProps;
   size?: 'display' | 'xl';
@@ -19,6 +25,7 @@ interface Props {
 const {
   title,
   eyebrow = null,
+  eyebrowTone = 'muted',
   titleEditable = {},
   eyebrowEditable = {},
   size = 'xl',
@@ -28,7 +35,7 @@ const {
 <div class="flex flex-col gap-3">
   {
     eyebrow && (
-      <Text size="sm" tone="muted" class="font-mono uppercase" {...eyebrowEditable}>
+      <Text size="sm" tone={eyebrowTone} class="font-mono uppercase" {...eyebrowEditable}>
         {eyebrow}
       </Text>
     )

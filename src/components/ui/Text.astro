@@ -1,6 +1,6 @@
 ---
 type Size = 'xs' | 'sm' | 'base';
-type Tone = 'ink' | 'muted';
+type Tone = 'ink' | 'muted' | 'accent-warm';
 
 interface Props {
   size?: Size;
@@ -23,7 +23,11 @@ const SIZE_CLASS: Record<Size, string> = {
   sm: 'text-sm',
   base: 'text-base',
 };
-const TONE_CLASS: Record<Tone, string> = { ink: 'text-ink', muted: 'text-ink-muted' };
+const TONE_CLASS: Record<Tone, string> = {
+  ink: 'text-ink',
+  muted: 'text-ink-muted',
+  'accent-warm': 'text-accent-warm',
+};
 ---
 
 <Tag class:list={[SIZE_CLASS[size], TONE_CLASS[tone], className]} {...rest}>

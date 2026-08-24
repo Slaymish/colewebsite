@@ -58,9 +58,16 @@
   }
 
   /* Every focusable thing, once, rather than per component — the ring is the
-     only signal a keyboard user gets and it is easy to forget on a new element. */
+     only signal a keyboard user gets and it is easy to forget on a new element.
+     The offset is what makes the accent safe here: the ring sits outside the
+     element, so it is read against the page (6.3:1) and not against whatever the
+     focused thing is filled with — the skip link's ink ground would be 2.1:1.
+
+     `var(--color-accent)` works because Tailwind emits a §2 name it finds
+     referenced in this file. It does not scan a component's <style> block, so the
+     same var() inside one resolves to nothing. Reach for §1 there. */
   :focus-visible {
-    outline: 2px solid var(--color-ink);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 

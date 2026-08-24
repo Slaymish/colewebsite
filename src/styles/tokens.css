@@ -2,12 +2,17 @@
  * Design tokens — the single source of truth for every value a component may use.
  *
  * ---------------------------------------------------------------------------
- * NOTHING BELOW IS A DESIGN DECISION YET.
+ * COLOUR IS DECIDED. NOTHING ELSE HERE IS.
  * ---------------------------------------------------------------------------
- * Every value here is provisional, chosen to be neutral and legible rather than
- * right: near-black on off-white, a system font stack, a plain modular scale.
- * The real palette, typefaces and scale come out of the design session with Cole.
- * Read this file as scaffolding with the correct shape, not as a look.
+ * The palette is Cole's, chosen 2026-08-24 and recorded in the colour table in
+ * docs/design/brief.md. It is also the one part of this file Cole can change
+ * himself: each palette value reads a `--cms-*` property first, which the
+ * `siteSettings` entry in Contentful sets — see src/lib/theme.ts, which explains
+ * why the override lands on the raw layer and not on the semantic names.
+ *
+ * Everything else is still provisional, chosen to be legible rather than right:
+ * a system font stack and a plain modular scale. The typefaces and the scale come
+ * out of the design session with Cole.
  *
  * ---------------------------------------------------------------------------
  * THE NAMING CONTRACT
@@ -16,8 +21,11 @@
  * §1  --raw-*   Raw values. Only §2 may read these; never a component.
  * §2  @theme    Semantic aliases in Tailwind's namespaces, so each one generates
  *               a utility class. This is the only layer components may touch.
- * §3  :root     Tokens with no Tailwind namespace to live in. Consumed by an
- *               `@utility` in global.css or by var() inside a <style> block.
+ * §3  :root     Tokens with no Tailwind namespace to live in. Plain `:root`, so
+ *               always emitted: safe to read by var() from an `@utility` in
+ *               global.css or from a component's <style> block. A §2 name is not
+ *               — Tailwind emits one only where it sees it referenced, and it
+ *               never looks inside a component's <style>.
  *
  * Two rules that hold regardless of what the values become:
  *   - No colour literal exists outside this file.
@@ -34,11 +42,39 @@
 /* ── §1 Raw values ─────────────────────────────────────────────────────────── */
 
 :root {
-  --raw-white: #fbfbf9;
-  --raw-near-black: #131313;
-  --raw-grey-600: #6b6b68;
-  --raw-grey-300: #d6d6d1;
-  --raw-grey-200: #e6e6e1;
+  /*
+   * The palette. Five values, and the `--cms-*` fallback is where Contentful
+   * gets to change them without a deploy. An unset field falls through to the
+   * literal here, so a half-filled entry is a working site.
+   */
+  --raw-page: var(--cms-page, #f2f0f0);
+  --raw-ink: var(--cms-ink, #262626);
+  --raw-accent: var(--cms-accent, #0f5c8c);
+  --raw-accent-deep: var(--cms-accent-deep, #0d518c);
+  --raw-accent-warm: var(--cms-accent-warm, #bf3706);
+
+  /*
+   * The neutrals are derived, not picked: each is a percentage of ink mixed into
+   * the ground, so changing either re-tunes all three rather than leaving three
+   * hand-chosen greys behind that no longer belong to the palette. The
+   * percentages reproduce the contrast ratios the greys they replaced had against
+   * the old ground — 5.06:1, 1.41:1 and 1.21:1.
+   *
+   * oklab and not sRGB: mixing two neutrals in sRGB dips through a muddier,
+   * darker midpoint, and `rule` sits right where that shows.
+   *
+   * DO NOT make the operand order consistent. A browser without `color-mix()`
+   * gets a fallback the build writes for it, and that fallback is the first
+   * operand — so the order chosen here is which colour each token degrades to.
+   * Ink first leaves muted text readable and merely unmuted; page first leaves a
+   * hairline and an empty-picture box invisible rather than near-black, which is
+   * what flipping these two to match the first would produce. Written the other
+   * way around a literal fallback does not help: a second declaration of the same
+   * property is dropped as overridden before it reaches the browser.
+   */
+  --raw-ink-muted: color-mix(in oklab, var(--raw-ink) 65%, var(--raw-page));
+  --raw-rule: color-mix(in oklab, var(--raw-page) 84%, var(--raw-ink));
+  --raw-placeholder: color-mix(in oklab, var(--raw-page) 91%, var(--raw-ink));
 
   --raw-font-sans:
     ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -63,13 +99,20 @@
 /* ── §2 Semantic aliases, in Tailwind's namespaces ─────────────────────────── */
 
 @theme inline {
-  --color-page: var(--raw-white);
-  --color-ink: var(--raw-near-black);
-  --color-ink-muted: var(--raw-grey-600);
-  --color-rule: var(--raw-grey-300);
-  --color-placeholder: var(--raw-grey-200);
-  --color-inverse-page: var(--raw-near-black);
-  --color-inverse-ink: var(--raw-white);
+  --color-page: var(--raw-page);
+  --color-ink: var(--raw-ink);
+  --color-ink-muted: var(--raw-ink-muted);
+  --color-rule: var(--raw-rule);
+  --color-placeholder: var(--raw-placeholder);
+  --color-inverse-page: var(--raw-ink);
+  --color-inverse-ink: var(--raw-page);
+
+  /* Accent 1 and Accent 2 from the brief, which fixes that there are two of them
+     and not what either one does. Nothing uses these yet, and inventing a role
+     for them is the design round's job, not this file's. */
+  --color-accent: var(--raw-accent);
+  --color-accent-deep: var(--raw-accent-deep);
+  --color-accent-warm: var(--raw-accent-warm);
 
   --font-sans: var(--raw-font-sans);
   --font-mono: var(--raw-font-mono);
