@@ -51,6 +51,30 @@ export interface About {
 }
 
 /**
+ * The palette, from the CMS rather than the stylesheet.
+ *
+ * The slots are the ones `docs/design/brief.md` agreed with Cole — one neutral
+ * ground, two accents — plus ink, and a darker variant of the blue accent. The
+ * derived neutrals (`ink-muted`, `rule`, `placeholder`) are deliberately absent:
+ * they are mixed off ink and ground in `src/styles/tokens.css`, so re-grounding
+ * the site re-tunes all three rather than leaving three greys behind.
+ *
+ * Null means "use the value in tokens.css", so a half-filled palette is a
+ * legitimate state and an empty one leaves the site exactly as it builds today.
+ */
+export interface SiteTheme {
+  /** The one neutral everything sits on. */
+  ground: string | null;
+  ink: string | null;
+  /** Accent 1 in the brief — the blue. */
+  accent: string | null;
+  /** Accent 1, darker. */
+  accentDeep: string | null;
+  /** Accent 2 in the brief — the rusty orange. */
+  accentWarm: string | null;
+}
+
+/**
  * Site settings — one entry, read by every page.
  *
  * Configuration rather than copy: the SEO defaults, the contact details and the
@@ -81,4 +105,5 @@ export interface SiteSettings {
     cvUrl: string | null;
   };
   copyright: string | null;
+  theme: SiteTheme;
 }
