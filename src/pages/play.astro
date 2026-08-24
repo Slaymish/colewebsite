@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Container from '~/components/ui/Container.astro';
-import Stack from '~/components/ui/Stack.astro';
-import Heading from '~/components/ui/Heading.astro';
+import Band from '~/components/patterns/Band.astro';
+import PageHeader from '~/components/patterns/PageHeader.astro';
+import PlayGrid from '~/components/patterns/PlayGrid.astro';
 import Text from '~/components/ui/Text.astro';
-import ProjectGrid from '~/components/patterns/ProjectGrid.astro';
 import { getPlay } from '~/lib/contentful';
 
 /**
@@ -17,22 +16,22 @@ const play = await getPlay();
 ---
 
 <BaseLayout title="Play" path="/play">
-  <Container>
-    <Stack gap="xl" class="py-16 md:py-24">
-      <Stack gap="sm">
-        <Heading level={1} size="display">Play</Heading>
-        <Text tone="muted" class="max-w-measure">
-          Experiments and things still in progress. Not finished work.
-        </Text>
-      </Stack>
+  <Band pad="lg" class="pb-12 md:pb-16">
+    <PageHeader
+      title="Play"
+      eyebrow="Unfinished"
+      eyebrowTone="accent-warm"
+      standfirst="Experiments, offcuts, and things still in progress. Not finished work, and not ordered."
+    />
+  </Band>
 
-      {
-        play.length > 0 ? (
-          <ProjectGrid projects={play} />
-        ) : (
-          <Text tone="muted">Nothing here yet.</Text>
-        )
-      }
-    </Stack>
-  </Container>
+  <Band pad="none" class="pb-16 md:pb-24">
+    {
+      play.length > 0 ? (
+        <PlayGrid projects={play} />
+      ) : (
+        <Text tone="muted">[Nothing marked as play in Contentful yet.]</Text>
+      )
+    }
+  </Band>
 </BaseLayout>

@@ -1,27 +1,38 @@
 ---
 import Container from '~/components/ui/Container.astro';
+import Label from '~/components/ui/Label.astro';
 import Link from '~/components/ui/Link.astro';
+import Rule from '~/components/ui/Rule.astro';
 import { NAV, SITE } from '~/lib/site';
+
+/**
+ * The whole header is the mono layer — wordmark included. The name is set at
+ * full size on the homepage a few hundred pixels below, so repeating it large
+ * here would be the site saying it twice.
+ *
+ * Current page is marked twice over, in colour and with an underline. Colour
+ * alone is not a signal for a reader who cannot see it, and `aria-current`
+ * alone is not a signal for a reader who can.
+ */
 ---
 
-<header class="border-rule bg-page z-header sticky top-0 border-b">
+<header class="bg-page z-header sticky top-0">
   <Container>
     <div class="flex items-baseline justify-between gap-8 py-5">
-      <Link href="/" plain class="text-base tracking-tight">{SITE.name}</Link>
+      <Link href="/" plain>
+        <Label tone="inherit" class="text-ink">{SITE.name}</Label>
+      </Link>
       <nav aria-label="Primary">
-        <ul class="flex gap-6">
+        <ul class="text-ink-muted flex gap-5 md:gap-8">
           {
             NAV.map((item) => (
               <li>
-                {/* `Link` sets aria-current; until now nothing showed it on
-                    screen. Scoped to the nav, so the wordmark — which also
-                    matches `/` on the homepage — stays ink. */}
                 <Link
                   href={item.href}
                   plain
-                  class="aria-[current=page]:text-accent text-sm"
+                  class="aria-[current=page]:text-accent underline-offset-8 aria-[current=page]:underline aria-[current=page]:decoration-2"
                 >
-                  {item.label}
+                  <Label tone="inherit">{item.label}</Label>
                 </Link>
               </li>
             ))
@@ -30,4 +41,5 @@ import { NAV, SITE } from '~/lib/site';
       </nav>
     </div>
   </Container>
+  <Rule />
 </header>

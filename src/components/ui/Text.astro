@@ -1,6 +1,6 @@
 ---
-type Size = 'xs' | 'sm' | 'base';
-type Tone = 'ink' | 'muted' | 'accent-warm';
+type Size = 'xs' | 'sm' | 'base' | 'lead';
+type Tone = 'ink' | 'muted' | 'inverse' | 'inverse-muted';
 
 interface Props {
   size?: Size;
@@ -22,11 +22,13 @@ const SIZE_CLASS: Record<Size, string> = {
   xs: 'text-xs',
   sm: 'text-sm',
   base: 'text-base',
+  lead: 'text-lead',
 };
 const TONE_CLASS: Record<Tone, string> = {
   ink: 'text-ink',
   muted: 'text-ink-muted',
-  'accent-warm': 'text-accent-warm',
+  inverse: 'text-inverse-ink',
+  'inverse-muted': 'text-inverse-ink-muted',
 };
 ---
 

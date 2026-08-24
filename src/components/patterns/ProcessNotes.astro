@@ -1,0 +1,97 @@
+---
+import Band from './Band.astro';
+import SectionHead from './SectionHead.astro';
+import Figure from '~/components/ui/Figure.astro';
+import Label from '~/components/ui/Label.astro';
+import Text from '~/components/ui/Text.astro';
+import type { ProcessNote } from '~/lib/content-types';
+import type { EditableProps } from '~/lib/preview';
+import { cycle } from '~/lib/ui';
+
+/**
+ * Process, on the ink ground.
+ *
+ * The brief asks for process to be first-class content rather than "another
+ * gallery image at the bottom of a project page", and the ground is how this
+ * answers that: the page flips, and the working shots are in their own room
+ * rather than trailing the finished ones. Rust on the note numbers for the same
+ * reason it is on the play marker — this is the unresolved half of the site.
+ *
+ * The dates are rendered where they exist and skipped where they do not, because
+ * `date` is optional on the content type and a run of notes with three dated and
+ * two not is the normal case, not a fault.
+ */
+interface Props {
+  notes: readonly ProcessNote[];
+  editableProps?: EditableProps;
+}
+
+const { notes, editableProps = {} } = Astro.props;
+
+/** Fixed locale, not the visitor's: the same build output for every reader. */
+const DATE_FORMAT = new Intl.DateTimeFormat('en-NZ', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+
+function formatted(date: string | null): string | null {
+  if (!date) return null;
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? null : DATE_FORMAT.format(parsed);
+}
+
+const LAYOUT = [
+  { span: 'md:col-span-7 md:col-start-1', ratio: 'landscape' },
+  { span: 'md:col-span-4 md:col-start-9', ratio: 'portrait' },
+  { span: 'md:col-span-5 md:col-start-3', ratio: 'square' },
+  { span: 'md:col-span-6 md:col-start-7', ratio: 'landscape' },
+] as const;
+---
+
+<Band ground="inverse" pad="lg" aria-labelledby="process">
+  <SectionHead
+    label="Process"
+    aside={`${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`}
+    tone="inverse"
+    id="process"
+  />
+
+  <div class="mt-12 grid grid-cols-12 gap-x-6 gap-y-16 md:mt-20" {...editableProps}>
+    {
+      notes.map((note, index) => {
+        const layout = cycle(LAYOUT, index);
+        const number = String(index + 1).padStart(2, '0');
+        const date = formatted(note.date);
+
+        return (
+          <figure class:list={['col-span-12 flex flex-col gap-4', layout.span]}>
+            <Figure
+              image={note.image}
+              ratio={layout.ratio}
+              tone="inverse"
+              crop
+              sizes="(min-width: 768px) 50vw, 100vw"
+              label={`Process ${number}`}
+            />
+            <figcaption class="flex flex-col gap-2">
+              <div class="flex items-baseline justify-between gap-4">
+                <Label tone="accent-warm" tabular>
+                  {number}
+                </Label>
+                {date && (
+                  <Label tone="inverse-muted" size="xs" tabular>
+                    {date}
+                  </Label>
+                )}
+              </div>
+              <Text size="sm" tone="inverse">
+                {note.caption}
+              </Text>
+            </figcaption>
+          </figure>
+        );
+      })
+    }
+  </div>
+</Band>

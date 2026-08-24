@@ -1,0 +1,45 @@
+---
+/**
+ * A horizontal line, as a design element rather than a semantic separator.
+ *
+ * A `<div aria-hidden>` and not an `<hr>` on purpose: an `<hr>` is announced as
+ * a thematic break, and most of the rules on this site sit above a heading that
+ * already says the same thing. Where a rule really is the break — between two
+ * project rows — the list markup carries that.
+ *
+ * `thick` is the section marker; `hairline` is everything else.
+ */
+type Tone = 'rule' | 'ink' | 'accent-warm' | 'inverse' | 'inverse-rule';
+type Weight = 'hairline' | 'thick';
+
+interface Props {
+  tone?: Tone;
+  weight?: Weight;
+  class?: string;
+}
+
+const {
+  tone = 'rule',
+  weight = 'hairline',
+  class: className = '',
+} = Astro.props as Props;
+
+const TONE_CLASS: Record<Tone, string> = {
+  rule: 'border-rule',
+  ink: 'border-ink',
+  'accent-warm': 'border-accent-warm',
+  inverse: 'border-inverse-ink',
+  'inverse-rule': 'border-inverse-rule',
+};
+
+const WEIGHT_CLASS: Record<Weight, string> = {
+  hairline: 'border-t',
+  thick: 'border-t-2',
+};
+---
+
+<div
+  aria-hidden="true"
+  class:list={['w-full', WEIGHT_CLASS[weight], TONE_CLASS[tone], className]}
+>
+</div>

@@ -1,39 +1,64 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Container from '~/components/ui/Container.astro';
-import Stack from '~/components/ui/Stack.astro';
-import Figure from '~/components/ui/Figure.astro';
-import Heading from '~/components/ui/Heading.astro';
-import Prose from '~/components/ui/Prose.astro';
-import Text from '~/components/ui/Text.astro';
-import Link from '~/components/ui/Link.astro';
+import Band from '~/components/patterns/Band.astro';
 import PageHeader from '~/components/patterns/PageHeader.astro';
+import MaterialList from '~/components/patterns/MaterialList.astro';
+import ProcessNotes from '~/components/patterns/ProcessNotes.astro';
+import ProjectNav from '~/components/patterns/ProjectNav.astro';
+import SectionHead from '~/components/patterns/SectionHead.astro';
+import Figure from '~/components/ui/Figure.astro';
+import Label from '~/components/ui/Label.astro';
+import Prose from '~/components/ui/Prose.astro';
 import { getProjects } from '~/lib/contentful';
 import { creativeWorkJsonLd } from '~/lib/seo';
 import { editable } from '~/lib/preview';
 import { TIER } from '~/lib/content-model';
 import type { Project } from '~/lib/content-types';
+import { cycle } from '~/lib/ui';
 
 /**
  * One page per project, built from the same memoised list the index reads. The
  * entry travels in `props` rather than being re-fetched per page: `getStaticPaths`
  * already has it, and Astro runs this module once for the whole route.
+ *
+ * The neighbours are worked out here too, and only within the same tier — see
+ * ProjectNav for why a "next" that crosses the work/play fence would be wrong.
  */
 export const getStaticPaths = (async () => {
   const projects = await getProjects();
-  return projects.map((project) => ({
-    params: { slug: project.slug },
-    props: { project },
-  }));
+
+  return projects.map((project) => {
+    const siblings = projects.filter((entry) => entry.tier === project.tier);
+    const at = siblings.findIndex((entry) => entry.slug === project.slug);
+
+    return {
+      params: { slug: project.slug },
+      props: {
+        project,
+        previous: at > 0 ? siblings[at - 1] : null,
+        next: at < siblings.length - 1 ? siblings[at + 1] : null,
+      },
+    };
+  });
 }) satisfies GetStaticPaths;
 
-const { project } = Astro.props as { project: Project };
+const { project, previous, next } = Astro.props as {
+  project: Project;
+  previous: Project | null;
+  next: Project | null;
+};
 
 const isPlay = project.tier === TIER.play;
 const path = `/project/${project.slug}`;
 const description = project.metaDescription ?? project.body[0] ?? '';
 const share = project.shareImage ?? project.cover;
+
+const GALLERY_LAYOUT = [
+  'md:col-span-12',
+  'md:col-span-7 md:col-start-1',
+  'md:col-span-6 md:col-start-7',
+] as const;
 ---
 
 <BaseLayout
@@ -49,78 +74,108 @@ const share = project.shareImage ?? project.cover;
     image: share?.url,
   })}
 >
-  <Container>
-    <Stack gap="lg" class="py-12 md:py-16">
-      <PageHeader
-        title={project.title}
-        eyebrow={isPlay ? 'Play' : null}
-        eyebrowTone="accent-warm"
-        titleEditable={editable('project', project.cmsId, 'title')}
-        eyebrowEditable={editable('project', project.cmsId, 'tier')}
-      />
+  <Band pad="lg" class="pb-10 md:pb-14">
+    <PageHeader
+      title={project.title}
+      eyebrow={isPlay ? 'Play' : null}
+      eyebrowTone="accent-warm"
+      uppercase={false}
+      titleEditable={editable('project', project.cmsId, 'title')}
+      eyebrowEditable={editable('project', project.cmsId, 'tier')}
+    />
+  </Band>
 
-      <Figure
-        image={project.cover}
-        priority
-        ratio="landscape"
-        sizes="(min-width: 1024px) 80vw, 100vw"
-      />
+  {
+    /* Edge to edge. The cover is the one image on the page allowed to leave the
+      container, which is what makes it read as the cover rather than as the
+      first of the gallery. */
+  }
+  <Band contained={false} pad="none">
+    <Figure
+      image={project.cover}
+      priority
+      ratio="wide"
+      crop
+      sizes="100vw"
+      label="Cover"
+    />
+  </Band>
 
-      <div class="flex flex-col gap-8 md:flex-row md:gap-16">
-        <div {...editable('project', project.cmsId, 'body')} class="md:flex-1">
-          <Prose paragraphs={project.body} />
-        </div>
-        {
-          project.tags.length > 0 && (
-            <ul
-              class="flex flex-wrap gap-x-4 gap-y-1 md:w-48 md:flex-none md:flex-col"
-              {...editable('project', project.cmsId, 'tags')}
-            >
-              {project.tags.map((tag) => (
-                <li>
-                  <Text size="sm" tone="muted" as="span">
-                    {tag}
-                  </Text>
-                </li>
-              ))}
-            </ul>
-          )
-        }
+  <Band pad="md">
+    <div class="grid grid-cols-12 gap-x-6 gap-y-10">
+      <div
+        class="col-span-12 md:col-span-7"
+        {...editable('project', project.cmsId, 'body')}
+      >
+        <Prose paragraphs={project.body} leadFirst />
       </div>
 
-      {
-        project.gallery.length > 0 && (
-          <Stack gap="md" as="section" {...editable('project', project.cmsId, 'gallery')}>
-            {project.gallery.map((image) => (
-              <Figure image={image} sizes="(min-width: 1024px) 80vw, 100vw" />
-            ))}
-          </Stack>
-        )
-      }
+      <aside class="col-span-12 flex flex-col gap-8 md:col-span-3 md:col-start-10">
+        {
+          project.tags.length > 0 && (
+            <div class="flex flex-col gap-3">
+              <Label tone="accent">Made of</Label>
+              <MaterialList
+                tags={project.tags}
+                class="flex-col gap-y-2"
+                {...editable('project', project.cmsId, 'tags')}
+              />
+            </div>
+          )
+        }
+        {
+          project.process.length > 0 && (
+            <div class="flex flex-col gap-3">
+              <Label tone="accent-warm">Process</Label>
+              <Label tone="muted" size="xs" tabular>
+                {project.process.length} notes below
+              </Label>
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </Band>
 
-      {
-        project.process.length > 0 && (
-          <Stack gap="md" as="section" {...editable('project', project.cmsId, 'process')}>
-            <Heading level={2} size="base" class="font-mono uppercase">
-              Process
-            </Heading>
-            {project.process.map((note) => (
-              <figure class="flex flex-col gap-2">
-                <Figure image={note.image} sizes="(min-width: 1024px) 80vw, 100vw" />
-                <figcaption>
-                  <Text size="sm" tone="muted">
-                    {note.caption}
-                  </Text>
-                </figcaption>
-              </figure>
-            ))}
-          </Stack>
-        )
-      }
+  {
+    project.gallery.length > 0 && (
+      <Band
+        pad="none"
+        aria-labelledby="gallery"
+        class="pb-16 md:pb-24"
+        {...editable('project', project.cmsId, 'gallery')}
+      >
+        <SectionHead
+          label="Gallery"
+          aside={String(project.gallery.length).padStart(2, '0')}
+          id="gallery"
+          class="mb-10 md:mb-16"
+        />
+        <div class="grid grid-cols-12 gap-x-6 gap-y-12">
+          {project.gallery.map((image, index) => (
+            <div class:list={['col-span-12', cycle(GALLERY_LAYOUT, index)]}>
+              <Figure
+                image={image}
+                sizes="(min-width: 768px) 60vw, 100vw"
+                label={`Gallery ${index + 1}`}
+              />
+            </div>
+          ))}
+        </div>
+      </Band>
+    )
+  }
 
-      <Link href={isPlay ? '/play' : '/'} class="text-sm">
-        {isPlay ? '← All play' : '← All work'}
-      </Link>
-    </Stack>
-  </Container>
+  {
+    project.process.length > 0 && (
+      <ProcessNotes
+        notes={project.process}
+        editableProps={editable('project', project.cmsId, 'process')}
+      />
+    )
+  }
+
+  <Band pad="md">
+    <ProjectNav previous={previous} next={next} />
+  </Band>
 </BaseLayout>

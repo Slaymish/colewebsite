@@ -1,0 +1,108 @@
+---
+import Figure from '~/components/ui/Figure.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
+import MaterialList from './MaterialList.astro';
+import type { Project } from '~/lib/content-types';
+import { editable } from '~/lib/preview';
+import { cycle } from '~/lib/ui';
+
+/**
+ * The work, as a numbered index rather than a grid of equal cards.
+ *
+ * Three things are deliberate here.
+ *
+ * The rhythm cycles through three column arrangements and three crops, keyed off
+ * the position in the list. That is what stops a page with no photographs in it
+ * yet — which is what Cole is looking at — from reading as a stack of identical
+ * grey rectangles. It is derived from the index rather than authored, so it holds
+ * for two projects or twenty and needs nothing from the CMS.
+ *
+ * The title comes before the picture in the source, whatever side it ends up on.
+ * The whole row is one link, so the title is its accessible name, and a screen
+ * reader should reach it before the image it belongs to.
+ *
+ * `crop` is on: the arrangement is a rhythm of shapes, and a real photograph with
+ * its own aspect ratio would break it the moment Cole uploads one.
+ */
+interface Props {
+  projects: readonly Project[];
+}
+
+const { projects } = Astro.props;
+
+const LAYOUT = [
+  {
+    meta: 'md:col-span-4 md:col-start-1 md:self-end',
+    image: 'md:col-span-7 md:col-start-6',
+    ratio: 'landscape',
+    shift: '',
+  },
+  {
+    meta: 'md:col-span-4 md:col-start-8 md:self-start',
+    image: 'md:col-span-5 md:col-start-1',
+    ratio: 'portrait',
+    shift: 'md:mt-12',
+  },
+  {
+    meta: 'md:col-span-3 md:col-start-1 md:self-end',
+    image: 'md:col-span-8 md:col-start-5',
+    ratio: 'wide',
+    shift: '',
+  },
+] as const;
+
+const SIZES = '(min-width: 768px) 58vw, 100vw';
+---
+
+<Rule />
+<ol class="flex flex-col">
+  {
+    projects.map((project, index) => {
+      const layout = cycle(LAYOUT, index);
+      const number = String(index + 1).padStart(2, '0');
+
+      return (
+        <li>
+          <a
+            href={`/project/${project.slug}`}
+            class="group grid grid-cols-12 items-start gap-x-6 gap-y-6 py-10 md:py-16"
+          >
+            <div
+              class:list={['col-span-12 flex flex-col gap-4 md:row-start-1', layout.meta]}
+            >
+              <Label tone="accent" tabular>
+                {number}
+              </Label>
+              <Heading
+                level={3}
+                size="2xl"
+                class="duration-normal ease-out-soft group-hover:text-accent transition-colors"
+                {...editable('project', project.cmsId, 'title')}
+              >
+                {project.title}
+              </Heading>
+              <MaterialList
+                tags={project.tags}
+                {...editable('project', project.cmsId, 'tags')}
+              />
+            </div>
+            <div class:list={['col-span-12 md:row-start-1', layout.image, layout.shift]}>
+              <Figure
+                image={project.cover}
+                priority={index === 0}
+                ratio={layout.ratio}
+                crop
+                sizes={SIZES}
+                label={number}
+                class="duration-normal ease-out-soft transition-opacity group-hover:opacity-80"
+              />
+            </div>
+          </a>
+          <Rule />
+        </li>
+      );
+    })
+  }
+</ol>

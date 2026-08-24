@@ -1,0 +1,47 @@
+---
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
+import type { Tone } from '~/lib/ui';
+
+/**
+ * The one section marker the site uses: a heavy rule, then a mono label and a
+ * count sitting on the same baseline at either end of it.
+ *
+ * The label is a real `<h2>` and not a styled div — it is what the section's
+ * `aria-labelledby` points at, so it has to be in the outline. Mono and small
+ * is how loud it looks, which is a separate question from what it is.
+ */
+interface Props {
+  label: string;
+  /** A count, a year, anything short. Sits hard right against the rule. */
+  aside?: string | null;
+  tone?: Tone;
+  id?: string;
+  class?: string;
+}
+
+const {
+  label,
+  aside = null,
+  tone = 'page',
+  id,
+  class: className = '',
+} = Astro.props as Props;
+
+const INK_TONE = { page: 'ink', inverse: 'inverse' } as const;
+const ASIDE_TONE = { page: 'muted', inverse: 'inverse-muted' } as const;
+---
+
+<div class:list={['flex flex-col gap-3', className]}>
+  <Rule tone={INK_TONE[tone]} weight="thick" />
+  <div class="flex items-baseline justify-between gap-6">
+    <Label as="h2" id={id} tone={INK_TONE[tone]}>{label}</Label>
+    {
+      aside && (
+        <Label tone={ASIDE_TONE[tone]} tabular>
+          {aside}
+        </Label>
+      )
+    }
+  </div>
+</div>

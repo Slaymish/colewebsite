@@ -15,14 +15,53 @@ interface Props {
    * the class list below for why those two travel together.
    */
   plain?: boolean;
+  /**
+   * `inverse` is for the ink-grounded bands, and it is a contrast fix rather
+   * than a style: the blue accent reads 2.7:1 against ink, so a link in the
+   * footer or a process band must not be blue. It goes to the inverse ink
+   * instead and keeps the underline, which is then the only thing marking it.
+   *
+   * `accent-warm` is the play route out of the homepage and nothing else. It
+   * hovers to ink rather than to a deeper rust because there is no deeper rust:
+   * the palette has a second blue and no second orange, and inventing one here
+   * would put a colour literal outside tokens.css.
+   */
+  tone?: 'accent' | 'accent-warm' | 'inverse';
   class?: string;
   [key: string]: unknown;
 }
 
-const { href, plain = false, class: className = '', ...rest } = Astro.props as Props;
+const {
+  href,
+  plain = false,
+  tone = 'accent',
+  class: className = '',
+  ...rest
+} = Astro.props as Props;
 
 const external = isExternalHref(href);
 const current = !external && samePath(Astro.url.pathname, href);
+
+// A link that reads as body text keeps the accent for the hover alone —
+// colouring the wordmark and the nav would put the accent on most of the
+// header. Underlined links are the ones carrying it at rest.
+const TONE_CLASS = {
+  accent: {
+    plain: 'hover:text-accent',
+    underlined:
+      'decoration-skip-none text-accent hover:text-accent-deep underline underline-offset-4',
+  },
+  'accent-warm': {
+    plain: 'text-accent-warm hover:text-ink',
+    underlined:
+      'decoration-skip-none text-accent-warm hover:text-ink underline underline-offset-4',
+  },
+  inverse: {
+    plain: 'hover:text-inverse-ink-muted',
+    underlined:
+      'decoration-skip-none text-inverse-ink hover:text-inverse-ink-muted underline underline-offset-4',
+  },
+} as const;
 ---
 
 <a
@@ -32,12 +71,7 @@ const current = !external && samePath(Astro.url.pathname, href);
   rel={external ? 'noopener noreferrer' : undefined}
   class:list={[
     'duration-fast transition-colors',
-    // A link that reads as body text keeps the accent for the hover alone —
-    // colouring the wordmark and the nav would put the accent on most of the
-    // header. Underlined links are the ones carrying it at rest.
-    plain
-      ? 'hover:text-accent'
-      : 'decoration-skip-none text-accent hover:text-accent-deep underline underline-offset-4',
+    TONE_CLASS[tone][plain ? 'plain' : 'underlined'],
     className,
   ]}
   {...rest}

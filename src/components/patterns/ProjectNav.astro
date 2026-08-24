@@ -1,0 +1,57 @@
+---
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
+import type { Project } from '~/lib/content-types';
+
+/**
+ * Previous and next, at the foot of a project.
+ *
+ * Neighbours come from the same tier, so play leads to play and work to work —
+ * a "next" that silently crossed the fence would undo the one distinction the
+ * project page spends its header making.
+ */
+interface Props {
+  previous: Pick<Project, 'slug' | 'title'> | null;
+  next: Pick<Project, 'slug' | 'title'> | null;
+}
+
+const { previous, next } = Astro.props;
+---
+
+{
+  (previous || next) && (
+    <nav aria-label="More work" class="flex flex-col gap-6">
+      <Rule tone="ink" weight="thick" />
+      <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
+        {previous && (
+          <a href={`/project/${previous.slug}`} class="group flex flex-col gap-3">
+            <Label tone="accent">← Previous</Label>
+            <Heading
+              level={2}
+              size="xl"
+              class="duration-normal ease-out-soft group-hover:text-accent transition-colors"
+            >
+              {previous.title}
+            </Heading>
+          </a>
+        )}
+        {next && (
+          <a
+            href={`/project/${next.slug}`}
+            class="group flex flex-col gap-3 md:col-start-2 md:items-end md:text-right"
+          >
+            <Label tone="accent">Next →</Label>
+            <Heading
+              level={2}
+              size="xl"
+              class="duration-normal ease-out-soft group-hover:text-accent transition-colors"
+            >
+              {next.title}
+            </Heading>
+          </a>
+        )}
+      </div>
+    </nav>
+  )
+}

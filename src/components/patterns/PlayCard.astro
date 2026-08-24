@@ -1,0 +1,51 @@
+---
+import Figure from '~/components/ui/Figure.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
+import MaterialList from './MaterialList.astro';
+import type { Project } from '~/lib/content-types';
+import type { Ratio } from '~/lib/ui';
+import { editable } from '~/lib/preview';
+
+/**
+ * One play piece.
+ *
+ * Everything about it is the inverse of a row in the work index, and none of it
+ * is decoration: no number, because play is not ranked; the title above the
+ * picture rather than beside it, so the card reads as a note rather than a
+ * plate; and a rust rule across the top, which is the site's one marker for the
+ * unresolved. That is the whole fence the brief asks for — legible as a second
+ * tier without being hidden or apologised for.
+ */
+interface Props {
+  project: Project;
+  ratio?: Ratio;
+}
+
+const { project, ratio = 'landscape' } = Astro.props;
+---
+
+<article>
+  <a href={`/project/${project.slug}`} class="group flex flex-col gap-4">
+    <Rule tone="accent-warm" weight="thick" />
+    <Label tone="accent-warm" {...editable('project', project.cmsId, 'tier')}>Play</Label>
+    <Heading
+      level={3}
+      size="xl"
+      class="duration-normal ease-out-soft group-hover:text-accent transition-colors"
+      {...editable('project', project.cmsId, 'title')}
+    >
+      {project.title}
+    </Heading>
+    <MaterialList tags={project.tags} {...editable('project', project.cmsId, 'tags')} />
+    <Figure
+      image={project.cover}
+      ratio={ratio}
+      crop
+      sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 100vw"
+      label="Play"
+      class="duration-normal ease-out-soft mt-2 transition-opacity group-hover:opacity-80"
+    />
+  </a>
+</article>

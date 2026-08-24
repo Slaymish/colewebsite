@@ -1,0 +1,40 @@
+---
+import PlayCard from './PlayCard.astro';
+import type { Project } from '~/lib/content-types';
+import { cycle } from '~/lib/ui';
+
+/**
+ * Play, laid out as a staggered three-column pin board.
+ *
+ * The vertical offsets and the crop both cycle off the position in the list, the
+ * same trick the work index uses and for the same reason — but here the offsets
+ * are the point rather than a rhythm: nothing lines up, so nothing reads as
+ * ranked. The stagger only exists at `lg`, because a two-column stagger on a
+ * tablet just looks like a mistake.
+ */
+interface Props {
+  projects: readonly Project[];
+}
+
+const { projects } = Astro.props;
+
+const STAGGER = ['', 'lg:mt-20', 'lg:mt-40'] as const;
+const RATIOS = [
+  'portrait',
+  'square',
+  'landscape',
+  'wide',
+  'landscape',
+  'portrait',
+] as const;
+---
+
+<ul class="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+  {
+    projects.map((project, index) => (
+      <li class={cycle(STAGGER, index)}>
+        <PlayCard project={project} ratio={cycle(RATIOS, index)} />
+      </li>
+    ))
+  }
+</ul>

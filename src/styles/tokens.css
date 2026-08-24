@@ -2,7 +2,7 @@
  * Design tokens — the single source of truth for every value a component may use.
  *
  * ---------------------------------------------------------------------------
- * COLOUR IS DECIDED. NOTHING ELSE HERE IS.
+ * COLOUR IS DECIDED. THE TYPE IS A FIRST PASS. THE LAYOUT IS A FIRST PASS.
  * ---------------------------------------------------------------------------
  * The palette is Cole's, chosen 2026-08-24 and recorded in the colour table in
  * docs/design/brief.md. It is also the one part of this file Cole can change
@@ -10,9 +10,9 @@
  * `siteSettings` entry in Contentful sets — see src/lib/theme.ts, which explains
  * why the override lands on the raw layer and not on the semantic names.
  *
- * Everything else is still provisional, chosen to be legible rather than right:
- * a system font stack and a plain modular scale. The typefaces and the scale come
- * out of the design session with Cole.
+ * The typefaces and the scale below came out of the first design round rather
+ * than a session with Cole — see docs/design/specs/workbench.md. They are a
+ * position to react to, not an agreement.
  *
  * ---------------------------------------------------------------------------
  * THE NAMING CONTRACT
@@ -34,9 +34,9 @@
  *
  * Tailwind v4 namespaces available to §2: --color-, --font-, --text-, --spacing-,
  * --breakpoint-, --container-, --radius-, --shadow-, --ease-, --leading-,
- * --tracking-, --aspect-. Note the absence of duration and z-index: a token
- * declared in @theme under a namespace Tailwind does not have emits no CSS and no
- * error, so both live in §3 and are bridged by an @utility.
+ * --tracking-, --aspect-. Note the absence of duration, z-index and font-stretch:
+ * a token declared in @theme under a namespace Tailwind does not have emits no
+ * CSS and no error, so all three live in §3 and are bridged by an @utility.
  */
 
 /* ── §1 Raw values ─────────────────────────────────────────────────────────── */
@@ -76,24 +76,78 @@
   --raw-rule: color-mix(in oklab, var(--raw-page) 84%, var(--raw-ink));
   --raw-placeholder: color-mix(in oklab, var(--raw-page) 91%, var(--raw-ink));
 
-  --raw-font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --raw-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /*
+   * The same three again for the ink-grounded bands — the process sections and
+   * the footer. Derived for the same reason, and the operand order follows the
+   * same rule read the other way up: page first where the token is text, ink
+   * first where it is a hairline or an empty box, so a browser with no
+   * `color-mix()` loses the decoration and never the words.
+   */
+  --raw-inverse-ink-muted: color-mix(in oklab, var(--raw-page) 62%, var(--raw-ink));
+  --raw-inverse-rule: color-mix(in oklab, var(--raw-ink) 82%, var(--raw-page));
+  --raw-inverse-placeholder: color-mix(in oklab, var(--raw-ink) 90%, var(--raw-page));
 
-  /* A plain scale. Replace wholesale once the type is chosen. */
+  /*
+   * Archivo carries a width axis as well as a weight one, which is the whole
+   * reason it is here: the mastheads are set expanded, and that is a real axis
+   * of the typeface rather than letter-spacing faked over the top of it. The
+   * variable files are pulled in by BaseLayout — see the import there for why
+   * they are not `@import`ed into this file.
+   *
+   * Both stacks name their fallback in full. A variable font is a large first
+   * request and `font-display: swap` means the fallback is what gets read for
+   * the first moment of every cold visit.
+   */
+  --raw-font-sans:
+    'Archivo Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica,
+    Arial, sans-serif;
+  --raw-font-display: var(--raw-font-sans);
+  --raw-font-mono:
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /*
+   * The scale is wide on purpose. Cole is filling this site with nothing but
+   * words for now, so the distance between the largest and the smallest step is
+   * doing the work the photographs will do later.
+   */
   --raw-text-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
   --raw-text-sm: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
   --raw-text-base: clamp(1rem, 0.97rem + 0.2vw, 1.0625rem);
+  --raw-text-lead: clamp(1.125rem, 1.04rem + 0.45vw, 1.4375rem);
   --raw-text-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
   --raw-text-xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  --raw-text-2xl: clamp(2.25rem, 1.6rem + 2.9vw, 4rem);
   --raw-text-display: clamp(2.5rem, 1.6rem + 4vw, 5rem);
+  --raw-text-mega: clamp(3rem, 0.6rem + 10.5vw, 9.5rem);
+
+  /* Set solid at the top of the scale: at mega the default leading opens a gap
+     between two stacked words wide enough to read as two separate elements. */
+  --raw-leading-mega: 0.84;
+  --raw-leading-display: 0.94;
+  /* And open at the bottom of it. A `--text-*` token with no paired
+     `--text-*--line-height` leaves Tailwind emitting
+     `line-height: var(--tw-leading, var(--text-base--line-height))`, which
+     resolves to nothing at all: the browser default stands, and at Archivo's
+     x-height that is far too tight to read a paragraph in. */
+  --raw-leading-body: 1.62;
+  --raw-leading-lead: 1.32;
+
+  --raw-tracking-display: -0.035em;
+  /* Mono, uppercase, small. Without this the labels set as a solid bar. */
+  --raw-tracking-label: 0.14em;
 
   --raw-measure: 62ch;
-  --raw-container: 82rem;
+  --raw-container: 88rem;
 
   --raw-duration-fast: 120ms;
   --raw-duration-normal: 240ms;
   --raw-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* A percentage on Archivo's `wdth` axis, which `font-stretch` addresses
+     directly because the @font-face declares the range. 100% is the drawn
+     default; 118% is short of the 125% ceiling, where the letterforms start to
+     flatten out. */
+  --raw-width-expanded: 118%;
 }
 
 /* ── §2 Semantic aliases, in Tailwind's namespaces ─────────────────────────── */
@@ -104,32 +158,62 @@
   --color-ink-muted: var(--raw-ink-muted);
   --color-rule: var(--raw-rule);
   --color-placeholder: var(--raw-placeholder);
+
   --color-inverse-page: var(--raw-ink);
   --color-inverse-ink: var(--raw-page);
+  --color-inverse-ink-muted: var(--raw-inverse-ink-muted);
+  --color-inverse-rule: var(--raw-inverse-rule);
+  --color-inverse-placeholder: var(--raw-inverse-placeholder);
 
-  /* Accent 1 and Accent 2 from the brief, which fixes that there are two of them
-     and not what either one does. Nothing uses these yet, and inventing a role
-     for them is the design round's job, not this file's. */
+  /*
+   * Accent 1 and Accent 2 from the brief, which fixes that there are two of them
+   * and not what either does. The first design round gave them a job, and it is
+   * a split rather than a hierarchy:
+   *
+   *   accent / accent-deep (blue)  — the resolved. Links, the index numbers,
+   *                                  the rules that structure a finished page.
+   *   accent-warm (rust)           — the unresolved. Play, process, in-progress.
+   *                                  Nothing finished ever wears it.
+   *
+   * That is the whole system, and it is why rust never appears on a project
+   * title and blue never appears on a process caption.
+   */
   --color-accent: var(--raw-accent);
   --color-accent-deep: var(--raw-accent-deep);
   --color-accent-warm: var(--raw-accent-warm);
 
   --font-sans: var(--raw-font-sans);
+  --font-display: var(--raw-font-display);
   --font-mono: var(--raw-font-mono);
 
   --text-xs: var(--raw-text-xs);
+  --text-xs--line-height: var(--raw-leading-body);
   --text-sm: var(--raw-text-sm);
+  --text-sm--line-height: var(--raw-leading-body);
   --text-base: var(--raw-text-base);
+  --text-base--line-height: var(--raw-leading-body);
+  --text-lead: var(--raw-text-lead);
+  --text-lead--line-height: var(--raw-leading-lead);
   --text-lg: var(--raw-text-lg);
   --text-xl: var(--raw-text-xl);
+  --text-2xl: var(--raw-text-2xl);
   --text-display: var(--raw-text-display);
+  --text-mega: var(--raw-text-mega);
+
+  --leading-mega: var(--raw-leading-mega);
+  --leading-display: var(--raw-leading-display);
+
+  --tracking-display: var(--raw-tracking-display);
+  --tracking-label: var(--raw-tracking-label);
 
   --container-measure: var(--raw-measure);
   --container-page: var(--raw-container);
 
   --ease-out-soft: var(--raw-ease-out);
 
-  /* Crops. Provisional — the real ratios follow the work they hold. */
+  /* Crops. Provisional — the real ratios follow the work they hold. Three
+     landscape-ish ratios and one portrait, because the index cycles through them
+     to keep a column of empty picture boxes from reading as a table. */
   --aspect-portrait: 3 / 4;
   --aspect-landscape: 3 / 2;
   --aspect-wide: 16 / 9;
@@ -140,6 +224,8 @@
 :root {
   --duration-fast: var(--raw-duration-fast);
   --duration-normal: var(--raw-duration-normal);
+
+  --width-expanded: var(--raw-width-expanded);
 
   --z-header: 40;
   --z-skip-link: 60;

@@ -43,3 +43,28 @@ export function samePath(a: string, b: string): boolean {
  * lives in this file rather than in either of them.
  */
 export type Ratio = 'portrait' | 'landscape' | 'wide' | 'square';
+
+/**
+ * Which ground a primitive is sitting on. The ink-grounded bands need different
+ * neutrals for the same job — a hairline and an empty picture box both invert —
+ * and passing a tone is how a primitive gets told, rather than every band
+ * overriding three classes from the outside.
+ */
+export type Tone = 'page' | 'inverse';
+
+/**
+ * Pick from a fixed rhythm by position — the alternating column arrangements and
+ * crops the index and the process band cycle through.
+ *
+ * The `?? first` is unreachable: `index % items.length` is in range for any
+ * non-empty array, and the tuple type is what makes it non-empty. It is there
+ * because `noUncheckedIndexedAccess` cannot see that, and it is cheaper than a
+ * non-null assertion at every call site.
+ */
+export function cycle<T extends readonly [unknown, ...unknown[]]>(
+  items: T,
+  index: number,
+): T[number] {
+  const [first] = items;
+  return items[index % items.length] ?? first;
+}
