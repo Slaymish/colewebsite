@@ -1,0 +1,69 @@
+---
+/**
+ * The mono utility layer — eyebrows, index numbers, material names, section
+ * markers, the play flag.
+ *
+ * It is a primitive rather than three classes retyped at fifteen call sites,
+ * and it exists because this is the layer that carries the site's colour
+ * system: a label is where blue and rust actually appear. `tracking-label` is
+ * not optional — mono, uppercase and small sets as a solid bar without it.
+ */
+type Tone =
+  | 'ink'
+  | 'muted'
+  | 'accent'
+  | 'accent-warm'
+  | 'inverse'
+  | 'inverse-muted'
+  /** Sets no colour at all, so an ancestor can drive it — the nav, where the
+      current-page and hover colours belong to the link and not to the label. */
+  | 'inherit';
+type Size = 'xs' | 'sm';
+
+interface Props {
+  tone?: Tone;
+  size?: Size;
+  as?: 'span' | 'p' | 'div' | 'li' | 'dt' | 'dd' | 'figcaption' | 'h2' | 'h3';
+  /** Numbers set in a column need to line up; text must not be tabular. */
+  tabular?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  tone = 'muted',
+  size = 'sm',
+  as: Tag = 'span',
+  tabular = false,
+  class: className = '',
+  ...rest
+} = Astro.props as Props;
+
+const TONE_CLASS: Record<Tone, string> = {
+  ink: 'text-ink',
+  muted: 'text-ink-muted',
+  accent: 'text-accent',
+  'accent-warm': 'text-accent-warm',
+  inverse: 'text-inverse-ink',
+  'inverse-muted': 'text-inverse-ink-muted',
+  inherit: '',
+};
+
+const SIZE_CLASS: Record<Size, string> = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+};
+---
+
+<Tag
+  class:list={[
+    'tracking-label font-mono uppercase',
+    SIZE_CLASS[size],
+    TONE_CLASS[tone],
+    tabular && 'tabular-nums',
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</Tag>

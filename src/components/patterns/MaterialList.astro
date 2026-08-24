@@ -1,0 +1,31 @@
+---
+import Label from '~/components/ui/Label.astro';
+
+/**
+ * What a piece is made of, set as a row of mono labels.
+ *
+ * Deliberately not links. The brief expects these to become the site's real
+ * grouping — "wool", "charcoal" rather than "object", "photography" — and that
+ * needs a page per material to land on. Until those exist, marking them up as
+ * navigation would be a promise the site does not keep.
+ */
+interface Props {
+  tags: readonly string[];
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { tags, class: className = '', ...rest } = Astro.props as Props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class:list={['flex flex-wrap gap-x-4 gap-y-1', className]} {...rest}>
+      {tags.map((tag) => (
+        <Label as="li" size="xs">
+          {tag}
+        </Label>
+      ))}
+    </ul>
+  )
+}

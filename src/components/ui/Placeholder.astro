@@ -1,20 +1,25 @@
 ---
-import type { Ratio } from '~/lib/ui';
+import type { Ratio, Tone } from '~/lib/ui';
 
 /**
- * A dashed grey box where a picture is missing.
+ * A dashed box where a picture is missing.
  *
  * It is deliberately ugly. An empty div would let a page with no images look
- * finished, and this site is reviewed by people who cannot see the CMS.
+ * finished, and this site is reviewed by people who cannot see the CMS. Right
+ * now it is also most of what Cole sees in the test environment, which is why
+ * it carries the ratio: a column of identical grey rectangles reads as a fault,
+ * a column of varied ones reads as a layout waiting for pictures.
  */
 interface Props {
   ratio?: Ratio;
+  tone?: Tone;
   label?: string;
   class?: string;
 }
 
 const {
   ratio = 'landscape',
+  tone = 'page',
   label = 'Image',
   class: className = '',
 } = Astro.props as Props;
@@ -25,14 +30,20 @@ const RATIO_CLASS: Record<Ratio, string> = {
   wide: 'aspect-wide',
   square: 'aspect-square',
 };
+
+const TONE_CLASS: Record<Tone, string> = {
+  page: 'border-rule text-ink-muted bg-placeholder',
+  inverse: 'border-inverse-rule text-inverse-ink-muted bg-inverse-placeholder',
+};
 ---
 
 <div
   class:list={[
-    'border-rule text-ink-muted bg-placeholder flex items-center justify-center border border-dashed',
+    'flex items-center justify-center border border-dashed',
     RATIO_CLASS[ratio],
+    TONE_CLASS[tone],
     className,
   ]}
 >
-  <span class="font-mono text-xs">[{label}]</span>
+  <span class="tracking-label font-mono text-xs uppercase">[{label}]</span>
 </div>

@@ -4,29 +4,62 @@
  * second section needs smaller type must not answer that by demoting an <h2> to
  * an <h3>: the level is the document outline a screen reader navigates by, and
  * the size is how loud it looks.
+ *
+ * The top three sizes carry `font-expanded` — Archivo's width axis, which is the
+ * reason the typeface is here. It is baked into the size rather than left to the
+ * call site because a masthead set at the default width is the one way to make
+ * the whole design look like an accident.
  */
-type Size = 'display' | 'xl' | 'lg' | 'base';
+type Size = 'mega' | 'display' | '2xl' | 'xl' | 'lg' | 'base';
 
 interface Props {
   /** The document level. Pick it from the outline, never from the size. */
   level?: 1 | 2 | 3 | 4;
   size?: Size;
+  /** Ink by default; the ink-grounded bands need the other one. */
+  tone?: 'ink' | 'inverse';
+  /**
+   * Escape hatch for type that is set like a heading and is not one — the
+   * footer wordmark. It takes the size and stays out of the document outline,
+   * which is the whole point: a screen reader user landing on the footer should
+   * not be told there is a second h2 there saying the site's name again.
+   */
+  as?: 'p';
   class?: string;
   [key: string]: unknown;
 }
 
-const { level = 2, size = 'lg', class: className = '', ...rest } = Astro.props as Props;
+const {
+  level = 2,
+  size = 'lg',
+  tone = 'ink',
+  as,
+  class: className = '',
+  ...rest
+} = Astro.props as Props;
 
-const Tag = `h${level}`;
+const Tag = as ?? `h${level}`;
 
 const SIZE_CLASS: Record<Size, string> = {
-  display: 'text-display leading-[0.95] tracking-tight',
-  xl: 'text-xl leading-tight tracking-tight',
-  lg: 'text-lg leading-snug',
-  base: 'text-base leading-snug',
+  mega: 'font-display font-expanded text-mega leading-mega tracking-display font-bold',
+  display:
+    'font-display font-expanded text-display leading-display tracking-display font-bold',
+  '2xl':
+    'font-display font-expanded text-2xl leading-display tracking-display font-semibold',
+  xl: 'text-xl leading-tight tracking-display font-semibold',
+  lg: 'text-lg leading-snug font-medium',
+  base: 'text-base leading-snug font-medium',
 };
+
+const TONE_CLASS = {
+  ink: 'text-ink',
+  inverse: 'text-inverse-ink',
+} as const;
 ---
 
-<Tag class:list={['text-ink text-balance', SIZE_CLASS[size], className]} {...rest}>
+<Tag
+  class:list={['text-balance', TONE_CLASS[tone], SIZE_CLASS[size], className]}
+  {...rest}
+>
   <slot />
 </Tag>

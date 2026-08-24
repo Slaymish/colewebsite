@@ -3,10 +3,10 @@
 
 /*
  * Utilities for the §3 tokens — the ones with no Tailwind namespace to live in.
- * Tailwind v4 has no --duration- or --z- theme namespace, so a token declared
- * there generates no CSS at all and the component silently falls back to
- * Tailwind's default. Declaring them here as static utilities is what makes the
- * token real.
+ * Tailwind v4 has no --duration-, --z- or font-stretch theme namespace, so a
+ * token declared there generates no CSS at all and the component silently falls
+ * back to Tailwind's default. Declaring them here as static utilities is what
+ * makes the token real.
  */
 
 @utility duration-fast {
@@ -23,6 +23,14 @@
 
 @utility z-skip-link {
   z-index: var(--z-skip-link);
+}
+
+/* Archivo's width axis. Tailwind ships font-stretch utilities, but only as
+   arbitrary values or the CSS keywords — neither of which can hold the token, and
+   the whole point of a single expanded width is that it is one value the type
+   round can move. */
+@utility font-expanded {
+  font-stretch: var(--width-expanded);
 }
 
 /* Tailwind ships no text-decoration-skip-ink utility, and the property is what
@@ -62,6 +70,10 @@
      The offset is what makes the accent safe here: the ring sits outside the
      element, so it is read against the page (6.3:1) and not against whatever the
      focused thing is filled with — the skip link's ink ground would be 2.1:1.
+
+     The ink-grounded bands are the exception and they carry their own ring;
+     see components/patterns/Band.astro, where the same 2.1:1 problem applies to
+     the whole section rather than to one element.
 
      `var(--color-accent)` works because Tailwind emits a §2 name it finds
      referenced in this file. It does not scan a component's <style> block, so the

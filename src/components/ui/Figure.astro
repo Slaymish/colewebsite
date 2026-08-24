@@ -1,5 +1,5 @@
 ---
-import type { ImageAsset, Ratio } from '~/lib/ui';
+import type { ImageAsset, Ratio, Tone } from '~/lib/ui';
 import Placeholder from './Placeholder.astro';
 
 /**
@@ -17,6 +17,14 @@ interface Props {
   priority?: boolean;
   sizes?: string;
   ratio?: Ratio;
+  /** Only reaches the placeholder — a real photograph needs no ground. */
+  tone?: Tone;
+  /**
+   * Crop a real image to the same ratio the placeholder would have used, so a
+   * layout built around a rhythm of shapes keeps it once the pictures land.
+   */
+  crop?: boolean;
+  label?: string;
   class?: string;
 }
 
@@ -25,10 +33,20 @@ const {
   priority = false,
   sizes = '(min-width: 768px) 50vw, 100vw',
   ratio = 'landscape',
+  tone = 'page',
+  crop = false,
+  label = 'Image',
   class: className = '',
 } = Astro.props as Props;
 
 const WIDTHS = [480, 768, 1024, 1440, 1920, 2560];
+
+const RATIO_CLASS: Record<Ratio, string> = {
+  portrait: 'aspect-portrait',
+  landscape: 'aspect-landscape',
+  wide: 'aspect-wide',
+  square: 'aspect-square',
+};
 
 /** Contentful serves AVIF/WebP by content negotiation when asked for `fm=avif`. */
 function variant(url: string, width: number): string {
@@ -54,9 +72,13 @@ const srcset = image
       loading={priority ? 'eager' : 'lazy'}
       decoding={priority ? 'sync' : 'async'}
       fetchpriority={priority ? 'high' : undefined}
-      class:list={['h-auto w-full', className]}
+      class:list={[
+        'w-full',
+        crop ? [RATIO_CLASS[ratio], 'object-cover'] : 'h-auto',
+        className,
+      ]}
     />
   ) : (
-    <Placeholder ratio={ratio} class={className} />
+    <Placeholder ratio={ratio} tone={tone} label={label} class={className} />
   )
 }

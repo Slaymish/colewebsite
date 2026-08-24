@@ -1,5 +1,18 @@
 ---
 import '~/styles/global.css';
+
+/*
+ * The typefaces. Imported here as modules rather than `@import`ed into
+ * tokens.css so that Vite resolves the package paths and fingerprints the
+ * woff2 files — a bare specifier inside a stylesheet Tailwind is already
+ * processing is not something either tool promises to resolve.
+ *
+ * `wdth.css` and not `index.css`: the standard file ships the weight axis
+ * only, and the width axis is the entire reason Archivo is here. Every
+ * masthead on the site would silently fall back to the drawn default width.
+ */
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
 import { buildSeo, type SeoInput } from '~/lib/seo';
 import { SITE } from '~/lib/site';
 import SiteHeader from '~/components/patterns/SiteHeader.astro';

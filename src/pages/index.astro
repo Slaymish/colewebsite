@@ -1,57 +1,81 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Container from '~/components/ui/Container.astro';
-import Stack from '~/components/ui/Stack.astro';
-import Heading from '~/components/ui/Heading.astro';
+import Band from '~/components/patterns/Band.astro';
+import Masthead from '~/components/patterns/Masthead.astro';
+import SectionHead from '~/components/patterns/SectionHead.astro';
+import WorkIndex from '~/components/patterns/WorkIndex.astro';
+import PlayGrid from '~/components/patterns/PlayGrid.astro';
+import Label from '~/components/ui/Label.astro';
+import Link from '~/components/ui/Link.astro';
 import Text from '~/components/ui/Text.astro';
-import ProjectGrid from '~/components/patterns/ProjectGrid.astro';
-import { getFeaturedProjects, getSiteSettings } from '~/lib/contentful';
+import { getFeaturedProjects, getPlay, getSiteSettings } from '~/lib/contentful';
 import { personJsonLd } from '~/lib/seo';
 import { SITE } from '~/lib/site';
 import { editable } from '~/lib/preview';
 
-const [projects, settings] = await Promise.all([
+/**
+ * The homepage carries both tiers. Play is on it rather than only behind its own
+ * nav item because the brief asks for the person to be visible in the feed and
+ * not just a catalogue of finished outputs — but it is below the work, in its
+ * own section, under its own accent. Visible, fenced, not ranked.
+ */
+const [projects, play, settings] = await Promise.all([
   getFeaturedProjects(),
+  getPlay(),
   getSiteSettings(),
 ]);
 
 const jobTitle = settings.seo.jobTitle ?? SITE.jobTitle;
 const description = settings.seo.description ?? SITE.description;
+
+/** Three is enough to show the tier exists; the rest are one click away. */
+const playTeaser = play.slice(0, 3);
 ---
 
 <BaseLayout
-  title="Selected work"
+  title="Work"
   path="/"
   jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
 >
-  <Container>
-    <Stack gap="xl" class="py-16 md:py-24">
-      <Stack gap="sm">
-        <Heading level={1} size="display">{SITE.name}</Heading>
-        {
-          settings.bio && (
-            <Text
-              tone="muted"
-              class="max-w-measure"
-              {...editable('siteSettings', settings.cmsId, 'bio')}
-            >
-              {settings.bio}
-            </Text>
-          )
-        }
-      </Stack>
+  <Masthead
+    bio={settings.bio}
+    workCount={projects.length}
+    playCount={play.length}
+    bioEditable={editable('siteSettings', settings.cmsId, 'bio')}
+  />
 
-      <section aria-labelledby="selected-work">
-        <Heading
-          level={2}
-          size="base"
-          id="selected-work"
-          class="mb-8 font-mono uppercase"
-        >
-          Selected work
-        </Heading>
-        <ProjectGrid projects={projects} />
-      </section>
-    </Stack>
-  </Container>
+  <Band pad="none" aria-labelledby="selected-work" class="pb-16 md:pb-24">
+    <SectionHead
+      label="Selected work"
+      aside={String(projects.length).padStart(2, '0')}
+      id="selected-work"
+      class="mb-10 md:mb-16"
+    />
+    {
+      projects.length > 0 ? (
+        <WorkIndex projects={projects} />
+      ) : (
+        <Text tone="muted">[No project is marked as featured in Contentful yet.]</Text>
+      )
+    }
+  </Band>
+
+  {
+    playTeaser.length > 0 && (
+      <Band aria-labelledby="play" pad="none" class="pb-16 md:pb-24">
+        <SectionHead
+          label="Play"
+          aside={String(play.length).padStart(2, '0')}
+          id="play"
+          class="mb-10 md:mb-16"
+        />
+        <PlayGrid projects={playTeaser} />
+        <p class="mt-16">
+          <Link href="/play" plain tone="accent-warm">
+            <Label tone="inherit">All play →</Label>
+          </Link>
+        </p>
+      </Band>
+    )
+  }
 </BaseLayout>

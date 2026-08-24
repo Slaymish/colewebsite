@@ -1,39 +1,75 @@
 ---
-import Container from '~/components/ui/Container.astro';
+import Band from './Band.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
 import Link from '~/components/ui/Link.astro';
+import Rule from '~/components/ui/Rule.astro';
 import Text from '~/components/ui/Text.astro';
 import { getSiteSettings } from '~/lib/contentful';
 import { SITE } from '~/lib/site';
 
+/**
+ * The footer is the second ink band and it is deliberately large: it is the
+ * bottom of every page, and a site whose ground never changes needs one place
+ * where it does.
+ *
+ * The wordmark here is a `<p>` and not a heading — see the `as` prop on
+ * Heading for why.
+ */
 const settings = await getSiteSettings();
 const year = new Date().getFullYear();
 const copyright = settings.copyright ?? `© ${year} ${SITE.name}`;
+
+const words = SITE.name.split(' ');
+const hasElsewhere = settings.seo.profiles.length > 0;
 ---
 
-<footer class="border-rule mt-28 border-t">
-  <Container>
-    <div class="flex flex-col gap-4 py-10 md:flex-row md:items-center md:justify-between">
-      <Text size="sm" tone="muted">{copyright}</Text>
-      <ul class="flex flex-wrap gap-6">
+<Band ground="inverse" as="footer" pad="lg" class="mt-24 md:mt-40">
+  <div class="flex flex-col gap-12 md:gap-20">
+    <Heading as="p" size="display" tone="inverse" class="uppercase">
+      {words.map((word) => <span class="block">{word}</span>)}
+    </Heading>
+
+    <Rule tone="inverse-rule" />
+
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-12">
+      <div class="flex flex-col gap-3 md:col-span-5">
+        <Label tone="inverse-muted">Get in touch</Label>
         {
-          settings.contact.email && (
-            <li>
-              <Link href={`mailto:${settings.contact.email}`} class="text-sm">
-                {settings.contact.email}
-              </Link>
-            </li>
+          settings.contact.email ? (
+            <Link href={`mailto:${settings.contact.email}`} tone="inverse">
+              {settings.contact.email}
+            </Link>
+          ) : (
+            <Text size="sm" tone="inverse-muted">
+              [No email set in site settings yet.]
+            </Text>
           )
         }
-        {
-          settings.seo.profiles.map((profile) => (
-            <li>
-              <Link href={profile} class="text-sm">
-                {new URL(profile).hostname.replace(/^www\./, '')}
-              </Link>
-            </li>
-          ))
-        }
-      </ul>
+      </div>
+
+      {
+        hasElsewhere && (
+          <div class="flex flex-col gap-3 md:col-span-4">
+            <Label tone="inverse-muted">Elsewhere</Label>
+            <ul class="flex flex-col gap-2">
+              {settings.seo.profiles.map((profile) => (
+                <li>
+                  <Link href={profile} tone="inverse">
+                    {new URL(profile).hostname.replace(/^www\./, '')}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      <div
+        class="flex flex-col gap-3 md:col-span-3 md:col-start-10 md:items-end md:text-right"
+      >
+        <Label tone="inverse-muted">{copyright}</Label>
+      </div>
     </div>
-  </Container>
-</footer>
+  </div>
+</Band>

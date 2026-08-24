@@ -1,12 +1,15 @@
 ---
 import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
 import Text from '~/components/ui/Text.astro';
 import type { EditableProps } from '~/lib/preview';
 
 /**
- * Title and optional standfirst. The two `editable` spreads are separate props
- * rather than one rest spread, because when both come from the CMS they are
- * different fields of the same entry and a single spread can only mark one.
+ * Title, optional eyebrow, optional standfirst. The `editable` spreads are
+ * separate props rather than one rest spread, because when both come from the
+ * CMS they are different fields of the same entry and a single spread can only
+ * mark one.
  */
 interface Props {
   title: string;
@@ -16,29 +19,49 @@ interface Props {
    * marker on a project — so which of them the accent belongs to is the caller's
    * to say, not this component's.
    */
-  eyebrowTone?: 'muted' | 'accent-warm';
+  eyebrowTone?: 'muted' | 'accent' | 'accent-warm';
+  /** One line under the title, at the standfirst size. */
+  standfirst?: string | null;
   titleEditable?: EditableProps;
   eyebrowEditable?: EditableProps;
-  size?: 'display' | 'xl';
+  size?: 'mega' | 'display' | 'xl';
+  /**
+   * On for the site's own words — About, Play, Contact — and off for Cole's.
+   * Setting a project title he wrote in sentence case as ALL CAPS is the site
+   * overruling the content, and a long one stops being readable besides.
+   */
+  uppercase?: boolean;
 }
 
 const {
   title,
   eyebrow = null,
   eyebrowTone = 'muted',
+  standfirst = null,
   titleEditable = {},
   eyebrowEditable = {},
-  size = 'xl',
+  size = 'display',
+  uppercase = true,
 } = Astro.props;
 ---
 
-<div class="flex flex-col gap-3">
+<div class="flex flex-col gap-5">
+  <Rule tone="ink" weight="thick" />
   {
     eyebrow && (
-      <Text size="sm" tone={eyebrowTone} class="font-mono uppercase" {...eyebrowEditable}>
+      <Label tone={eyebrowTone} {...eyebrowEditable}>
         {eyebrow}
+      </Label>
+    )
+  }
+  <Heading level={1} size={size} class={uppercase ? 'uppercase' : ''} {...titleEditable}>
+    {title}
+  </Heading>
+  {
+    standfirst && (
+      <Text size="lead" tone="muted" class="max-w-measure">
+        {standfirst}
       </Text>
     )
   }
-  <Heading level={1} size={size} {...titleEditable}>{title}</Heading>
 </div>

@@ -1,0 +1,62 @@
+---
+import Band from './Band.astro';
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
+import Rule from '~/components/ui/Rule.astro';
+import Text from '~/components/ui/Text.astro';
+import { SITE } from '~/lib/site';
+import type { EditableProps } from '~/lib/preview';
+
+/**
+ * The homepage masthead: the name at the top of the scale, and two counts.
+ *
+ * The name is split on its spaces and each part set on its own line, so the
+ * longest word decides the size and the rest fill the measure with it. That is
+ * why it is not one string with a `<br>` — a name of one word, or of three,
+ * still works.
+ *
+ * The counts are the only numbers on the page that are not an index, and they
+ * carry the site's two accents in their two roles: blue on the finished work,
+ * rust on play.
+ */
+interface Props {
+  bio: string | null;
+  workCount: number;
+  playCount: number;
+  bioEditable?: EditableProps;
+}
+
+const { bio, workCount, playCount, bioEditable = {} } = Astro.props;
+
+const words = SITE.name.split(' ');
+
+/** Bracketed, like everything else that is waiting on Contentful. */
+const BIO_PLACEHOLDER =
+  '[A line or two, in Cole’s words, about what the work is and why he makes it. ' +
+  'Set the bio on the site settings entry in Contentful and this disappears.]';
+---
+
+<Band pad="lg" class="pb-12 md:pb-16">
+  <div class="flex flex-col gap-8 md:gap-12">
+    <div class="flex flex-wrap items-baseline gap-x-8 gap-y-2">
+      <Label tone="accent" tabular>
+        Work — {workCount}
+      </Label>
+      <Label tone="accent-warm" tabular>
+        Play — {playCount}
+      </Label>
+    </div>
+
+    <Heading level={1} size="mega" class="uppercase">
+      {words.map((word) => <span class="block">{word}</span>)}
+    </Heading>
+
+    <Rule tone="ink" weight="thick" />
+
+    <div class="grid grid-cols-12 gap-x-6 gap-y-4">
+      <div class="col-span-12 md:col-span-7 md:col-start-6" {...bioEditable}>
+        <Text size="lead" tone={bio ? 'ink' : 'muted'}>{bio ?? BIO_PLACEHOLDER}</Text>
+      </div>
+    </div>
+  </div>
+</Band>

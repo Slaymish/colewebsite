@@ -1,0 +1,61 @@
+---
+import Container from '~/components/ui/Container.astro';
+
+/**
+ * A full-width horizontal section, and the only thing on the site allowed to
+ * change the ground under it.
+ *
+ * The ink-grounded band is how process and the footer read as a different
+ * register from the finished work above them, and it exists as a component
+ * rather than two classes because of the third line in `GROUND_CLASS`: the
+ * global focus ring is the blue accent, which reads 2.7:1 against ink and is
+ * effectively invisible there. Anything that flips the ground has to flip the
+ * ring with it, and a component is the only way to make that not a thing
+ * someone has to remember.
+ */
+type Ground = 'page' | 'inverse';
+type Pad = 'none' | 'sm' | 'md' | 'lg';
+
+interface Props {
+  ground?: Ground;
+  pad?: Pad;
+  /** Off for a band whose content runs edge to edge — a full-bleed cover. */
+  contained?: boolean;
+  as?: 'section' | 'div' | 'footer' | 'header';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  ground = 'page',
+  pad = 'md',
+  contained = true,
+  as: Tag = 'section',
+  class: className = '',
+  ...rest
+} = Astro.props as Props;
+
+const GROUND_CLASS: Record<Ground, string> = {
+  page: '',
+  inverse: 'bg-inverse-page text-inverse-ink [&_:focus-visible]:outline-inverse-ink',
+};
+
+const PAD_CLASS: Record<Pad, string> = {
+  none: '',
+  sm: 'py-10 md:py-14',
+  md: 'py-16 md:py-24',
+  lg: 'py-24 md:py-36',
+};
+---
+
+<Tag class:list={[GROUND_CLASS[ground], PAD_CLASS[pad], className]} {...rest}>
+  {
+    contained ? (
+      <Container>
+        <slot />
+      </Container>
+    ) : (
+      <slot />
+    )
+  }
+</Tag>

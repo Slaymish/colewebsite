@@ -5,12 +5,27 @@ import Text from './Text.astro';
 interface Props {
   paragraphs: readonly string[];
   size?: 'sm' | 'base';
+  /**
+   * Sets the opening paragraph one step larger. A CMS long-text field arrives as
+   * an undifferentiated run, and this is the only typographic hierarchy available
+   * inside one — without it a three-paragraph About page has no way in.
+   */
+  leadFirst?: boolean;
   class?: string;
 }
 
-const { paragraphs, size = 'base', class: className = '' } = Astro.props as Props;
+const {
+  paragraphs,
+  size = 'base',
+  leadFirst = false,
+  class: className = '',
+} = Astro.props as Props;
 ---
 
-<div class:list={['max-w-measure flex flex-col gap-4', className]}>
-  {paragraphs.map((paragraph) => <Text size={size}>{paragraph}</Text>)}
+<div class:list={['max-w-measure flex flex-col gap-5', className]}>
+  {
+    paragraphs.map((paragraph, index) => (
+      <Text size={leadFirst && index === 0 ? 'lead' : size}>{paragraph}</Text>
+    ))
+  }
 </div>

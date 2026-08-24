@@ -1,74 +1,102 @@
 ---
+import Heading from '~/components/ui/Heading.astro';
+import Label from '~/components/ui/Label.astro';
 import Link from '~/components/ui/Link.astro';
+import Rule from '~/components/ui/Rule.astro';
 import Text from '~/components/ui/Text.astro';
 import type { SiteSettings } from '~/lib/content-types';
 import { editable } from '~/lib/preview';
 
+/**
+ * The email is the page, and it is set at the same size as a project title.
+ * Everything else on a contact page is a footnote to it, and a definition list
+ * of four equally-weighted rows says the opposite.
+ *
+ * The CV stays in the list and stays last. It is here because Cole may want it,
+ * and it is not promoted because the brief's sharpest avoidance is a site that
+ * reads as an online CV.
+ */
 interface Props {
   settings: SiteSettings;
 }
 
 const { settings } = Astro.props;
 const { contact, seo } = settings;
+
+const secondary =
+  contact.phone !== null || contact.cvUrl !== null || seo.profiles.length > 0;
 ---
 
-<dl class="flex flex-col gap-6">
+<div class="flex flex-col gap-14">
   {
     contact.email && (
-      <div class="flex flex-col gap-1">
-        <dt>
-          <Text size="sm" tone="muted" as="span">
-            Email
-          </Text>
-        </dt>
-        <dd {...editable('siteSettings', settings.cmsId, 'contactEmail')}>
-          <Link href={`mailto:${contact.email}`}>{contact.email}</Link>
-        </dd>
+      <div
+        class="flex flex-col gap-4"
+        {...editable('siteSettings', settings.cmsId, 'contactEmail')}
+      >
+        <Label tone="accent">Email</Label>
+        <Heading level={2} size="2xl">
+          <Link href={`mailto:${contact.email}`} class="underline-offset-8">
+            {contact.email}
+          </Link>
+        </Heading>
       </div>
     )
   }
+
   {
-    contact.phone && (
-      <div class="flex flex-col gap-1">
-        <dt>
-          <Text size="sm" tone="muted" as="span">
-            Phone
-          </Text>
-        </dt>
-        <dd {...editable('siteSettings', settings.cmsId, 'contactPhone')}>
-          <Link href={`tel:${contact.phone.replace(/\s+/g, '')}`}>{contact.phone}</Link>
-        </dd>
+    secondary && (
+      <div class="flex flex-col gap-6">
+        <Rule />
+        <dl class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          {contact.phone && (
+            <div class="flex flex-col gap-2">
+              <Label as="dt" tone="muted">
+                Phone
+              </Label>
+              <dd {...editable('siteSettings', settings.cmsId, 'contactPhone')}>
+                <Link href={`tel:${contact.phone.replace(/\s+/g, '')}`}>
+                  {contact.phone}
+                </Link>
+              </dd>
+            </div>
+          )}
+
+          {seo.profiles.length > 0 && (
+            <div class="flex flex-col gap-2">
+              <Label as="dt" tone="muted">
+                Elsewhere
+              </Label>
+              <dd class="flex flex-col gap-2">
+                {seo.profiles.map((profile) => (
+                  <Link href={profile}>
+                    {new URL(profile).hostname.replace(/^www\./, '')}
+                  </Link>
+                ))}
+              </dd>
+            </div>
+          )}
+
+          {contact.cvUrl && (
+            <div class="flex flex-col gap-2">
+              <Label as="dt" tone="muted">
+                CV
+              </Label>
+              <dd>
+                <Link href={contact.cvUrl}>Download CV</Link>
+              </dd>
+            </div>
+          )}
+        </dl>
       </div>
     )
   }
+
   {
-    contact.cvUrl && (
-      <div class="flex flex-col gap-1">
-        <dt>
-          <Text size="sm" tone="muted" as="span">
-            CV
-          </Text>
-        </dt>
-        <dd>
-          <Link href={contact.cvUrl}>Download CV</Link>
-        </dd>
-      </div>
+    !contact.email && (
+      <Text tone="muted">
+        [No email set. Contact details live on the site settings entry in Contentful.]
+      </Text>
     )
   }
-  {
-    seo.profiles.length > 0 && (
-      <div class="flex flex-col gap-1">
-        <dt>
-          <Text size="sm" tone="muted" as="span">
-            Elsewhere
-          </Text>
-        </dt>
-        <dd class="flex flex-wrap gap-x-6 gap-y-2">
-          {seo.profiles.map((profile) => (
-            <Link href={profile}>{new URL(profile).hostname.replace(/^www\./, '')}</Link>
-          ))}
-        </dd>
-      </div>
-    )
-  }
-</dl>
+</div>
