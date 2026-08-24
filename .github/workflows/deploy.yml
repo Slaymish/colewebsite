@@ -21,7 +21,13 @@ permissions:
 
 concurrency:
   group: deploy-${{ github.event.inputs.environment || 'test' }}
-  cancel-in-progress: false
+  # Four entries published in three minutes used to queue four deploys, the last
+  # starting 35s after it arrived. Every automatic run builds the same commit with
+  # newer content, so a newer one always supersedes the one in flight. Keyed on
+  # the event and not the environment input: production is only reachable by
+  # workflow_dispatch, so it stays uncancellable even though the input is absent
+  # on a push or a dispatch.
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   deploy:
@@ -39,7 +45,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      # The deploy only builds. Skipping eslint, prettier, astro check and the
+      # management SDK takes the install from 5s to under 3s — ci.yml installs
+      # everything on the pull request, which is where they are needed.
+      - run: pnpm install --frozen-lockfile --prod --prefer-offline
 
       # The domain is a repository variable rather than a literal in this file,
       # so changing it stays a settings change and not a commit. Absent, every
@@ -87,16 +96,23 @@ jobs:
           set -euo pipefail
           STACK=${{ env.IS_PROD == 'true' && 'ColeAndersonProd' || 'ColeAndersonTest' }}
 
-          # A stack that does not exist yet is "nothing to deploy" and skips: a
-          # permanently red main branch teaches everyone to ignore it. Anything
-          # else is a real failure and must be loud.
+          # One call, asking for the outputs. Failure is then classified from the
+          # error text: a stack that does not exist yet is "nothing to deploy" and
+          # skips, because a permanently red main branch teaches everyone to
+          # ignore it. Anything else is a real failure and must be loud.
           #
-          # These two must stay separate. On the site this was ported from they
-          # were one branch: the content role was missing
+          # The two cases must stay separate. On the site this was ported from
+          # they were one branch: the content role was missing
           # cloudformation:DescribeStacks, the denial was swallowed by
           # 2>/dev/null, and both environments reported "does not exist yet" and
           # went green having uploaded nothing.
-          if ! ERROR=$(aws cloudformation describe-stacks --stack-name "$STACK" 2>&1 >/dev/null); then
+          #
+          # stderr goes to a file, not into OUTPUTS — merged with 2>&1 any CLI
+          # warning would end up parsed as a bucket name.
+          if ! OUTPUTS=$(aws cloudformation describe-stacks --stack-name "$STACK" \
+            --query "Stacks[0].Outputs[?OutputKey=='BucketName'||OutputKey=='DistributionId'].OutputValue" \
+            --output text 2>"$RUNNER_TEMP/describe-stacks.err"); then
+            ERROR=$(cat "$RUNNER_TEMP/describe-stacks.err")
             case "$ERROR" in
               *"does not exist"*)
                 echo "::notice::Stack $STACK does not exist yet — skipping deploy. The site infrastructure has not been deployed yet."
@@ -110,9 +126,6 @@ jobs:
             esac
           fi
 
-          OUTPUTS=$(aws cloudformation describe-stacks --stack-name "$STACK" \
-            --query "Stacks[0].Outputs[?OutputKey=='BucketName'||OutputKey=='DistributionId'].OutputValue" \
-            --output text)
           read -r BUCKET DIST <<< "$OUTPUTS"
 
           # Without this, an empty value silently becomes `s3://` further down.
