@@ -30,6 +30,7 @@ export const getStaticPaths = (async () => {
 
 const { project } = Astro.props as { project: Project };
 
+const isPlay = project.tier === TIER.play;
 const path = `/project/${project.slug}`;
 const description = project.metaDescription ?? project.body[0] ?? '';
 const share = project.shareImage ?? project.cover;
@@ -52,7 +53,8 @@ const share = project.shareImage ?? project.cover;
     <Stack gap="lg" class="py-12 md:py-16">
       <PageHeader
         title={project.title}
-        eyebrow={project.tier === TIER.play ? 'Play' : null}
+        eyebrow={isPlay ? 'Play' : null}
+        eyebrowTone="accent-warm"
         titleEditable={editable('project', project.cmsId, 'title')}
         eyebrowEditable={editable('project', project.cmsId, 'tier')}
       />
@@ -116,8 +118,8 @@ const share = project.shareImage ?? project.cover;
         )
       }
 
-      <Link href={project.tier === TIER.play ? '/play' : '/'} class="text-sm">
-        {project.tier === TIER.play ? '← All play' : '← All work'}
+      <Link href={isPlay ? '/play' : '/'} class="text-sm">
+        {isPlay ? '← All play' : '← All work'}
       </Link>
     </Stack>
   </Container>

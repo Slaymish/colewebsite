@@ -28,8 +28,12 @@ const current = !external && samePath(Astro.url.pathname, href);
   rel={external ? 'noopener noreferrer' : undefined}
   class:list={[
     'duration-fast transition-colors',
-    plain ? '' : 'decoration-skip-none underline underline-offset-4',
-    'hover:text-ink-muted',
+    // A link that reads as body text keeps the accent for the hover alone —
+    // colouring the wordmark and the nav would put the accent on most of the
+    // header. Underlined links are the ones carrying it at rest.
+    plain
+      ? 'hover:text-accent'
+      : 'decoration-skip-none text-accent hover:text-accent-deep underline underline-offset-4',
     className,
   ]}
   {...rest}
