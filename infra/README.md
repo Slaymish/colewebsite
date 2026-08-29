@@ -1,20 +1,23 @@
 # Infrastructure
 
-CDK app defining five stacks:
+CDK app defining six stacks:
 
-| Stack                  | What it is                                              |
-| ---------------------- | ------------------------------------------------------- |
-| `ColeAndersonOidc`     | The infra and content deploy roles, federated to GitHub |
-| `ColeAndersonProd`     | Bucket, distribution and DNS for the canonical domain   |
-| `ColeAndersonTest`     | Same, plus basic auth and `X-Robots-Tag: noindex`       |
-| `ColeAndersonWww`      | 301s `www` at the apex, on the shared wildcard cert     |
-| `ColeAndersonRedirect` | 301s a secondary domain at the canonical one            |
+| Stack                     | What it is                                              |
+| ------------------------- | ------------------------------------------------------- |
+| `ColeAndersonOidc`        | The infra and content deploy roles, federated to GitHub |
+| `ColeAndersonProd`        | Bucket, distribution and DNS for the canonical domain   |
+| `ColeAndersonTest`        | Same, plus basic auth and `X-Robots-Tag: noindex`       |
+| `ColeAndersonWww`         | 301s `www` at the apex, on the shared wildcard cert     |
+| `ColeAndersonRedirect`    | 301s a secondary domain at the canonical one            |
+| `ColeAndersonExternalDns` | Points the apex and `www` at a host that is not ours    |
 
 The site stacks need a hosted zone and a certificate, so `bin/infra.ts` declares
 them only once `zoneName`, `hostedZoneId` and `certificateArn` are all supplied
-and prints a line saying it skipped them otherwise. All three exist now, so the
-whole app synthesises — but the certificate cannot validate until the domain is
-delegated, so the site stacks cannot deploy yet. See "Before the first deploy".
+and prints a line saying it skipped them otherwise. All three exist and the site
+stacks are deployed — see "Where this stands".
+
+`ColeAndersonExternalDns` is declared only when `externalApexIps` is set, and
+`ColeAndersonRedirect` only when `secondaryDomain` is. See "Who serves the apex".
 
 ## infra is its own pnpm project
 
@@ -44,7 +47,8 @@ pnpm exec cdk diff \
 ```
 
 Add `-c secondaryDomain=...` with its own `secondaryHostedZoneId` and
-`secondaryCertificateArn` to deploy the redirect stack.
+`secondaryCertificateArn` to deploy the redirect stack, and
+`-c externalApexIps=1.2.3.4,5.6.7.8` to park the apex elsewhere.
 
 ## What is already true of this AWS account
 
@@ -69,33 +73,67 @@ The two IAM role names are suffixed `-coleanderson` for the same reason. Role
 names are account-global, and the Beth site already holds `github-infra-deploy`
 and `github-content-deploy`.
 
-## Before the first deploy
+## Where this stands
 
-1. ~~Deploy `ColeAndersonOidc`, then put its two role ARNs into the repository
-   secrets `AWS_INFRA_ROLE_ARN` and `AWS_CONTENT_ROLE_ARN`.~~ **Done** —
-   `ColeAndersonOidc` is `CREATE_COMPLETE` and both secrets are set.
-2. ~~Create the Route 53 hosted zone for `coleanderson.nz`~~ **Done** —
-   `Z06561742DYXOK4WGBYM8`. **Still outstanding: replace the nameservers at
-   domainsdirect.nz** — where the domain is registered — with the four the zone
-   reports. It is still on the registrar's parking nameservers
-   (`ns1.secureparkme.com`, `ns2.secureparkme.com`). Nothing after this works
-   until that delegation has propagated: check with
-   `dig NS coleanderson.nz @ns1.dns.net.nz` before moving on.
-3. ~~Issue **one ACM certificate in us-east-1** covering the apex and the
-   wildcard.~~ **Requested, not yet issued** —
-   `arn:aws:acm:us-east-1:025513282486:certificate/12a7d52a-abb3-4e2c-8a23-83e5126700ae`.
-   CloudFront will not accept a certificate from any other region, and every site
-   stack shares this one. Validation is DNS and its CNAME is already in the zone,
-   so the certificate issues on its own once step 2 propagates — an undelegated
-   zone leaves it sitting at `PENDING_VALIDATION` with no error to read. **ACM
-   gives up 72 hours after the request**, which was 2026-08-23 16:22 NZST; past
-   that the request has to be made again.
-4. ~~Set the repository variable `SITE_DOMAIN`, the variable `ZONE_NAME`, and the
-   secrets `HOSTED_ZONE_ID`, `CERTIFICATE_ARN` and
-   `TEST_BASIC_AUTH_HEADER`.~~ **Done.**
-5. Run the Infrastructure workflow with `deploy`, once the certificate reads
-   `ISSUED`.
-6. Set an AWS Budgets alarm at US$10/month.
+Every step below is done and the site stacks are deployed. Kept as a record of
+what had to happen and in what order, because none of it is visible from the code.
+
+1. `ColeAndersonOidc` deployed, its two role ARNs in the repository secrets
+   `AWS_INFRA_ROLE_ARN` and `AWS_CONTENT_ROLE_ARN`.
+2. Route 53 hosted zone `Z06561742DYXOK4WGBYM8` created, and the four nameservers
+   it reports put in at domainsdirect.nz in place of the registrar's parking pair
+   (`ns1.secureparkme.com`, `ns2.secureparkme.com`). Nothing before this
+   delegation propagated worked at all; `dig NS coleanderson.nz @ns1.dns.net.nz`
+   is how it was confirmed.
+3. **One ACM certificate in us-east-1** covering the apex and the wildcard —
+   `arn:aws:acm:us-east-1:025513282486:certificate/12a7d52a-abb3-4e2c-8a23-83e5126700ae`,
+   now `ISSUED`. CloudFront will not accept a certificate from any other region,
+   and every site stack shares this one. Validation is DNS, and **its CNAME must
+   stay in the zone** — ACM re-validates through it at renewal, and renewal is
+   silent until it fails. It is in there as
+   `_eeedda439c2ffe5e6e6c7a03088008ce.coleanderson.nz`.
+4. Repository variables `SITE_DOMAIN` and `ZONE_NAME`, secrets `HOSTED_ZONE_ID`,
+   `CERTIFICATE_ARN` and `TEST_BASIC_AUTH_HEADER`.
+5. Infrastructure workflow run with `deploy`.
+
+Still outstanding: an AWS Budgets alarm scoped to this site. The account carries
+an `account-monthly-cost` budget at US$20 covering everything in it.
+
+## Who serves the apex
+
+`coleanderson.nz` and `www.coleanderson.nz` are served by **Cole's Adobe
+Portfolio**, not by this site, and will be until this one is ready to replace it.
+`test.coleanderson.nz` is this site.
+
+That is one setting: the repository variable `EXTERNAL_APEX_IPS`, passed to the
+app as `externalApexIps`. Non-empty, and `ColeAndersonProd` and `ColeAndersonWww`
+build everything except their Route 53 records, while `ColeAndersonExternalDns`
+points both hostnames at the addresses given. Empty it and redeploy to take the
+two names back — nothing else has to change, because nothing else was undone.
+
+Four things about this that are easy to get wrong:
+
+- **The distributions stay up with no DNS pointing at them.** That is deliberate.
+  CloudFront does not require an alternate domain name to resolve to it, and
+  holding the name here stops any other distribution, in any account, from
+  claiming it while we are not using it.
+- **No AAAA record.** Adobe published IPv4 only, and the alias records these
+  replaced answered AAAA too. An AAAA left behind would keep sending every
+  IPv6-capable visitor — most of them — to CloudFront, and silently.
+- **`ColeAndersonExternalDns` depends on the other two stacks.** Route 53 refuses
+  to put an A record over a name that still holds an alias A, and reports it as
+  "already exists" against the stack trying to create it rather than the one
+  still holding it. The dependency is what makes the two owners let go first.
+- **The apex still sends HSTS from before the switch.** `max-age` is a year with
+  `includeSubdomains`, so anyone who loaded the CloudFront placeholder has the
+  name pinned to HTTPS with no click-through. Adobe serves HTTPS on custom
+  domains, so this is only a problem in the window before their certificate
+  issues — the fix is to wait for it, not to retry over HTTP.
+
+The production content deploy is untouched by this and still uploads to the prod
+bucket, where nothing serves it. It is manual-dispatch only, so it will not
+happen by accident, and leaving it working is what makes the switch back a DNS
+change on its own.
 
 ## The test gate, and the Contentful iframe
 

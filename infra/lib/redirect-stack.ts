@@ -15,6 +15,12 @@ export interface RedirectStackProps extends StackProps {
   readonly toOrigin: string;
   readonly hostedZone: { readonly zoneName: string; readonly hostedZoneId: string };
   readonly certificateArn: string;
+  /**
+   * Whether this stack owns the A/AAAA records for `fromDomain`. Defaults true.
+   * False while that hostname is served by someone else — see the same prop on
+   * SiteStack.
+   */
+  readonly manageDns?: boolean;
 }
 
 /**
@@ -54,18 +60,20 @@ export class RedirectStack extends Stack {
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
     });
 
-    const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'Zone', {
-      zoneName: props.hostedZone.zoneName,
-      hostedZoneId: props.hostedZone.hostedZoneId,
-    });
-    const target = route53.RecordTarget.fromAlias(
-      new targets.CloudFrontTarget(distribution),
-    );
-    new route53.ARecord(this, 'AliasA', { zone, recordName: props.fromDomain, target });
-    new route53.AaaaRecord(this, 'AliasAAAA', {
-      zone,
-      recordName: props.fromDomain,
-      target,
-    });
+    if (props.manageDns ?? true) {
+      const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'Zone', {
+        zoneName: props.hostedZone.zoneName,
+        hostedZoneId: props.hostedZone.hostedZoneId,
+      });
+      const target = route53.RecordTarget.fromAlias(
+        new targets.CloudFrontTarget(distribution),
+      );
+      new route53.ARecord(this, 'AliasA', { zone, recordName: props.fromDomain, target });
+      new route53.AaaaRecord(this, 'AliasAAAA', {
+        zone,
+        recordName: props.fromDomain,
+        target,
+      });
+    }
   }
 }

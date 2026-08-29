@@ -49,6 +49,12 @@ jobs:
       # site stacks, which is the correct state until the hosted zone and the
       # certificate exist.
       #
+      # EXTERNAL_APEX_IPS holds the addresses of whoever is serving the apex
+      # while this site is not — Cole's Adobe Portfolio today. Emptying it hands
+      # the apex and www back to CloudFront on the next deploy, so it is a
+      # settings change and not a commit. Do not empty it by forgetting: the run
+      # would fail creating an alias over records another stack still owns.
+      #
       # --all is a deploy-only option. `cdk diff` already diffs every stack in the
       # app, and passing it there earns "Unknown option(s): --all" and nothing else.
       - name: Run CDK
@@ -61,6 +67,7 @@ jobs:
             -c certificateArn=${{ secrets.CERTIFICATE_ARN }} \
             -c repository=${{ github.repository }} \
             -c basicAuthHeader='${{ secrets.TEST_BASIC_AUTH_HEADER }}' \
+            -c externalApexIps='${{ vars.EXTERNAL_APEX_IPS }}' \
             -c oidcProviderArn=${{ secrets.OIDC_PROVIDER_ARN }} \
             -c ownerId=${{ github.repository_owner_id }} \
             -c repositoryId=${{ github.repository_id }}

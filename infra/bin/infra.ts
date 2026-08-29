@@ -2,6 +2,7 @@
 import { App, Environment } from 'aws-cdk-lib';
 import { SiteStack } from '../lib/site-stack.js';
 import { RedirectStack } from '../lib/redirect-stack.js';
+import { ExternalDnsStack } from '../lib/external-dns-stack.js';
 import { GithubOidcStack } from '../lib/github-oidc-stack.js';
 
 const app = new App();
@@ -68,12 +69,27 @@ function defineSiteStacks(
   hostedZone: { zoneName: string; hostedZoneId: string },
   certificateArn: string,
 ): void {
-  new SiteStack(app, 'ColeAndersonProd', {
+  /**
+   * Cole's Adobe Portfolio serves the live domain, so the apex and www point at
+   * its addresses while this site is still being built behind test.<domain>.
+   *
+   * Everything below stays deployed while that is true — only the records move.
+   * Clear `externalApexIps` and redeploy to take both hostnames back; there is
+   * nothing else to undo.
+   */
+  const externalApexIps = (optional('externalApexIps') ?? '')
+    .split(',')
+    .map((address) => address.trim())
+    .filter((address) => address.length > 0);
+  const apexIsExternal = externalApexIps.length > 0;
+
+  const prod = new SiteStack(app, 'ColeAndersonProd', {
     env,
     siteEnv: 'prod',
     domainName: hostedZone.zoneName,
     hostedZone,
     certificateArn,
+    manageDns: !apexIsExternal,
   });
 
   new SiteStack(app, 'ColeAndersonTest', {
@@ -90,13 +106,31 @@ function defineSiteStacks(
   // www 301s at the apex rather than serving it, so one hostname carries every
   // search signal. The wildcard half of the shared certificate already covers
   // www, so this needs no certificate of its own.
-  new RedirectStack(app, 'ColeAndersonWww', {
+  const www = new RedirectStack(app, 'ColeAndersonWww', {
     env,
     fromDomain: `www.${hostedZone.zoneName}`,
     toOrigin: `https://${hostedZone.zoneName}`,
     hostedZone,
     certificateArn,
+    // The external host serves www itself, so while the apex is theirs this
+    // redirect has nothing to redirect and its records would fight theirs.
+    manageDns: !apexIsExternal,
   });
+
+  if (apexIsExternal) {
+    const external = new ExternalDnsStack(app, 'ColeAndersonExternalDns', {
+      env,
+      hostedZone,
+      domainNames: [hostedZone.zoneName, `www.${hostedZone.zoneName}`],
+      addresses: externalApexIps,
+    });
+    // Route 53 refuses to put an A record over a name that still holds an alias
+    // A, and reports it as "already exists" against this stack rather than
+    // against the one still holding it. The two owners have to let go first, and
+    // only a stack dependency orders the deploy that way.
+    external.addStackDependency(prod, 'must release the apex records first');
+    external.addStackDependency(www, 'must release the www records first');
+  }
 
   const secondaryDomain = optional('secondaryDomain');
   if (secondaryDomain) {
