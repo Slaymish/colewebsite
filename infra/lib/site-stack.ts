@@ -29,6 +29,13 @@ export interface SiteStackProps extends StackProps {
   readonly basicAuthHeader?: string;
   /** Test builds are excluded from search. Production must never set this. */
   readonly noindex?: boolean;
+  /**
+   * Whether this stack owns the A/AAAA records for `domainName`. Defaults true.
+   * False while the hostname is served by someone else — the distribution and
+   * its alternate domain name stay, so taking the name back is a DNS change and
+   * not a rebuild.
+   */
+  readonly manageDns?: boolean;
 }
 
 export class SiteStack extends Stack {
@@ -105,24 +112,30 @@ export class SiteStack extends Stack {
       ],
     });
 
-    const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'Zone', {
-      zoneName: props.hostedZone.zoneName,
-      hostedZoneId: props.hostedZone.hostedZoneId,
-    });
+    // Only the records are conditional. CloudFront does not require an alternate
+    // domain name to resolve to it, so a distribution with no records is a
+    // hostname held in reserve — and holding it stops any other distribution, in
+    // any account, from claiming the same name in the meantime.
+    if (props.manageDns ?? true) {
+      const zone = route53.HostedZone.fromHostedZoneAttributes(this, 'Zone', {
+        zoneName: props.hostedZone.zoneName,
+        hostedZoneId: props.hostedZone.hostedZoneId,
+      });
 
-    const recordTarget = route53.RecordTarget.fromAlias(
-      new targets.CloudFrontTarget(distribution),
-    );
-    new route53.ARecord(this, 'AliasA', {
-      zone,
-      recordName: props.domainName,
-      target: recordTarget,
-    });
-    new route53.AaaaRecord(this, 'AliasAAAA', {
-      zone,
-      recordName: props.domainName,
-      target: recordTarget,
-    });
+      const recordTarget = route53.RecordTarget.fromAlias(
+        new targets.CloudFrontTarget(distribution),
+      );
+      new route53.ARecord(this, 'AliasA', {
+        zone,
+        recordName: props.domainName,
+        target: recordTarget,
+      });
+      new route53.AaaaRecord(this, 'AliasAAAA', {
+        zone,
+        recordName: props.domainName,
+        target: recordTarget,
+      });
+    }
 
     // Consumed by the deploy workflow, which syncs content and invalidates.
     new CfnOutput(this, 'BucketName', { value: bucket.bucketName });

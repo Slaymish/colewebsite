@@ -80,13 +80,21 @@ No colour literals outside `tokens.css`, and no opacity modifiers
 
 ### Infrastructure
 
-Five CDK stacks in `infra/`. The site stacks declare themselves only when
+Six CDK stacks in `infra/`. The site stacks declare themselves only when
 `zoneName`, `hostedZoneId` and `certificateArn` are all in context, so the app
-still synthesises with none of them set. All three exist now, but the certificate
-is still `PENDING_VALIDATION` — the domain has not been delegated off the
-registrar's parking nameservers, so nothing but `ColeAndersonOidc` can deploy
-yet. Read `infra/README.md` before changing anything there — `PRICE_CLASS_ALL`,
-the real-404 behaviour, the OIDC provider import and the role-name suffixes each
+still synthesises with none of them set. All three exist, the certificate is
+`ISSUED`, the domain is delegated to Route 53 and everything is deployed.
+
+**The apex is not this site.** `coleanderson.nz` and `www` are served by Cole's
+Adobe Portfolio until this one replaces it; `test.coleanderson.nz` is this site.
+The prod distribution and bucket stay deployed with no DNS pointing at them, so
+the handover in either direction is a DNS change and nothing else. It is one
+repository variable, `EXTERNAL_APEX_IPS` — read "Who serves the apex" in
+`infra/README.md` before touching the apex records, the AAAA absence or the
+stack dependency, each of which fails quietly if got wrong.
+
+Read `infra/README.md` before changing anything there — `PRICE_CLASS_ALL`, the
+real-404 behaviour, the OIDC provider import and the role-name suffixes each
 exist for a reason recorded in it.
 
 ### Comments
