@@ -150,6 +150,14 @@ exists because the obvious version fails:
   on to show a basic-auth prompt, and a cookie set while browsing the site
   directly is not necessarily sent inside one. `pnpm cf:preview -- --key ...`
   writes the key into the preview URLs so the frame authenticates itself.
+- **The key is pasted raw, never percent-encoded.** The function compares the
+  querystring value to the base64 half of the `Authorization` header, byte for
+  byte, and CloudFront does not decode it: a token ending in `=` works as `=`
+  and 401s as `%3D` (verified against the deployed function). So a base64 token
+  containing `+` or `/` is a trap — generate a credential whose base64 avoids
+  them, as this one does, and re-check the share link after any rotation. This
+  is also the only way to hand the site to someone without giving them a
+  password to type.
 - **The cookie is set from a viewer-_response_ function.** Doing it with a 302
   and `Set-Cookie` from the request function loops forever in the one case that
   matters — a browser that rejects the cookie but replays the cached
