@@ -1,5 +1,10 @@
 /**
- * Shared vocabulary for the UI primitives in src/components/ui/.
+ * Shared vocabulary for the UI primitives — which are not on this branch.
+ *
+ * `src/components/ui/` and `src/components/patterns/` were removed with the first
+ * design round (docs/design/wireframe.md). What survives here is the shape and
+ * the two helpers the templates legitimately shared: `ImageAsset`, and the two
+ * link/path functions whose absence was silent. It comes back with the design.
  *
  * Only things two or more primitives need to agree on live here. Variant class
  * maps stay inside the component that owns them — they are that component's

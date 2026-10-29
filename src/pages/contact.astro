@@ -1,22 +1,58 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Band from '~/components/patterns/Band.astro';
-import PageHeader from '~/components/patterns/PageHeader.astro';
-import ContactBlock from '~/components/patterns/ContactBlock.astro';
 import { getSiteSettings } from '~/lib/contentful';
+import { ROUTES } from '~/lib/site';
 
+/**
+ * `/contact` — as a wireframe.
+ *
+ * One page, one address. No form is decided, and a form is a decision (spam,
+ * deliverability, a service to run), so the wireframe shows the absence rather
+ * than inventing one.
+ */
 const settings = await getSiteSettings();
+const email = settings.contact.email;
+const description = 'Contact Cole Anderson.';
 ---
 
-<BaseLayout title="Contact" path="/contact">
-  <Band pad="lg" class="pb-12 md:pb-16">
-    <PageHeader
-      title="Contact"
-      standfirst="Collaborations, commissions, and anyone who wants to know how something was made."
-    />
-  </Band>
+<BaseLayout title="Contact" path={ROUTES.contact} description={description}>
+  <h1 class="page-title">/contact</h1>
 
-  <Band pad="none" class="pb-20 md:pb-32">
-    <ContactBlock settings={settings} />
-  </Band>
+  <section class="wire wire--decided" aria-labelledby="address">
+    <span class="wire-label">Block — address</span>
+    <h2 id="address">Email</h2>
+    <p class="wide-footer">
+      {
+        email ? (
+          <a href={`mailto:${email}`}>{email}</a>
+        ) : (
+          '[email — not set in site settings]'
+        )
+      }
+    </p>
+    <p class="wire-note">One address, set at type size. It is the whole page.</p>
+  </section>
+
+  <section class="wire" aria-labelledby="elsewhere">
+    <span class="wire-label">Block — elsewhere</span>
+    <h2 id="elsewhere">Elsewhere</h2>
+    <p class="wire-note">
+      {
+        settings.seo.profiles.length > 0
+          ? settings.seo.profiles.join(' · ')
+          : '[social links — from site settings, none set]'
+      }
+    </p>
+  </section>
+
+  <section class="wire" aria-labelledby="form">
+    <span class="wire-label">Block — form · not decided</span>
+    <h2 id="form">Form</h2>
+    <div class="slot">
+      [no form. A form means a service to run, spam handling, and a deliverability
+      decision.]
+    </div>
+  </section>
+
+  <p class="wire-note"><a href={ROUTES.home}>← home</a></p>
 </BaseLayout>

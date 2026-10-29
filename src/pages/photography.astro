@@ -1,0 +1,56 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { WIREFRAME_PHOTO_SETS } from '~/lib/wireframe-content';
+import { getSiteSettings } from '~/lib/contentful';
+import { ROUTES } from '~/lib/site';
+
+/**
+ * `/photography` — the photo index, as a wireframe.
+ *
+ * A grid of sets, not of photographs: the unit of the index is the set, which is
+ * the one thing this page decides. There is no `photoSet` content type in
+ * Contentful yet, so the sets below come from lib/wireframe-content.ts and are
+ * bracketed on screen.
+ */
+const settings = await getSiteSettings();
+const description = settings.seo.description ?? 'Photography, by Cole Anderson.';
+---
+
+<BaseLayout title="Photography" path={ROUTES.photography} description={description}>
+  <h1 class="page-title">/photography</h1>
+
+  <section class="wire" aria-labelledby="sets">
+    <span class="wire-label"
+      >Block — sets · {WIREFRAME_PHOTO_SETS.length} placeholder sets</span
+    >
+    <h2 id="sets">Photo sets</h2>
+    <ul class="grid--sets grid">
+      {
+        WIREFRAME_PHOTO_SETS.map((set) => (
+          <li class="wire">
+            <div class="slot">[cover]</div>
+            <a href={ROUTES.photoSet(set.slug)}>{set.title}</a>
+            <p class="wire-note">
+              {set.count} photographs{set.year ? ` · ${set.year}` : ''}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="wire-note">
+      Uniform tiles. Whether a set carries a cover image, a title, or only a number is
+      undecided — the tiles are the same shape here because the wireframe has no images to
+      size them by.
+    </p>
+  </section>
+
+  <div class="notes">
+    <h2>Open on this page</h2>
+    <ul>
+      <li>Does a set need a title at all, or does the first photograph stand for it?</li>
+      <li>Counts on the tile, or nothing?</li>
+      <li>Sort by date, by curation, or as entered?</li>
+      <li>Where do single photographs live that belong to no set?</li>
+    </ul>
+  </div>
+</BaseLayout>

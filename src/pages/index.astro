@@ -1,81 +1,104 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Band from '~/components/patterns/Band.astro';
-import Masthead from '~/components/patterns/Masthead.astro';
-import SectionHead from '~/components/patterns/SectionHead.astro';
-import WorkIndex from '~/components/patterns/WorkIndex.astro';
-import PlayGrid from '~/components/patterns/PlayGrid.astro';
-import Label from '~/components/ui/Label.astro';
-import Link from '~/components/ui/Link.astro';
-import Text from '~/components/ui/Text.astro';
-import { getFeaturedProjects, getPlay, getSiteSettings } from '~/lib/contentful';
+import { getSiteSettings } from '~/lib/contentful';
 import { personJsonLd } from '~/lib/seo';
 import { SITE } from '~/lib/site';
-import { editable } from '~/lib/preview';
 
 /**
- * The homepage carries both tiers. Play is on it rather than only behind its own
- * nav item because the brief asks for the person to be visible in the feed and
- * not just a catalogue of finished outputs — but it is below the work, in its
- * own section, under its own accent. Visible, fenced, not ranked.
+ * `/` — the home page, as a wireframe.
+ *
+ * Nothing here is a look. Each block is a box with the name of the section and a
+ * line about what has to happen in it, because the order of the blocks is still
+ * TBD: the copy lists them, and the list is not a sequence yet.
  */
-const [projects, play, settings] = await Promise.all([
-  getFeaturedProjects(),
-  getPlay(),
-  getSiteSettings(),
-]);
-
+const settings = await getSiteSettings();
 const jobTitle = settings.seo.jobTitle ?? SITE.jobTitle;
 const description = settings.seo.description ?? SITE.description;
-
-/** Three is enough to show the tier exists; the rest are one click away. */
-const playTeaser = play.slice(0, 3);
 ---
 
 <BaseLayout
-  title="Work"
+  title="I am human"
   path="/"
+  description={description}
   jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
 >
-  <Masthead
-    bio={settings.bio}
-    workCount={projects.length}
-    playCount={play.length}
-    bioEditable={editable('siteSettings', settings.cmsId, 'bio')}
-  />
+  <h1 class="page-title">/ — home</h1>
+  <p class="wire-note">
+    Section order TBD. The six blocks below are the decided content, listed in the order
+    they were written down.
+  </p>
 
-  <Band pad="none" aria-labelledby="selected-work" class="pb-16 md:pb-24">
-    <SectionHead
-      label="Selected work"
-      aside={String(projects.length).padStart(2, '0')}
-      id="selected-work"
-      class="mb-10 md:mb-16"
-    />
-    {
-      projects.length > 0 ? (
-        <WorkIndex projects={projects} />
-      ) : (
-        <Text tone="muted">[No project is marked as featured in Contentful yet.]</Text>
-      )
-    }
-  </Band>
+  <section class="wire wire--decided" aria-labelledby="hero">
+    <span class="wire-label">Section — hero</span>
+    <h2 id="hero">I am human</h2>
+    <div class="slot slot--hero">[animated illustration] + [wordmark / logo]</div>
+    <p class="wire-note">
+      Illustration moves; the wordmark does not. The line is the identity statement, so
+      the hero is settled and only the drawing is not.
+    </p>
+  </section>
 
-  {
-    playTeaser.length > 0 && (
-      <Band aria-labelledby="play" pad="none" class="pb-16 md:pb-24">
-        <SectionHead
-          label="Play"
-          aside={String(play.length).padStart(2, '0')}
-          id="play"
-          class="mb-10 md:mb-16"
-        />
-        <PlayGrid projects={playTeaser} />
-        <p class="mt-16">
-          <Link href="/play" plain tone="accent-warm">
-            <Label tone="inherit">All play →</Label>
-          </Link>
-        </p>
-      </Band>
-    )
-  }
+  <section class="wire" aria-labelledby="design-cta">
+    <span class="wire-label">Section — CTA</span>
+    <h2 id="design-cta"><a href="/design">Design</a></h2>
+    <div class="slot">[design CTA — image or type, size TBD]</div>
+    <p class="wire-note">
+      Slides over into /design rather than navigating. Slide-over is a transition
+      decision, so it belongs to the design round; the route itself is settled.
+    </p>
+  </section>
+
+  <section class="wire" aria-labelledby="photo-cta">
+    <span class="wire-label">Section — CTA</span>
+    <h2 id="photo-cta"><a href="/photography">Photography</a></h2>
+    <div class="slot">[photography CTA — image or type, size TBD]</div>
+    <p class="wire-note">
+      Slides over into /photography, same mechanism as the design CTA. Whether the two
+      CTAs share a shape or oppose each other is open.
+    </p>
+  </section>
+
+  <section class="wire wire--decided" aria-labelledby="what-makes-me-human">
+    <span class="wire-label">Section — about Cole</span>
+    <h2 id="what-makes-me-human">What makes me human</h2>
+    <div class="slot slot--cover">[about — revealed from the star mask]</div>
+    <p class="wire-note">
+      Red ground. The panel arrives out of a masked star on scroll: the star is the wipe,
+      not decoration. Copy here is Cole's, from Contentful — nothing is written in this
+      repo.
+    </p>
+  </section>
+
+  <section class="wire" aria-labelledby="contact-cta">
+    <span class="wire-label">Section — CTA</span>
+    <h2 id="contact-cta"><a href="/contact">Contact</a></h2>
+    <div class="slot">[contact CTA — one line plus a link]</div>
+    <p class="wire-note">
+      The last thing before the footer, and the only CTA that repeats in the footer.
+    </p>
+  </section>
+
+  <footer>
+    <span class="wire-label">Footer</span>
+    <p class="wide-footer"><a href="/contact">contact</a></p>
+    <p class="wire-note">
+      Big text that says "contact". The whole word is the link — a footer here is one
+      word, not a sitemap.
+    </p>
+  </footer>
+
+  <div class="notes">
+    <h2>Open on this page</h2>
+    <ul>
+      <li>Order of the six blocks.</li>
+      <li>Whether the CTAs are pictures, type, or their own illustrations.</li>
+      <li>
+        Whether "What makes me human" is a section of / or its own route reached by
+        scroll.
+      </li>
+      <li>
+        Whether the footer word is a second contact CTA or replaces the one above it.
+      </li>
+    </ul>
+  </div>
 </BaseLayout>

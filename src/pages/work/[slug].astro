@@ -1,0 +1,116 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getProjects } from '~/lib/contentful';
+import { creativeWorkJsonLd } from '~/lib/seo';
+import { ROUTES } from '~/lib/site';
+import type { Project } from '~/lib/content-types';
+
+/**
+ * `/work/<slug>` — one piece, as a wireframe.
+ *
+ * Built from the same memoised list the index reads, and the entry travels in
+ * `props` rather than being re-fetched per page. Neighbours are worked out here
+ * too, so the prev/next pair can be seen in the wireframe.
+ */
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+
+  return projects.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      previous: index > 0 ? (projects[index - 1] ?? null) : null,
+      next: index < projects.length - 1 ? (projects[index + 1] ?? null) : null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project, previous, next } = Astro.props as {
+  project: Project;
+  previous: Project | null;
+  next: Project | null;
+};
+
+const path = ROUTES.work(project.slug);
+const description = project.metaDescription ?? project.body[0] ?? '';
+---
+
+<BaseLayout
+  title={project.title}
+  description={description}
+  path={path}
+  jsonLd={creativeWorkJsonLd({ title: project.title, description, path })}
+>
+  <h1 class="page-title">{project.title}</h1>
+  <p class="wire-note">/work/&lt;slug&gt; — the URL shape is still open; see /sitemap.</p>
+
+  <section class="wire" aria-labelledby="piece">
+    <span class="wire-label">Block — piece</span>
+    <h2 id="piece">Title, materials, one line</h2>
+    <div class="slot slot--cover">[cover]</div>
+    <p class="wire-note">
+      Materials come from the piece's tags, because grouping is data and not layout.{' '}
+      {
+        project.tags.length > 0
+          ? project.tags.join(' · ')
+          : '[no materials on this piece yet]'
+      }
+    </p>
+  </section>
+
+  <section class="wire" aria-labelledby="body">
+    <span class="wire-label">Block — body</span>
+    <h2 id="body">What it is</h2>
+    <div class="slot">[running text — from Contentful]</div>
+    <p class="wire-note">{project.body.length} paragraph(s) in the CMS for this piece.</p>
+  </section>
+
+  <section class="wire" aria-labelledby="gallery">
+    <span class="wire-label">Block — gallery · {project.gallery.length}</span>
+    <h2 id="gallery">Photographs</h2>
+    <div class="slot">[{project.gallery.length || 'no'} more images]</div>
+  </section>
+
+  {
+    project.process.length > 0 && (
+      <section class="wire" aria-labelledby="process">
+        <span class="wire-label">Block — process · {project.process.length} notes</span>
+        <h2 id="process">Making</h2>
+        <div class="slot">[in-progress shots and a line each]</div>
+        <p class="wire-note">
+          Process is first-class content in the brief, so it cannot be an extra gallery at
+          the bottom.
+        </p>
+      </section>
+    )
+  }
+
+  <nav class="wire" aria-label="Previous and next">
+    <span class="wire-label">Block — prev / next</span>
+    <p>
+      {
+        previous ? (
+          <a href={ROUTES.work(previous.slug)}>← {previous.title}</a>
+        ) : (
+          '[start of work]'
+        )
+      }
+      {' · '}
+      {next ? <a href={ROUTES.work(next.slug)}>{next.title} →</a> : '[end of work]'}
+    </p>
+    <p class="wire-note">
+      <a href={ROUTES.design}>Back to the work cloud</a> — and whether the way back is the cloud
+      or the piece's neighbours is open.
+    </p>
+  </nav>
+
+  <div class="notes">
+    <h2>Open on this page</h2>
+    <ul>
+      <li>Does a piece open as its own page, or as a slide-over from the cloud?</li>
+      <li>Process notes inline, in their own band, or a separate scroll section?</li>
+      <li>Prev/next across photography as well, or only within design?</li>
+    </ul>
+  </div>
+</BaseLayout>

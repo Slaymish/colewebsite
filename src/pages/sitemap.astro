@@ -1,0 +1,127 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { WIREFRAME_PHOTO_SETS } from '~/lib/wireframe-content';
+import { ROUTES } from '~/lib/site';
+
+/**
+ * `/sitemap` — the wireframe's own map.
+ *
+ * Not part of the site. It is the one page that says what the other pages are
+ * for, which route each block belongs to, and what is still undecided; without
+ * it the wireframe is six pages of boxes and no argument. Delete it with
+ * src/styles/wireframe.css when the design round starts.
+ */
+---
+
+<BaseLayout title="Wireframe map" path="/sitemap" noindex>
+  <h1 class="page-title">Wireframe map</h1>
+  <p class="wire-note">
+    Structure only: routes, the blocks on each, and the questions still open. No layout,
+    colour or type is decided here.
+  </p>
+
+  <section class="wire wire--decided" aria-labelledby="tree">
+    <span class="wire-label">Routes</span>
+    <h2 id="tree">Sitemap</h2>
+    <ul>
+      <li>
+        <a href={ROUTES.home}>/</a> — home. Order TBD.
+        <ul>
+          <li>Hero — "I am human": animated illustration + wordmark</li>
+          <li>Design CTA → slide over to <a href={ROUTES.design}>/design</a></li>
+          <li>
+            Photography CTA → slide over to <a href={ROUTES.photography}>/photography</a>
+          </li>
+          <li>
+            What makes me human — about Cole, red ground, revealed from a masked star on
+            scroll
+          </li>
+          <li>Contact CTA → <a href={ROUTES.contact}>/contact</a></li>
+          <li>Footer — one word, "contact", as the link</li>
+        </ul>
+      </li>
+      <li>
+        <a href={ROUTES.design}>/design</a> — work index.
+        <ul>
+          <li>
+            Featured work — carousel wheel, "See all" beneath; absent below the threshold
+          </li>
+          <li>
+            Work cloud — hover to focus, click to enter a piece, scroll to continue.
+            Pieces: <a href={ROUTES.work('[slug]')}>/work/&lt;slug&gt;</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href={ROUTES.photography}>/photography</a> — grid of photo sets, each →
+        <a href={ROUTES.photoSet('[slug]')}>/photography/&lt;slug&gt;</a>
+        <ul>
+          {
+            WIREFRAME_PHOTO_SETS.map((set) => (
+              <li>
+                <a href={ROUTES.photoSet(set.slug)}>{set.title}</a> — {set.count}{' '}
+                photographs
+              </li>
+            ))
+          }
+        </ul>
+      </li>
+      <li>
+        <a href={ROUTES.work('[slug]')}>/work/&lt;slug&gt;</a> — one piece: title, cover, body,
+        gallery, process, prev/next
+      </li>
+      <li>
+        <a href={ROUTES.photoSet('[slug]')}>/photography/&lt;slug&gt;</a> — one set: cover,
+        photographs, prev/next
+      </li>
+      <li><a href={ROUTES.contact}>/contact</a> — one address, no form</li>
+      <li>/404 — real, not an S3 error document</li>
+    </ul>
+    <p class="wire-note">
+      Global on every page: masthead nav (Design · Photography · Contact) and the cookies
+      disclaimer.
+    </p>
+  </section>
+
+  <section class="wire" aria-labelledby="features">
+    <span class="wire-label">Features that cross pages</span>
+    <h2 id="features">Features</h2>
+    <ul>
+      <li>
+        <strong>Featured work wheel.</strong> A carousel of slides on an arc, one focused at
+        a time, with "See all" underneath going to the work cloud. Renders only when there are
+        enough featured pieces to be a wheel; below that the page links straight to the cloud
+        and the block does not exist. The threshold is a single constant,
+        <code>WIREFRAME.featuredMinimum</code> in <code>src/lib/wireframe-content.ts</code
+        >.
+      </li>
+      <li>
+        <strong>Silly cookies disclaimer.</strong> One line, in voice, with a dismiss. Shown
+        closed on every page; no handler yet — the static build's CSP refuses inline script,
+        so dismissal needs a bundled script and a stored preference.
+      </li>
+    </ul>
+  </section>
+
+  <section class="wire" aria-labelledby="changed">
+    <span class="wire-label">What the strip changed</span>
+    <h2 id="changed">From the first design round</h2>
+    <ul>
+      <li><code>/about</code> → folded into "What makes me human" on /</li>
+      <li>
+        <code>/play</code> → dropped. The tier still exists in the content model, with no route.
+      </li>
+      <li>
+        <code>/project/&lt;slug&gt;</code> → <code>/work/&lt;slug&gt;</code> (shape open)
+      </li>
+      <li>
+        All UI primitives, patterns, tokens, the Tailwind layer and both typefaces →
+        removed
+      </li>
+      <li>
+        Infrastructure, the content model, the CMS boundary, SEO and the deploy pipeline →
+        untouched
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

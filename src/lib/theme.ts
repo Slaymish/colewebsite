@@ -1,6 +1,12 @@
 /**
  * Turns the palette in `siteSettings` into a `<style>` block for the document.
  *
+ * Not rendered on this branch: the wireframe has no brand colour, so nothing
+ * imports this module and `BaseLayout` emits no `<style>` block. `tokens.css`,
+ * `global.css` and §1/§2 below live on `main` — the design round that owned them
+ * was removed (docs/design/wireframe.md). The plumbing is kept because it is
+ * framework, and because the reasoning underneath is expensive to rediscover.
+ *
  * ---------------------------------------------------------------------------
  * WHY THE OVERRIDE LANDS ON `--cms-*` AND NOT ON THE SEMANTIC NAMES
  * ---------------------------------------------------------------------------

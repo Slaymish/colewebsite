@@ -32,16 +32,28 @@ export const SITE = {
 } as const;
 
 /**
- * Play is in here on purpose. It is a second tier and not a secret — the whole
- * point of the fence is that it is visible — and /play existed as a route with
- * nothing linking to it.
+ * Top-level navigation, as decided for the wireframe: the work index, the photo
+ * index and contact. Home is reached from the wordmark, not from the nav.
+ *
+ * The prefixes stay here rather than in each page because the URL shape is still
+ * an open question (docs/design/wireframe.md): `/design` carries the work cloud
+ * while single pieces sit at `/work/<slug>`, and nothing enforces that pairing.
  */
 export const NAV: readonly { readonly href: string; readonly label: string }[] = [
-  { href: '/', label: 'Work' },
-  { href: '/play', label: 'Play' },
-  { href: '/about', label: 'About' },
+  { href: '/design', label: 'Design' },
+  { href: '/photography', label: 'Photography' },
   { href: '/contact', label: 'Contact' },
 ];
+
+/** Where a single piece lives, so a route change is one edit. */
+export const ROUTES = {
+  home: '/',
+  design: '/design',
+  work: (slug: string) => `/work/${slug}`,
+  photography: '/photography',
+  photoSet: (slug: string) => `/photography/${slug}`,
+  contact: '/contact',
+} as const;
 
 /** True when this build renders unpublished Contentful entries. */
 export const IS_PREVIEW = import.meta.env.CONTENTFUL_USE_PREVIEW === 'true';
