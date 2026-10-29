@@ -1,81 +1,45 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Band from '~/components/patterns/Band.astro';
-import Masthead from '~/components/patterns/Masthead.astro';
-import SectionHead from '~/components/patterns/SectionHead.astro';
-import WorkIndex from '~/components/patterns/WorkIndex.astro';
-import PlayGrid from '~/components/patterns/PlayGrid.astro';
-import Label from '~/components/ui/Label.astro';
-import Link from '~/components/ui/Link.astro';
-import Text from '~/components/ui/Text.astro';
-import { getFeaturedProjects, getPlay, getSiteSettings } from '~/lib/contentful';
+import { getSiteSettings } from '~/lib/contentful';
 import { personJsonLd } from '~/lib/seo';
 import { SITE } from '~/lib/site';
-import { editable } from '~/lib/preview';
 
-/**
- * The homepage carries both tiers. Play is on it rather than only behind its own
- * nav item because the brief asks for the person to be visible in the feed and
- * not just a catalogue of finished outputs — but it is below the work, in its
- * own section, under its own accent. Visible, fenced, not ranked.
- */
-const [projects, play, settings] = await Promise.all([
-  getFeaturedProjects(),
-  getPlay(),
-  getSiteSettings(),
-]);
-
+const settings = await getSiteSettings();
 const jobTitle = settings.seo.jobTitle ?? SITE.jobTitle;
 const description = settings.seo.description ?? SITE.description;
-
-/** Three is enough to show the tier exists; the rest are one click away. */
-const playTeaser = play.slice(0, 3);
 ---
 
 <BaseLayout
-  title="Work"
+  title="I am human"
   path="/"
+  description={description}
   jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
 >
-  <Masthead
-    bio={settings.bio}
-    workCount={projects.length}
-    playCount={play.length}
-    bioEditable={editable('siteSettings', settings.cmsId, 'bio')}
-  />
+  <section class="wire wire--decided">
+    <span class="wire-label">Hero</span>
+    <h1>I am human</h1>
+    <div class="slot slot--hero">[animated illustration] [wordmark]</div>
+  </section>
 
-  <Band pad="none" aria-labelledby="selected-work" class="pb-16 md:pb-24">
-    <SectionHead
-      label="Selected work"
-      aside={String(projects.length).padStart(2, '0')}
-      id="selected-work"
-      class="mb-10 md:mb-16"
-    />
-    {
-      projects.length > 0 ? (
-        <WorkIndex projects={projects} />
-      ) : (
-        <Text tone="muted">[No project is marked as featured in Contentful yet.]</Text>
-      )
-    }
-  </Band>
+  <a class="wire slot slot--hero" href="/design">
+    <span class="wire-label">Design CTA</span>
+  </a>
 
-  {
-    playTeaser.length > 0 && (
-      <Band aria-labelledby="play" pad="none" class="pb-16 md:pb-24">
-        <SectionHead
-          label="Play"
-          aside={String(play.length).padStart(2, '0')}
-          id="play"
-          class="mb-10 md:mb-16"
-        />
-        <PlayGrid projects={playTeaser} />
-        <p class="mt-16">
-          <Link href="/play" plain tone="accent-warm">
-            <Label tone="inherit">All play →</Label>
-          </Link>
-        </p>
-      </Band>
-    )
-  }
+  <a class="wire slot slot--hero" href="/photography">
+    <span class="wire-label">Photography CTA</span>
+  </a>
+
+  <section class="wire wire--decided">
+    <span class="wire-label">What makes me human</span>
+    <div class="slot slot--hero">[about]</div>
+  </section>
+
+  <a class="wire slot" href="/contact">
+    <span class="wire-label">Contact CTA</span>
+  </a>
+
+  <footer>
+    <span class="wire-label">Footer</span>
+    <p class="wide-footer"><a href="/contact">contact</a></p>
+  </footer>
 </BaseLayout>

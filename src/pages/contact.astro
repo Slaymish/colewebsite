@@ -1,22 +1,32 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import Band from '~/components/patterns/Band.astro';
-import PageHeader from '~/components/patterns/PageHeader.astro';
-import ContactBlock from '~/components/patterns/ContactBlock.astro';
 import { getSiteSettings } from '~/lib/contentful';
+import { ROUTES } from '~/lib/site';
 
 const settings = await getSiteSettings();
+const email = settings.contact.email;
 ---
 
-<BaseLayout title="Contact" path="/contact">
-  <Band pad="lg" class="pb-12 md:pb-16">
-    <PageHeader
-      title="Contact"
-      standfirst="Collaborations, commissions, and anyone who wants to know how something was made."
-    />
-  </Band>
+<BaseLayout title="Contact" path={ROUTES.contact} description="Contact Cole Anderson.">
+  <section class="wire wire--decided">
+    <span class="wire-label">Email</span>
+    <p class="wide-footer">
+      {email ? <a href={`mailto:${email}`}>{email}</a> : '[email]'}
+    </p>
+  </section>
 
-  <Band pad="none" class="pb-20 md:pb-32">
-    <ContactBlock settings={settings} />
-  </Band>
+  <section class="wire">
+    <span class="wire-label">Elsewhere</span>
+    {
+      settings.seo.profiles.length > 0 ? (
+        <ul>
+          {settings.seo.profiles.map((profile) => (
+            <li>{profile}</li>
+          ))}
+        </ul>
+      ) : (
+        <p class="slot">[social links]</p>
+      )
+    }
+  </section>
 </BaseLayout>

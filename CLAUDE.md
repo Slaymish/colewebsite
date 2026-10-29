@@ -19,8 +19,9 @@ No test suite is configured.
 ## Architecture
 
 Portfolio site for Cole Anderson: **Astro** static build, **Contentful** for
-content, **Tailwind v4** for styling, **AWS** (S3 + CloudFront + Route 53) for
-hosting, all defined in **CDK** under `infra/`.
+content, **AWS** (S3 + CloudFront + Route 53) for hosting, all defined in **CDK**
+under `infra/`. Tailwind v4 is still installed and wired into `astro.config.mjs`,
+but nothing imports it any more — see Styling below.
 
 Migrated off Next.js + Sanity + Vercel in August 2026. Nothing of that stack
 remains.
@@ -45,38 +46,21 @@ field for Contentful's inspector mode.
 
 ### Components
 
-`components/ui/` are primitives with no content knowledge. `components/patterns/`
-compose them. A primitive taking a rest spread declares
-`[key: string]: unknown` and casts `Astro.props as Props` — Astro does not infer
-`Props` on a component with a dynamic `<Tag>`, and `astro check` fails without
-the cast.
-
-Reach for `Link` rather than a bare `<a>`: it carries the external-link `rel`,
-the "opens in a new tab" announcement, and `aria-current` — all easy to forget
-and silent when forgotten.
+There are none on this branch. Every route is plain HTML in one `.astro` file,
+and that is the point: a wireframe factored into reusable pieces has already
+started making layout decisions. Components come back with the design round.
 
 ### Styling
 
-Every value comes from `src/styles/tokens.css`. §1 holds raw values, §2 aliases
-them into Tailwind's namespaces, §3 holds tokens Tailwind has no namespace for. A
-token declared in `@theme` under a namespace Tailwind does not have
-(`--duration-`, `--z-`) emits no CSS and no error, so those are bridged by an
-`@utility` in `global.css`.
+One stylesheet, `src/styles/wireframe.css`: dashed boxes, a monospace face, and
+enough layout to describe a grid of sets and a row of slides. It is scaffolding
+with an expiry date and is deleted when the design round starts, so the old rules
+about tokens and no hardcoded values do not apply to it — do not reintroduce a
+token layer on top of it.
 
-**Colour is decided** — Cole's palette, recorded in `docs/design/brief.md` — and
-it is the one part he can change himself: five fields on `siteSettings` become a
-`<style>` block in `BaseLayout`. Everything else in the file is still provisional.
-
-The override lands on §1 and not on the §2 names, and that is not a style
-preference. §2 uses `@theme inline`, which compiles a utility down to the raw
-variable it reads: `.bg-page` becomes `background-color: var(--raw-page)`, never
-`var(--color-page)`. So setting a semantic name at runtime does nothing, with no
-error, whether or not that name also reaches `:root`. §1 reads
-`var(--cms-*, <default>)` so the override needs no cascade ordering to win;
-`src/lib/theme.ts` records why that matters.
-
-No colour literals outside `tokens.css`, and no opacity modifiers
-(`bg-page/60`) at a use site — a tinted variant means a new token.
+Tailwind is still a dependency and still registered in `astro.config.mjs`, but no
+stylesheet imports it, so it emits nothing. `lib/theme.ts` (the CMS palette →
+`<style>` bridge) is kept and not rendered. Both come back with the design.
 
 ### Infrastructure
 
@@ -127,5 +111,9 @@ stacks read `zoneName` from context. Do not write the domain into the code to
 
 ## Not decided yet
 
-- **The design**, apart from the palette. Type, scale and layout are a neutral
-  base to redesign against; the colour tokens are Cole's real values.
+- **The design, entirely.** No palette in use, no typeface, no scale, no grid.
+  Cole's five palette values survive in `docs/design/brief.md` and in
+  `lib/theme.ts`'s plumbing, not on the page.
+- **The structure's open questions**, listed in `docs/design/wireframe.md` — URL
+  shape for a piece, whether the featured wheel lives on `/` or `/design`, what
+  "enough" featured work means, and the missing `photoSet` content type.

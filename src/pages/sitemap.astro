@@ -1,0 +1,60 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { ROUTES } from '~/lib/site';
+---
+
+<BaseLayout title="Sitemap" path="/sitemap" noindex>
+  <h1>Sitemap</h1>
+
+  <ul class="sitemap">
+    <li>
+      <a href={ROUTES.home}>/</a>
+      <ul>
+        <li>Hero — I am human</li>
+        <li>Design CTA → <a href={ROUTES.design}>/design</a></li>
+        <li>Photography CTA → <a href={ROUTES.photography}>/photography</a></li>
+        <li>What makes me human</li>
+        <li>Contact CTA → <a href={ROUTES.contact}>/contact</a></li>
+        <li>Footer</li>
+      </ul>
+    </li>
+    <li>
+      <a href={ROUTES.design}>/design</a>
+      <ul>
+        <li>Featured work</li>
+        <li>
+          Work cloud → <a href={ROUTES.work('[slug]')}>/work/&lt;slug&gt;</a>
+          <ul>
+            <li>Title · materials</li>
+            <li>Body</li>
+            <li>Gallery</li>
+            <li>Process</li>
+            <li>Prev / next</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href={ROUTES.photography}>/photography</a>
+      <ul>
+        <li>Sets</li>
+        <li>
+          <a href={ROUTES.photoSet('[slug]')}>/photography/&lt;slug&gt;</a>
+          <ul>
+            <li>Cover</li>
+            <li>Photographs</li>
+            <li>Prev / next</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href={ROUTES.contact}>/contact</a>
+      <ul>
+        <li>Email</li>
+        <li>Elsewhere</li>
+      </ul>
+    </li>
+    <li>/404</li>
+  </ul>
+</BaseLayout>

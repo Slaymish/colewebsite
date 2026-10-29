@@ -1,47 +1,36 @@
 ---
-import '~/styles/global.css';
-
-/*
- * The typefaces. Imported here as modules rather than `@import`ed into
- * tokens.css so that Vite resolves the package paths and fingerprints the
- * woff2 files — a bare specifier inside a stylesheet Tailwind is already
- * processing is not something either tool promises to resolve.
+/**
+ * The page shell, stripped.
  *
- * `wdth.css` and not `index.css`: the standard file ships the weight axis
- * only, and the width axis is the entire reason Archivo is here. Every
- * masthead on the site would silently fall back to the drawn default width.
+ * What is kept is the plumbing that is expensive to rebuild and has nothing to
+ * do with how the site looks: the head, the SEO and JSON-LD builders in
+ * `lib/seo.ts`, the canonical origin, the sitemap link, the noindex switch for
+ * the test environment, and the one memoised site-settings fetch.
+ *
+ * What is gone is everything from the first design round: the palette layer in
+ * `lib/theme.ts` (kept, but no longer rendered — a wireframe has no brand
+ * colour), the font imports, the Tailwind utility layer, the header and footer
+ * patterns, and the UI primitives. `src/styles/wireframe.css` is the only
+ * stylesheet left and it exists to draw boxes, not to propose a look.
  */
-import '@fontsource-variable/archivo/wdth.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
+import '~/styles/wireframe.css';
 import { buildSeo, type SeoInput } from '~/lib/seo';
-import { SITE } from '~/lib/site';
-import SiteHeader from '~/components/patterns/SiteHeader.astro';
-import SiteFooter from '~/components/patterns/SiteFooter.astro';
-import SkipLink from '~/components/ui/SkipLink.astro';
+import { SITE, NAV } from '~/lib/site';
 import { getSiteSettings } from '~/lib/contentful';
-import { themeStyle } from '~/lib/theme';
 
 interface Props extends SeoInput {
   jsonLd?: Record<string, unknown>;
-  /** The LCP image, preloaded so it is requested before the CSS resolves it. */
-  preloadImage?: string;
 }
 
-const { jsonLd, preloadImage, ...seoInput } = Astro.props;
+const { jsonLd, ...seoInput } = Astro.props;
 
-/**
- * The one fetch every page makes. `getSiteSettings` memoises, so this is a
- * single request per build rather than one per page.
- */
+/** Memoised, so this is one request per build rather than one per page. */
 const settings = await getSiteSettings();
 
 const seo = buildSeo(seoInput, {
   description: settings.seo.description,
   image: settings.seo.shareImage?.url,
 });
-
-/** Empty unless Cole has set a colour. See lib/theme.ts for what it overrides. */
-const themeCss = themeStyle(settings.theme);
 ---
 
 <html lang="en-NZ">
@@ -62,18 +51,6 @@ const themeCss = themeStyle(settings.theme);
     {seo.image && <meta property="og:image" content={seo.image} />}
     <meta name="twitter:card" content={seo.image ? 'summary_large_image' : 'summary'} />
 
-    {
-      preloadImage && (
-        <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
-      )
-    }
-
-    {
-      /* is:inline keeps this in the document rather than bundling it into a
-        stylesheet, which is what puts the palette in the first response. */
-    }
-    {themeCss && <style is:inline set:html={themeCss} />}
-
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -83,12 +60,25 @@ const themeCss = themeStyle(settings.theme);
       )
     }
   </head>
-  <body class="bg-page text-ink flex min-h-screen flex-col">
-    <SkipLink />
-    <SiteHeader />
-    <main id="main" class="flex-1">
-      <slot />
+  <body>
+    {/* Wireframe chrome, not site chrome. It exists so the routes can be walked. */}
+    <header class="chrome">
+      <a href="/">[wordmark]</a>
+      <nav aria-label="Primary">
+        {NAV.map((item) => <a href={item.href}>{item.label}</a>)}
+        <a href="/sitemap">Map</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <div class="wrap">
+        <slot />
+      </div>
     </main>
-    <SiteFooter />
+
+    <div class="cookie-bar">
+      <span>[cookies]</span>
+      <span>[dismiss]</span>
+    </div>
   </body>
 </html>

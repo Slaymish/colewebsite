@@ -6,3 +6,6 @@ infra/cdk.out
 # Agent tooling, not site source. Its config is hand-maintained JSON with
 # $comment keys that Prettier reflows.
 .claude
+# Generated: one rendered copy of every route, extracted from dist/. Prettier
+# reformatting it only makes the next regeneration a diff.
+docs/design/wireframe-preview.html

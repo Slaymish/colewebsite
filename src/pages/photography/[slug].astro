@@ -1,0 +1,66 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { WIREFRAME_PHOTO_SETS, type WireframePhotoSet } from '~/lib/wireframe-content';
+import { ROUTES } from '~/lib/site';
+
+export const getStaticPaths = (async () =>
+  WIREFRAME_PHOTO_SETS.map((set, index) => ({
+    params: { slug: set.slug },
+    props: {
+      set,
+      previous: index > 0 ? (WIREFRAME_PHOTO_SETS[index - 1] ?? null) : null,
+      next:
+        index < WIREFRAME_PHOTO_SETS.length - 1
+          ? (WIREFRAME_PHOTO_SETS[index + 1] ?? null)
+          : null,
+    },
+  }))) satisfies GetStaticPaths;
+
+const { set, previous, next } = Astro.props as {
+  set: WireframePhotoSet;
+  previous: WireframePhotoSet | null;
+  next: WireframePhotoSet | null;
+};
+
+const path = ROUTES.photoSet(set.slug);
+---
+
+<BaseLayout
+  title={set.title}
+  description="A set of photographs, by Cole Anderson."
+  path={path}
+>
+  <h1>{set.title}</h1>
+
+  <section class="wire">
+    <span class="wire-label">Cover</span>
+    <div class="slot slot--cover">[cover]</div>
+  </section>
+
+  <section class="wire">
+    <span class="wire-label">Photographs</span>
+    <ul class="grid--photos grid">
+      {
+        Array.from({ length: set.count }, (_, i) => (
+          <li class="slot">[{String(i + 1).padStart(2, '0')}]</li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <nav class="wire" aria-label="Previous and next set">
+    <span class="wire-label">Prev / next</span>
+    <p>
+      {
+        previous ? (
+          <a href={ROUTES.photoSet(previous.slug)}>← {previous.title}</a>
+        ) : (
+          '[first]'
+        )
+      }
+      {' · '}
+      {next ? <a href={ROUTES.photoSet(next.slug)}>{next.title} →</a> : '[last]'}
+    </p>
+  </nav>
+</BaseLayout>

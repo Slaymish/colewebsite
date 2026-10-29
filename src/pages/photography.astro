@@ -1,0 +1,29 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { WIREFRAME_PHOTO_SETS } from '~/lib/wireframe-content';
+import { getSiteSettings } from '~/lib/contentful';
+import { ROUTES } from '~/lib/site';
+
+const settings = await getSiteSettings();
+const description = settings.seo.description ?? 'Photography, by Cole Anderson.';
+---
+
+<BaseLayout title="Photography" path={ROUTES.photography} description={description}>
+  <h1>Photography</h1>
+
+  <section class="wire wire--decided">
+    <span class="wire-label">Sets</span>
+    <ul class="grid--sets grid">
+      {
+        WIREFRAME_PHOTO_SETS.map((set) => (
+          <li class="wire">
+            <a href={ROUTES.photoSet(set.slug)}>
+              <span class="slot">[cover]</span>
+              {set.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

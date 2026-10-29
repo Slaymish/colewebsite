@@ -1,66 +1,46 @@
 ---
-description: Astro component, page and styling conventions
+description: Astro page and styling conventions on the stripped wireframe branch
 paths:
-  - "src/components/**"
   - "src/pages/**"
   - "src/layouts/**"
   - "src/styles/**"
 ---
 
-# Components, pages and styling
+# Pages and styling
 
-## The two component tiers
-
-`src/components/ui/` are primitives that know nothing about Cole or the CMS.
-`src/components/patterns/` compose them and may take content types. A primitive
-that imports from `content-types.ts` is in the wrong tier — see the note at the
-top of `src/lib/ui.ts`.
-
-Shared vocabulary between two or more primitives (`ImageAsset`, `Ratio`,
-`isExternalHref`, `samePath`) lives in `src/lib/ui.ts`. A variant class map used
-by one component stays in that component.
-
-## Primitives that already solve the easy-to-forget thing
-
-- `Link` — external `rel`, `target`, the spoken "(opens in a new tab)", and
-  `aria-current`. Use it instead of a bare `<a>`; forgetting these is silent.
-- `Figure` / `Placeholder` — take a `Ratio` name, not a ratio.
-- `VisuallyHidden`, `SkipLink` — the announced-but-unseen cases.
-- `Heading` — `level` is the document outline, `size` is how loud it looks. Never
-  demote a level to get smaller type.
-
-A primitive taking a rest spread declares `[key: string]: unknown` in `Props` and
-reads `Astro.props as Props`. Astro does not infer `Props` on a component with a
-dynamic `<Tag>`, and `astro check` fails without the cast.
-
-## Styling
-
-Every value comes from `src/styles/tokens.css`. §1 raw values are read only by §2;
-components touch only §2 aliases. Colour is Cole's real palette and is overridable
-from `siteSettings`; the type scale is still provisional.
-
-- No colour literal outside `tokens.css`.
-- No opacity modifier at a use site (`bg-page/60`). A tint means a new token.
-- A token in a namespace Tailwind v4 does not have (`--duration-`, `--z-`) emits
-  no CSS and no error. Those live in §3 and are bridged by an `@utility` in
-  `global.css` — add both halves or the class silently does nothing.
-- `@theme inline` compiles a utility down to the §1 variable it reads —
-  `.bg-page` is `var(--raw-page)`, never `var(--color-page)` — so a runtime
-  override has to target §1. A new CMS-settable colour means a `--cms-*` fallback
-  in §1 and an entry in `src/lib/theme.ts`.
-- A §2 name only reaches `:root` when Tailwind finds it referenced in a file it
-  processes. `var(--color-accent)` in `global.css` resolves for that reason (the
-  focus ring depends on it); the same `var()` in a component `<style>` block does
-  not, because Tailwind never sees that block. Use a §1 name there.
-- The operand order in the §1 `color-mix()` neutrals is load-bearing. See the
-  comment there before making them consistent.
+This branch has no design. The first design round — primitives, patterns, the
+token layer, the Tailwind entry and both typefaces — was removed, and what
+replaced it is an unstyled wireframe of the decided structure. Read
+`docs/design/wireframe.md` first; it is the sitemap plus the questions each page
+is waiting on.
 
 ## Pages
 
-Routes build statically. `getStaticPaths` passes the entry through `props` rather
-than letting each page re-fetch it. Imports use the `~/*` alias, not relative
-paths out of the directory.
+- **Plain HTML per route.** No components on this branch. A wireframe factored
+  into reusable pieces has already started making layout decisions, which is the
+  one thing it is not allowed to do. Components come back with the design round.
+- **Labels only.** A `.wire-label` names each block and `[bracketed]` text marks a
+  slot. No explanatory copy on the page: it is a wireframe, everyone looking at it
+  knows that, and the reasoning lives in `docs/design/wireframe.md` instead.
+- **No invented copy about Cole.** Content is the CMS's job. `[Bracketed]` text is
+  a slot, and it stays bracketed.
+- Routes build statically. `getStaticPaths` passes the entry through `props`
+  rather than letting each page re-fetch it. Imports use the `~/*` alias, not
+  relative paths out of the directory.
+- Anything rendered from a CMS field should spread `editable('type', cmsId,
+  'field')` from `~/lib/preview` so Contentful's inspector mode can find it. It
+  returns nothing on production builds.
 
-Anything rendered from a CMS field should spread `editable('type', cmsId,
-'field')` from `~/lib/preview` so Contentful's inspector mode can find it. It
-returns nothing on production builds.
+## Styling
+
+One stylesheet, `src/styles/wireframe.css`: dashed boxes for unbuilt areas, a
+system monospace face, grey labels, and the two grids the structure needs.
+
+- It is **throwaway**. The old rules — tokens only, no colour literals, no opacity
+  modifiers — do not apply here, and do not reintroduce a token layer on top of
+  it. When the design round starts, this file is deleted rather than grown.
+- Nothing in it is a proposal: no brand colour, no typeface, no scale, no motion.
+  Cole's palette lives in `docs/design/brief.md` and in the `lib/theme.ts` bridge,
+  which is kept and not rendered.
+- Layout in it exists only to describe structure — a grid of photo sets, a row of
+  slides. Anything beyond that is a design decision being made by accident.

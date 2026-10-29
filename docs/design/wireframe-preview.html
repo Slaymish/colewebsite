@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<title>coleanderson.nz — wireframe</title>
+<!--
+  Generated, not authored: one rendered copy of every route on the
+  lofi/wireframe branch, with src/styles/wireframe.css inlined so the file
+  opens anywhere without a build. Regenerate by building the site and
+  re-running the same extraction; edit the .astro sources, never this.
+-->
+<style>
+/*
+ * Wireframe notation — not a design system.
+ *
+ * Every colour, typeface, scale and layout decision from the first design round
+ * has been removed (see `git log --all -- src/styles/tokens.css` on main if you
+ * need it back). What is left here is the minimum needed to read a page as a
+ * structure: dashed boxes for unbuilt areas, a monospace face, and grey labels.
+ *
+ * Nothing in this file is a proposal. It is scaffolding with an expiry date and
+ * is deleted the moment the next design round starts — so no token names, no
+ * palettes, no brand colour, nothing worth keeping.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #111;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A block that is also a link: the box is the target, not the words. */
+a.wire,
+a.slot {
+  display: block;
+  color: inherit;
+}
+
+/* The site's own chrome, drawn as chrome so the page content below it is not
+   mistaken for it. */
+.chrome {
+  border-bottom: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.chrome nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.wrap {
+  padding: 1rem;
+  max-width: 60rem;
+}
+
+/* One box per block of page. Dashed = not built. */
+.wire {
+  border: 1px dashed #999;
+  padding: 0.75rem;
+  margin: 0 0 0.75rem;
+}
+
+/* A block the copy calls out as a real element with behaviour attached
+   (animated hero, scroll-driven panel, carousel). Solid edge = structurally
+   decided, still unbuilt. */
+.wire--decided {
+  border-style: solid;
+  border-width: 2px;
+}
+
+.wire-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+/* Image slots. Crossed box is the conventional "picture goes here". */
+.slot {
+  border: 1px solid #bbb;
+  background-color: #f6f6f6;
+  background-image: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    #ddd calc(50% - 1px),
+    #ddd calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  display: grid;
+  place-items: center;
+  color: #888;
+  font-size: 12px;
+  min-height: 6rem;
+  margin: 0.5rem 0;
+}
+
+.slot--hero {
+  min-height: 16rem;
+}
+
+.slot--cover {
+  min-height: 14rem;
+}
+
+/* Grids are the only layout here, and only because "grid of photo sets" and a
+   carousel of slides are the structure being described. */
+.grid {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grid--sets {
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+}
+
+.grid--wheel {
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.grid--photos {
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+}
+
+.cookie-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  border-top: 1px dashed #999;
+  background: #fff;
+  padding: 0.6rem 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+/* Keeps the fixed bar from covering the last block on a short page. */
+main {
+  padding-bottom: 5rem;
+}
+
+.wide-footer {
+  font-size: clamp(2rem, 12vw, 8rem);
+  line-height: 1;
+  margin: 2rem 0 0;
+}
+
+.sheet { border-top: 2px solid #ddd; padding: 1rem 0 2rem; }
+.sheet-head { font-size: 12px; color: #666; margin: 0 0 .75rem; }
+.wrap { max-width: none; padding: 0; }
+.cookie-bar { position: static; }
+</style>
+</head>
+<body>
+<section class="sheet">
+<p class="sheet-head">/</p>
+<div class="wrap"><section class="wire wire--decided"><span class="wire-label">Hero</span><h1>I am human</h1><div class="slot slot--hero">[animated illustration] [wordmark]</div></section><a class="wire slot slot--hero" href="#"><span class="wire-label">Design CTA</span></a><a class="wire slot slot--hero" href="#"><span class="wire-label">Photography CTA</span></a><section class="wire wire--decided"><span class="wire-label">What makes me human</span><div class="slot slot--hero">[about]</div></section><a class="wire slot" href="#"><span class="wire-label">Contact CTA</span></a><footer><span class="wire-label">Footer</span><p class="wide-footer"><a href="#">contact</a></p></footer></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/design</p>
+<div class="wrap"><h1>Design</h1><section class="wire wire--decided" id="work-cloud"><span class="wire-label">Work cloud</span><div class="slot slot--hero">[work cloud]</div><ul class="grid--sets grid"><li><a href="#">[First project]</a></li><li><a href="#">[Second project]</a></li><li><a href="#">[Something from Play]</a></li></ul></section></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/photography</p>
+<div class="wrap"><h1>Photography</h1><section class="wire wire--decided"><span class="wire-label">Sets</span><ul class="grid--sets grid"><li class="wire"><a href="#"><span class="slot">[cover]</span>[First photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Second photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Third photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Fourth photo set]</a></li></ul></section></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/photography/set-one</p>
+<div class="wrap"><h1>[First photo set]</h1><section class="wire"><span class="wire-label">Cover</span><div class="slot slot--cover">[cover]</div></section><section class="wire"><span class="wire-label">Photographs</span><ul class="grid--photos grid"><li class="slot">[01]</li><li class="slot">[02]</li><li class="slot">[03]</li><li class="slot">[04]</li><li class="slot">[05]</li><li class="slot">[06]</li><li class="slot">[07]</li><li class="slot">[08]</li><li class="slot">[09]</li><li class="slot">[10]</li><li class="slot">[11]</li><li class="slot">[12]</li></ul></section><nav class="wire" aria-label="Previous and next set"><span class="wire-label">Prev / next</span><p>[first] · <a href="#">[Second photo set] →</a></p></nav></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/work/first-project</p>
+<div class="wrap"><h1>[First project]</h1><section class="wire"><span class="wire-label">Title · materials</span><div class="slot slot--cover">[cover]</div></section><section class="wire"><span class="wire-label">Body</span><p>[Two or three paragraphs about the project — what it was, what Cole did on it, and what it was for. This is placeholder text: nothing here comes from the CMS.]</p></section><section class="wire"><span class="wire-label">Gallery</span><ul class="grid--photos grid"><li class="slot">[gallery]</li></ul></section><section class="wire"><span class="wire-label">Process</span><ul class="grid--photos grid"><li class="slot">[process]</li></ul></section><nav class="wire" aria-label="Previous and next"><span class="wire-label">Prev / next</span><p>[start] · <a href="#">[Second project] →</a></p></nav></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/contact</p>
+<div class="wrap"><section class="wire wire--decided"><span class="wire-label">Email</span><p class="wide-footer">[email]</p></section><section class="wire"><span class="wire-label">Elsewhere</span><p class="slot">[social links]</p></section></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/sitemap</p>
+<div class="wrap"><h1>Sitemap</h1><ul class="sitemap"><li><a href="#">/</a><ul><li>Hero — I am human</li><li>Design CTA → <a href="#">/design</a></li><li>Photography CTA → <a href="#">/photography</a></li><li>What makes me human</li><li>Contact CTA → <a href="#">/contact</a></li><li>Footer</li></ul></li><li><a href="#">/design</a><ul><li>Featured work</li><li>Work cloud → <a href="#">/work/&lt;slug&gt;</a><ul><li>Title · materials</li><li>Body</li><li>Gallery</li><li>Process</li><li>Prev / next</li></ul></li></ul></li><li><a href="#">/photography</a><ul><li>Sets</li><li><a href="#">/photography/&lt;slug&gt;</a><ul><li>Cover</li><li>Photographs</li><li>Prev / next</li></ul></li></ul></li><li><a href="#">/contact</a><ul><li>Email</li><li>Elsewhere</li></ul></li><li>/404</li></ul></div>
+</section>
+<section class="sheet">
+<p class="sheet-head">/404</p>
+<div class="wrap"><h1>404</h1><p><a href="#">← home</a></p></div>
+</section>
+</body>
+</html>
