@@ -66,7 +66,7 @@ const seo = buildSeo(seoInput, {
       <a href="/">[wordmark]</a>
       <nav aria-label="Primary">
         {NAV.map((item) => <a href={item.href}>{item.label}</a>)}
-        <a href="/sitemap">Wireframe map</a>
+        <a href="/sitemap">Map</a>
       </nav>
     </header>
 
@@ -76,19 +76,8 @@ const seo = buildSeo(seoInput, {
       </div>
     </main>
 
-    {
-      /*
-      The disclaimer the copy calls for. Rendered closed every time on purpose:
-      the site is static, its CSP sends `script-src 'self'` with no
-      'unsafe-inline' (infra/lib/site-stack.ts), so a dismiss handler here
-      would need a bundled script and a stored preference. Decide that with the
-      real copy — see docs/design/wireframe.md.
-    */
-    }
     <div class="cookie-bar">
-      <span
-        >[Silly cookies disclaimer — copy TBD. One line, in voice, offering a biscuit.]</span
-      >
+      <span>[cookies]</span>
       <span>[dismiss]</span>
     </div>
   </body>

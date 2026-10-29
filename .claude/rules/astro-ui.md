@@ -19,9 +19,9 @@ is waiting on.
 - **Plain HTML per route.** No components on this branch. A wireframe factored
   into reusable pieces has already started making layout decisions, which is the
   one thing it is not allowed to do. Components come back with the design round.
-- **Every block is labelled.** A `<section aria-labelledby>` per block, with a
-  `.wire-label` naming it and a `.wire-note` saying what has to happen in it or
-  what is still undecided. That annotation is the deliverable, not clutter.
+- **Labels only.** A `.wire-label` names each block and `[bracketed]` text marks a
+  slot. No explanatory copy on the page: it is a wireframe, everyone looking at it
+  knows that, and the reasoning lives in `docs/design/wireframe.md` instead.
 - **No invented copy about Cole.** Content is the CMS's job. `[Bracketed]` text is
   a slot, and it stays bracketed.
 - Routes build statically. `getStaticPaths` passes the entry through `props`

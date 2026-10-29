@@ -4,78 +4,38 @@ import { getProjects, getSiteSettings } from '~/lib/contentful';
 import { WIREFRAME } from '~/lib/wireframe-content';
 import { ROUTES } from '~/lib/site';
 
-/**
- * `/design` — the work index, as a wireframe.
- *
- * Two things live here and their order is not decided: the featured wheel and
- * the work cloud. The wheel only exists once there are enough featured pieces
- * for it to be a wheel rather than two slides and a gap, and the threshold is
- * deliberately explicit — see WIREFRAME.featuredMinimum.
- */
 const [projects, settings] = await Promise.all([getProjects(), getSiteSettings()]);
 
-/*
- * The explicitly featured ones, not `getFeaturedProjects()`: that falls back to
- * "all finished work" when nothing is flagged, which would make the wheel
- * appear on a site where Cole has featured nothing.
- */
+/* Explicitly featured only: getFeaturedProjects() falls back to all finished work. */
 const featured = projects.filter((project) => project.featured);
 const showFeatured = featured.length >= WIREFRAME.featuredMinimum;
 const description = settings.seo.description ?? 'Work, by Cole Anderson.';
 ---
 
 <BaseLayout title="Design" path={ROUTES.design} description={description}>
-  <h1 class="page-title">/design</h1>
-  <p class="wire-note">Work index. Order of the two blocks below is TBD.</p>
+  <h1>Design</h1>
 
-  <section class="wire" aria-labelledby="featured">
-    <span class="wire-label"
-      >Block — featured work · {featured.length} of {WIREFRAME.featuredMinimum} needed</span
-    >
-    <h2 id="featured">Featured work</h2>
+  {
+    showFeatured && (
+      <section class="wire wire--decided">
+        <span class="wire-label">Featured work</span>
+        <ul class="grid--wheel grid">
+          {featured.map((project) => (
+            <li>
+              <a class="slot" href={ROUTES.work(project.slug)}>
+                [slide] {project.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="#work-cloud">See all</a>
+      </section>
+    )
+  }
 
-    {
-      showFeatured ? (
-        <>
-          <ul class="grid--wheel grid">
-            {featured.map((project) => (
-              <li class="wire">
-                <div class="slot">[slide]</div>
-                <a href={ROUTES.work(project.slug)}>{project.title}</a>
-              </li>
-            ))}
-          </ul>
-          <p class="wire-note">
-            Carousel wheel: the slides sit on an arc and rotate through, one focused at a
-            time. "See all" sits under the wheel and goes to the work cloud.
-          </p>
-          <p class="wire-note">
-            <a href="#work-cloud">See all work →</a>
-          </p>
-        </>
-      ) : (
-        <>
-          <p class="wire-note">
-            [Not enough featured work — no carousel. This block does not render; the page
-            goes straight to the work cloud.]
-          </p>
-          <p class="wire-note">
-            <a href="#work-cloud">See all work →</a>
-          </p>
-        </>
-      )
-    }
-  </section>
-
-  <section class="wire wire--decided" aria-labelledby="work-cloud">
-    <span class="wire-label">Block — work cloud · {projects.length} pieces</span>
-    <h2 id="work-cloud">Work cloud</h2>
-    <div class="slot slot--hero">[all work, positioned in a cloud of names]</div>
-    <p class="wire-note">
-      Hover focuses one piece and dims the rest; click enters {ROUTES.work('[slug]')};
-      scrolling continues the page past the cloud. The cloud is the whole index — every
-      piece, no filters, and the names below stand in for its positions.
-    </p>
+  <section class="wire wire--decided" id="work-cloud">
+    <span class="wire-label">Work cloud</span>
+    <div class="slot slot--hero">[work cloud]</div>
     <ul class="grid--sets grid">
       {
         projects.map((project) => (
@@ -86,19 +46,4 @@ const description = settings.seo.description ?? 'Work, by Cole Anderson.';
       }
     </ul>
   </section>
-
-  <div class="notes">
-    <h2>Open on this page</h2>
-    <ul>
-      <li>Wheel above the cloud or below it — and does the wheel exist on / instead?</li>
-      <li>
-        What "enough" means: {WIREFRAME.featuredMinimum} is a placeholder for a decision.
-      </li>
-      <li>
-        The cloud is the whole index, but "/work-slug" sits outside /design. Is a piece at
-        /work/&lt;slug&gt;, /design/&lt;slug&gt;, or a flat /&lt;slug&gt;?
-      </li>
-      <li>Is the cloud ordered, or is position itself the curation?</li>
-    </ul>
-  </div>
 </BaseLayout>

@@ -2,7 +2,7 @@
 <html lang="en-NZ">
 <head>
 <meta charset="utf-8">
-<title>coleanderson.nz — wireframe contact sheet</title>
+<title>coleanderson.nz — wireframe</title>
 <!--
   Generated, not authored: one rendered copy of every route on the
   lofi/wireframe branch, with src/styles/wireframe.css inlined so the file
@@ -40,6 +40,14 @@ body {
 }
 
 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A block that is also a link: the box is the target, not the words. */
+a.wire,
+a.slot {
+  display: block;
   color: inherit;
 }
 
@@ -86,16 +94,6 @@ a {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #666;
-}
-
-.wire-note {
-  margin: 0.35rem 0 0;
-  font-size: 12px;
-  color: #555;
-}
-
-.wire-note::before {
-  content: '↳ ';
 }
 
 /* Image slots. Crossed box is the conventional "picture goes here". */
@@ -147,34 +145,6 @@ a {
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
 }
 
-/* The wireframe's own annotation panel: what this block becomes, and what is
-   still undecided about it. Not part of the site. */
-.notes {
-  border-left: 2px solid #ddd;
-  padding-left: 0.75rem;
-  margin: 0.75rem 0 1.5rem;
-  font-size: 12px;
-  color: #444;
-}
-
-.notes h2 {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 0 0 0.35rem;
-}
-
-.notes ul {
-  margin: 0;
-  padding-left: 1.1rem;
-}
-
-.page-title {
-  font-size: 1.25rem;
-  font-weight: normal;
-  margin: 0 0 0.25rem;
-}
-
 .cookie-bar {
   position: fixed;
   inset: auto 0 0 0;
@@ -200,45 +170,43 @@ main {
 }
 
 .sheet { border-top: 2px solid #ddd; padding: 1rem 0 2rem; }
-.sheet-head { font-size: 12px; margin: 0 0 .75rem; }
+.sheet-head { font-size: 12px; color: #666; margin: 0 0 .75rem; }
 .wrap { max-width: none; padding: 0; }
 .cookie-bar { position: static; }
 </style>
 </head>
 <body>
-<h1 class="page-title">coleanderson.nz — wireframe</h1>
-<p class="wire-note">Every route on <code>lofi/wireframe</code>, rendered. Structure only: no colour, type or layout is proposed.</p>
 <section class="sheet">
-<p class="sheet-head"><strong>/</strong> — Home</p>
-<div class="wrap"><h1 class="page-title">/ — home</h1><p class="wire-note">Section order TBD. The six blocks below are the decided content, listed in the order they were written down.</p><section class="wire wire--decided" aria-labelledby="hero"><span class="wire-label">Section — hero</span><h2 id="hero">I am human</h2><div class="slot slot--hero">[animated illustration] + [wordmark / logo]</div><p class="wire-note">Illustration moves; the wordmark does not. The line is the identity statement, so the hero is settled and only the drawing is not.</p></section><section class="wire" aria-labelledby="design-cta"><span class="wire-label">Section — CTA</span><h2 id="design-cta"><a href="#">Design</a></h2><div class="slot">[design CTA — image or type, size TBD]</div><p class="wire-note">Slides over into /design rather than navigating. Slide-over is a transition decision, so it belongs to the design round; the route itself is settled.</p></section><section class="wire" aria-labelledby="photo-cta"><span class="wire-label">Section — CTA</span><h2 id="photo-cta"><a href="#">Photography</a></h2><div class="slot">[photography CTA — image or type, size TBD]</div><p class="wire-note">Slides over into /photography, same mechanism as the design CTA. Whether the two CTAs share a shape or oppose each other is open.</p></section><section class="wire wire--decided" aria-labelledby="what-makes-me-human"><span class="wire-label">Section — about Cole</span><h2 id="what-makes-me-human">What makes me human</h2><div class="slot slot--cover">[about — revealed from the star mask]</div><p class="wire-note">Red ground. The panel arrives out of a masked star on scroll: the star is the wipe, not decoration. Copy here is Cole's, from Contentful — nothing is written in this repo.</p></section><section class="wire" aria-labelledby="contact-cta"><span class="wire-label">Section — CTA</span><h2 id="contact-cta"><a href="#">Contact</a></h2><div class="slot">[contact CTA — one line plus a link]</div><p class="wire-note">The last thing before the footer, and the only CTA that repeats in the footer.</p></section><footer><span class="wire-label">Footer</span><p class="wide-footer"><a href="#">contact</a></p><p class="wire-note">Big text that says "contact". The whole word is the link — a footer here is one word, not a sitemap.</p></footer><div class="notes"><h2>Open on this page</h2><ul><li>Order of the six blocks.</li><li>Whether the CTAs are pictures, type, or their own illustrations.</li><li>Whether "What makes me human" is a section of / or its own route reached by scroll.</li><li>Whether the footer word is a second contact CTA or replaces the one above it.</li></ul></div></div>
+<p class="sheet-head">/</p>
+<div class="wrap"><section class="wire wire--decided"><span class="wire-label">Hero</span><h1>I am human</h1><div class="slot slot--hero">[animated illustration] [wordmark]</div></section><a class="wire slot slot--hero" href="#"><span class="wire-label">Design CTA</span></a><a class="wire slot slot--hero" href="#"><span class="wire-label">Photography CTA</span></a><section class="wire wire--decided"><span class="wire-label">What makes me human</span><div class="slot slot--hero">[about]</div></section><a class="wire slot" href="#"><span class="wire-label">Contact CTA</span></a><footer><span class="wire-label">Footer</span><p class="wide-footer"><a href="#">contact</a></p></footer></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/design</strong> — Design — featured wheel (absent below threshold) + work cloud</p>
-<div class="wrap"><h1 class="page-title">/design</h1><p class="wire-note">Work index. Order of the two blocks below is TBD.</p><section class="wire" aria-labelledby="featured"><span class="wire-label">Block — featured work · 2 of 3 needed</span><h2 id="featured">Featured work</h2><p class="wire-note">[Not enough featured work — no carousel. This block does not render; the page goes straight to the work cloud.]</p><p class="wire-note"><a href="#">See all work →</a></p></section><section class="wire wire--decided" aria-labelledby="work-cloud"><span class="wire-label">Block — work cloud · 3 pieces</span><h2 id="work-cloud">Work cloud</h2><div class="slot slot--hero">[all work, positioned in a cloud of names]</div><p class="wire-note">Hover focuses one piece and dims the rest; click enters /work/[slug]; scrolling continues the page past the cloud. The cloud is the whole index — every piece, no filters, and the names below stand in for its positions.</p><ul class="grid--sets grid"><li><a href="#">[First project]</a></li><li><a href="#">[Second project]</a></li><li><a href="#">[Something from Play]</a></li></ul></section><div class="notes"><h2>Open on this page</h2><ul><li>Wheel above the cloud or below it — and does the wheel exist on / instead?</li><li>What "enough" means: 3 is a placeholder for a decision.</li><li>The cloud is the whole index, but "/work-slug" sits outside /design. Is a piece at /work/&lt;slug&gt;, /design/&lt;slug&gt;, or a flat /&lt;slug&gt;?</li><li>Is the cloud ordered, or is position itself the curation?</li></ul></div></div>
+<p class="sheet-head">/design</p>
+<div class="wrap"><h1>Design</h1><section class="wire wire--decided" id="work-cloud"><span class="wire-label">Work cloud</span><div class="slot slot--hero">[work cloud]</div><ul class="grid--sets grid"><li><a href="#">[First project]</a></li><li><a href="#">[Second project]</a></li><li><a href="#">[Something from Play]</a></li></ul></section></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/photography</strong> — Photography — grid of photo sets</p>
-<div class="wrap"><h1 class="page-title">/photography</h1><section class="wire" aria-labelledby="sets"><span class="wire-label">Block — sets · 4 placeholder sets</span><h2 id="sets">Photo sets</h2><ul class="grid--sets grid"><li class="wire"><div class="slot">[cover]</div><a href="#">[First photo set]</a><p class="wire-note">12 photographs</p></li><li class="wire"><div class="slot">[cover]</div><a href="#">[Second photo set]</a><p class="wire-note">8 photographs</p></li><li class="wire"><div class="slot">[cover]</div><a href="#">[Third photo set]</a><p class="wire-note">20 photographs</p></li><li class="wire"><div class="slot">[cover]</div><a href="#">[Fourth photo set]</a><p class="wire-note">5 photographs</p></li></ul><p class="wire-note">Uniform tiles. Whether a set carries a cover image, a title, or only a number is undecided — the tiles are the same shape here because the wireframe has no images to size them by.</p></section><div class="notes"><h2>Open on this page</h2><ul><li>Does a set need a title at all, or does the first photograph stand for it?</li><li>Counts on the tile, or nothing?</li><li>Sort by date, by curation, or as entered?</li><li>Where do single photographs live that belong to no set?</li></ul></div></div>
+<p class="sheet-head">/photography</p>
+<div class="wrap"><h1>Photography</h1><section class="wire wire--decided"><span class="wire-label">Sets</span><ul class="grid--sets grid"><li class="wire"><a href="#"><span class="slot">[cover]</span>[First photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Second photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Third photo set]</a></li><li class="wire"><a href="#"><span class="slot">[cover]</span>[Fourth photo set]</a></li></ul></section></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/photography/set-one</strong> — Photo set</p>
-<div class="wrap"><h1 class="page-title">[First photo set]</h1><p class="wire-note">/photography/&lt;slug&gt; · 12 photographs · placeholder set</p><section class="wire" aria-labelledby="set-cover"><span class="wire-label">Block — cover</span><h2 id="set-cover">Cover</h2><div class="slot slot--cover">[cover photograph]</div><p class="wire-note">Whether the cover is the first photograph in the set or a chosen one is undecided.</p></section><section class="wire" aria-labelledby="set-photos"><span class="wire-label">Block — photographs</span><h2 id="set-photos">Photographs</h2><ul class="grid--photos grid"><li class="slot">[01]</li><li class="slot">[02]</li><li class="slot">[03]</li><li class="slot">[04]</li><li class="slot">[05]</li><li class="slot">[06]</li><li class="slot">[07]</li><li class="slot">[08]</li><li class="slot">[09]</li><li class="slot">[10]</li><li class="slot">[11]</li><li class="slot">[12]</li></ul><p class="wire-note">One column on a phone, whatever the set holds; nothing is cropped to fit a grid.</p></section><nav class="wire" aria-label="Previous and next set"><span class="wire-label">Block — prev / next</span><p>[first set] · <a href="#">[Second photo set] →</a></p><p class="wire-note"><a href="#">All photography</a></p></nav></div>
+<p class="sheet-head">/photography/set-one</p>
+<div class="wrap"><h1>[First photo set]</h1><section class="wire"><span class="wire-label">Cover</span><div class="slot slot--cover">[cover]</div></section><section class="wire"><span class="wire-label">Photographs</span><ul class="grid--photos grid"><li class="slot">[01]</li><li class="slot">[02]</li><li class="slot">[03]</li><li class="slot">[04]</li><li class="slot">[05]</li><li class="slot">[06]</li><li class="slot">[07]</li><li class="slot">[08]</li><li class="slot">[09]</li><li class="slot">[10]</li><li class="slot">[11]</li><li class="slot">[12]</li></ul></section><nav class="wire" aria-label="Previous and next set"><span class="wire-label">Prev / next</span><p>[first] · <a href="#">[Second photo set] →</a></p></nav></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/work/first-project</strong> — One piece</p>
-<div class="wrap"><h1 class="page-title">[First project]</h1><p class="wire-note">/work/&lt;slug&gt; — the URL shape is still open; see /sitemap.</p><section class="wire" aria-labelledby="piece"><span class="wire-label">Block — piece</span><h2 id="piece">Title, materials, one line</h2><div class="slot slot--cover">[cover]</div><p class="wire-note">Materials come from the piece's tags, because grouping is data and not layout. [no materials on this piece yet]</p></section><section class="wire" aria-labelledby="body"><span class="wire-label">Block — body</span><h2 id="body">What it is</h2><div class="slot">[running text — from Contentful]</div><p class="wire-note">1 paragraph(s) in the CMS for this piece.</p></section><section class="wire" aria-labelledby="gallery"><span class="wire-label">Block — gallery · 0</span><h2 id="gallery">Photographs</h2><div class="slot">[no more images]</div></section><nav class="wire" aria-label="Previous and next"><span class="wire-label">Block — prev / next</span><p>[start of work] · <a href="#">[Second project] →</a></p><p class="wire-note"><a href="#">Back to the work cloud</a> — and whether the way back is the cloud or the piece's neighbours is open.</p></nav><div class="notes"><h2>Open on this page</h2><ul><li>Does a piece open as its own page, or as a slide-over from the cloud?</li><li>Process notes inline, in their own band, or a separate scroll section?</li><li>Prev/next across photography as well, or only within design?</li></ul></div></div>
+<p class="sheet-head">/work/first-project</p>
+<div class="wrap"><h1>[First project]</h1><section class="wire"><span class="wire-label">Title · materials</span><div class="slot slot--cover">[cover]</div></section><section class="wire"><span class="wire-label">Body</span><p>[Two or three paragraphs about the project — what it was, what Cole did on it, and what it was for. This is placeholder text: nothing here comes from the CMS.]</p></section><section class="wire"><span class="wire-label">Gallery</span><ul class="grid--photos grid"><li class="slot">[gallery]</li></ul></section><section class="wire"><span class="wire-label">Process</span><ul class="grid--photos grid"><li class="slot">[process]</li></ul></section><nav class="wire" aria-label="Previous and next"><span class="wire-label">Prev / next</span><p>[start] · <a href="#">[Second project] →</a></p></nav></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/contact</strong> — Contact</p>
-<div class="wrap"><h1 class="page-title">/contact</h1><section class="wire wire--decided" aria-labelledby="address"><span class="wire-label">Block — address</span><h2 id="address">Email</h2><p class="wide-footer">[email — not set in site settings]</p><p class="wire-note">One address, set at type size. It is the whole page.</p></section><section class="wire" aria-labelledby="elsewhere"><span class="wire-label">Block — elsewhere</span><h2 id="elsewhere">Elsewhere</h2><p class="wire-note">[social links — from site settings, none set]</p></section><section class="wire" aria-labelledby="form"><span class="wire-label">Block — form · not decided</span><h2 id="form">Form</h2><div class="slot">[no form. A form means a service to run, spam handling, and a deliverability decision.]</div></section><p class="wire-note"><a href="#">← home</a></p></div>
+<p class="sheet-head">/contact</p>
+<div class="wrap"><section class="wire wire--decided"><span class="wire-label">Email</span><p class="wide-footer">[email]</p></section><section class="wire"><span class="wire-label">Elsewhere</span><p class="slot">[social links]</p></section></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/sitemap</strong> — Wireframe map</p>
-<div class="wrap"><h1 class="page-title">Wireframe map</h1><p class="wire-note">Structure only: routes, the blocks on each, and the questions still open. No layout, colour or type is decided here.</p><section class="wire wire--decided" aria-labelledby="tree"><span class="wire-label">Routes</span><h2 id="tree">Sitemap</h2><ul><li><a href="#">/</a> — home. Order TBD.<ul><li>Hero — "I am human": animated illustration + wordmark</li><li>Design CTA → slide over to <a href="#">/design</a></li><li>Photography CTA → slide over to <a href="#">/photography</a></li><li>What makes me human — about Cole, red ground, revealed from a masked star on scroll</li><li>Contact CTA → <a href="#">/contact</a></li><li>Footer — one word, "contact", as the link</li></ul></li><li><a href="#">/design</a> — work index.<ul><li>Featured work — carousel wheel, "See all" beneath; absent below the threshold</li><li>Work cloud — hover to focus, click to enter a piece, scroll to continue. Pieces: <a href="#">/work/&lt;slug&gt;</a></li></ul></li><li><a href="#">/photography</a> — grid of photo sets, each →<a href="#">/photography/&lt;slug&gt;</a><ul><li><a href="#">[First photo set]</a> — 12 photographs</li><li><a href="#">[Second photo set]</a> — 8 photographs</li><li><a href="#">[Third photo set]</a> — 20 photographs</li><li><a href="#">[Fourth photo set]</a> — 5 photographs</li></ul></li><li><a href="#">/work/&lt;slug&gt;</a> — one piece: title, cover, body, gallery, process, prev/next</li><li><a href="#">/photography/&lt;slug&gt;</a> — one set: cover, photographs, prev/next</li><li><a href="#">/contact</a> — one address, no form</li><li>/404 — real, not an S3 error document</li></ul><p class="wire-note">Global on every page: masthead nav (Design · Photography · Contact) and the cookies disclaimer.</p></section><section class="wire" aria-labelledby="features"><span class="wire-label">Features that cross pages</span><h2 id="features">Features</h2><ul><li><strong>Featured work wheel.</strong> A carousel of slides on an arc, one focused at a time, with "See all" underneath going to the work cloud. Renders only when there are enough featured pieces to be a wheel; below that the page links straight to the cloud and the block does not exist. The threshold is a single constant,<code>WIREFRAME.featuredMinimum</code> in <code>src/lib/wireframe-content.ts</code>.</li><li><strong>Silly cookies disclaimer.</strong> One line, in voice, with a dismiss. Shown closed on every page; no handler yet — the static build's CSP refuses inline script, so dismissal needs a bundled script and a stored preference.</li></ul></section><section class="wire" aria-labelledby="changed"><span class="wire-label">What the strip changed</span><h2 id="changed">From the first design round</h2><ul><li><code>/about</code> → folded into "What makes me human" on /</li><li><code>/play</code> → dropped. The tier still exists in the content model, with no route.</li><li><code>/project/&lt;slug&gt;</code> → <code>/work/&lt;slug&gt;</code> (shape open)</li><li>All UI primitives, patterns, tokens, the Tailwind layer and both typefaces → removed</li><li>Infrastructure, the content model, the CMS boundary, SEO and the deploy pipeline → untouched</li></ul></section></div>
+<p class="sheet-head">/sitemap</p>
+<div class="wrap"><h1>Sitemap</h1><ul class="sitemap"><li><a href="#">/</a><ul><li>Hero — I am human</li><li>Design CTA → <a href="#">/design</a></li><li>Photography CTA → <a href="#">/photography</a></li><li>What makes me human</li><li>Contact CTA → <a href="#">/contact</a></li><li>Footer</li></ul></li><li><a href="#">/design</a><ul><li>Featured work</li><li>Work cloud → <a href="#">/work/&lt;slug&gt;</a><ul><li>Title · materials</li><li>Body</li><li>Gallery</li><li>Process</li><li>Prev / next</li></ul></li></ul></li><li><a href="#">/photography</a><ul><li>Sets</li><li><a href="#">/photography/&lt;slug&gt;</a><ul><li>Cover</li><li>Photographs</li><li>Prev / next</li></ul></li></ul></li><li><a href="#">/contact</a><ul><li>Email</li><li>Elsewhere</li></ul></li><li>/404</li></ul></div>
 </section>
 <section class="sheet">
-<p class="sheet-head"><strong>/404</strong> — 404</p>
-<div class="wrap"><h1 class="page-title">404</h1><p class="wire-note">[not found — one line, in voice, plus the way back]</p><p><a href="#">← home</a></p></div>
+<p class="sheet-head">/404</p>
+<div class="wrap"><h1>404</h1><p><a href="#">← home</a></p></div>
 </section>
 </body>
 </html>

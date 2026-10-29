@@ -1,20 +1,9 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import {
-  WIREFRAME_PHOTO_SETS,
-  getWireframePhotoSet,
-  type WireframePhotoSet,
-} from '~/lib/wireframe-content';
+import { WIREFRAME_PHOTO_SETS, type WireframePhotoSet } from '~/lib/wireframe-content';
 import { ROUTES } from '~/lib/site';
 
-/**
- * `/photography/<slug>` — one set, as a wireframe.
- *
- * The set is a shell: cover, a line about it, then the photographs. Deliberately
- * the shortest page on the site, because a photo set's whole argument is that
- * the pictures carry it.
- */
 export const getStaticPaths = (async () =>
   WIREFRAME_PHOTO_SETS.map((set, index) => ({
     params: { slug: set.slug },
@@ -34,8 +23,6 @@ const { set, previous, next } = Astro.props as {
   next: WireframePhotoSet | null;
 };
 
-/* Proves the module is the source of the shell, not that the set exists in a CMS. */
-const exists = getWireframePhotoSet(set.slug) !== null;
 const path = ROUTES.photoSet(set.slug);
 ---
 
@@ -44,50 +31,36 @@ const path = ROUTES.photoSet(set.slug);
   description="A set of photographs, by Cole Anderson."
   path={path}
 >
-  <h1 class="page-title">{set.title}</h1>
-  <p class="wire-note">
-    /photography/&lt;slug&gt; · {set.count} photographs · placeholder set{
-      exists ? '' : ' · NOT FOUND'
-    }
-  </p>
+  <h1>{set.title}</h1>
 
-  <section class="wire" aria-labelledby="set-cover">
-    <span class="wire-label">Block — cover</span>
-    <h2 id="set-cover">Cover</h2>
-    <div class="slot slot--cover">[cover photograph]</div>
-    <p class="wire-note">
-      Whether the cover is the first photograph in the set or a chosen one is undecided.
-    </p>
+  <section class="wire">
+    <span class="wire-label">Cover</span>
+    <div class="slot slot--cover">[cover]</div>
   </section>
 
-  <section class="wire" aria-labelledby="set-photos">
-    <span class="wire-label">Block — photographs</span>
-    <h2 id="set-photos">Photographs</h2>
+  <section class="wire">
+    <span class="wire-label">Photographs</span>
     <ul class="grid--photos grid">
       {
         Array.from({ length: set.count }, (_, i) => (
-          <li class="slot">[{(i + 1).toString().padStart(2, '0')}]</li>
+          <li class="slot">[{String(i + 1).padStart(2, '0')}]</li>
         ))
       }
     </ul>
-    <p class="wire-note">
-      One column on a phone, whatever the set holds; nothing is cropped to fit a grid.
-    </p>
   </section>
 
   <nav class="wire" aria-label="Previous and next set">
-    <span class="wire-label">Block — prev / next</span>
+    <span class="wire-label">Prev / next</span>
     <p>
       {
         previous ? (
           <a href={ROUTES.photoSet(previous.slug)}>← {previous.title}</a>
         ) : (
-          '[first set]'
+          '[first]'
         )
       }
       {' · '}
-      {next ? <a href={ROUTES.photoSet(next.slug)}>{next.title} →</a> : '[last set]'}
+      {next ? <a href={ROUTES.photoSet(next.slug)}>{next.title} →</a> : '[last]'}
     </p>
-    <p class="wire-note"><a href={ROUTES.photography}>All photography</a></p>
   </nav>
 </BaseLayout>
