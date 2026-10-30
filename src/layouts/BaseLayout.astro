@@ -15,7 +15,7 @@
  */
 import '~/styles/wireframe.css';
 import { buildSeo, type SeoInput } from '~/lib/seo';
-import { SITE, NAV } from '~/lib/site';
+import { SITE } from '~/lib/site';
 import { getSiteSettings } from '~/lib/contentful';
 
 interface Props extends SeoInput {
@@ -61,19 +61,15 @@ const seo = buildSeo(seoInput, {
     }
   </head>
   <body>
-    {/* Wireframe chrome, not site chrome. It exists so the routes can be walked. */}
-    <header class="chrome">
-      <a href="/">[wordmark]</a>
-      <nav aria-label="Primary">
-        {NAV.map((item) => <a href={item.href}>{item.label}</a>)}
-        <a href="/sitemap">Map</a>
-      </nav>
-    </header>
-
+    {
+      /*
+      No top nav. The site is four routes and it is entered through the two CTAs
+      and the footer word, so there is deliberately no global navigation — see
+      docs/design/wireframe.md.
+    */
+    }
     <main id="main">
-      <div class="wrap">
-        <slot />
-      </div>
+      <slot />
     </main>
 
     <div class="cookie-bar">

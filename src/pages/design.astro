@@ -13,11 +13,9 @@ const description = settings.seo.description ?? 'Work, by Cole Anderson.';
 ---
 
 <BaseLayout title="Design" path={ROUTES.design} description={description}>
-  <h1>Design</h1>
-
   {
     showFeatured && (
-      <section class="wire wire--decided">
+      <section class="wire page wire--decided">
         <span class="wire-label">Featured work</span>
         <ul class="grid--wheel grid">
           {featured.map((project) => (
@@ -33,8 +31,9 @@ const description = settings.seo.description ?? 'Work, by Cole Anderson.';
     )
   }
 
-  <section class="wire wire--decided" id="work-cloud">
+  <section class="wire page wire--decided" id="work-cloud">
     <span class="wire-label">Work cloud</span>
+    <h1>Design</h1>
     <div class="slot slot--hero">[work cloud]</div>
     <ul class="grid--sets grid">
       {

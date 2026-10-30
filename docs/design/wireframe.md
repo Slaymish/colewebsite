@@ -56,9 +56,10 @@ round starts.
 /404                  real page
 ```
 
-Global: masthead nav (Design · Photography · Contact) and the cookies
-disclaimer. `/sitemap` renders this same map on the site itself and is not part
-of it.
+There is no top-level navigation: the homepage is entered by scrolling and left
+through the two CTAs and the footer word, and every section is a full page,
+centred. The cookies disclaimer sits on every page. `/sitemap` renders this same
+map on the site itself and is not part of it, so nothing links to it.
 
 ## Features
 
@@ -109,6 +110,7 @@ Structural, not visual — the ones that change a route or a content type:
    really overlay, `/design` and `/photography` still need to exist as URLs for
    sharing and search.
 6. **Is "What makes me human" a section or a route?** It is a section on `/` here.
-7. **Does the footer word duplicate the contact CTA,** or take its place?
+7. **Is the footer word enough on its own?** There is no separate contact CTA
+   block now, so the footer is the only way out of the homepage into /contact.
 8. **Do single photographs that belong to no set have a home?**
 9. **Does a piece open as a page at all,** or as a slide-over from the cloud?

@@ -35,14 +35,13 @@ const description = project.metaDescription ?? project.body[0] ?? '';
   path={path}
   jsonLd={creativeWorkJsonLd({ title: project.title, description, path })}
 >
-  <h1>{project.title}</h1>
-
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Title · materials</span>
+    <h1>{project.title}</h1>
     <div class="slot slot--cover">[cover]</div>
     {
       project.tags.length > 0 && (
-        <ul>
+        <ul class="bare">
           {project.tags.map((tag) => (
             <li>{tag}</li>
           ))}
@@ -51,12 +50,12 @@ const description = project.metaDescription ?? project.body[0] ?? '';
     }
   </section>
 
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Body</span>
     {project.body.map((paragraph) => <p>{paragraph}</p>)}
   </section>
 
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Gallery</span>
     <ul class="grid--photos grid">
       {
@@ -71,7 +70,7 @@ const description = project.metaDescription ?? project.body[0] ?? '';
     </ul>
   </section>
 
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Process</span>
     <ul class="grid--photos grid">
       {
@@ -86,7 +85,7 @@ const description = project.metaDescription ?? project.body[0] ?? '';
     </ul>
   </section>
 
-  <nav class="wire" aria-label="Previous and next">
+  <nav class="wire page" aria-label="Previous and next">
     <span class="wire-label">Prev / next</span>
     <p>
       {previous ? <a href={ROUTES.work(previous.slug)}>← {previous.title}</a> : '[start]'}

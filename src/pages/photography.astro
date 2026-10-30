@@ -9,10 +9,9 @@ const description = settings.seo.description ?? 'Photography, by Cole Anderson.'
 ---
 
 <BaseLayout title="Photography" path={ROUTES.photography} description={description}>
-  <h1>Photography</h1>
-
-  <section class="wire wire--decided">
+  <section class="wire page wire--decided">
     <span class="wire-label">Sets</span>
+    <h1>Photography</h1>
     <ul class="grid--sets grid">
       {
         WIREFRAME_PHOTO_SETS.map((set) => (

@@ -32,20 +32,14 @@ export const SITE = {
 } as const;
 
 /**
- * Top-level navigation, as decided for the wireframe: the work index, the photo
- * index and contact. Home is reached from the wordmark, not from the nav.
+ * There is no top-level navigation, on purpose. The homepage is a sequence of
+ * full-page sections that are entered by scrolling, and the only routes out of
+ * it are the two CTAs and the footer word. Nothing renders a nav, so there is
+ * nothing to keep in step here.
  *
- * The prefixes stay here rather than in each page because the URL shape is still
- * an open question (docs/design/wireframe.md): `/design` carries the work cloud
- * while single pieces sit at `/work/<slug>`, and nothing enforces that pairing.
+ * Where a single piece lives still has to be one answer, so the route shapes are
+ * here rather than repeated in each template.
  */
-export const NAV: readonly { readonly href: string; readonly label: string }[] = [
-  { href: '/design', label: 'Design' },
-  { href: '/photography', label: 'Photography' },
-  { href: '/contact', label: 'Contact' },
-];
-
-/** Where a single piece lives, so a route change is one edit. */
 export const ROUTES = {
   home: '/',
   design: '/design',
