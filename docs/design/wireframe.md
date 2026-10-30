@@ -58,7 +58,7 @@ round starts.
 
 There is no top-level navigation: the homepage is entered by scrolling and left
 through the two CTAs and the footer word, and every section is a full page,
-centred. The cookies disclaimer sits on every page. `/sitemap` renders this same
+centred. `/sitemap` renders this same
 map on the site itself and is not part of it, so nothing links to it.
 
 ## Features
@@ -72,11 +72,6 @@ links straight to the cloud. The threshold is one constant,
 The count is of _explicitly_ featured pieces, not `getFeaturedProjects()` — that
 falls back to "all finished work" when nothing is flagged, which would put a wheel
 on a site where Cole has featured nothing.
-
-**Cookies disclaimer.** One silly line, rendered closed on every page. No dismiss
-handler: the static build's CSP sends `script-src 'self'` with no
-`'unsafe-inline'`, so dismissal needs a bundled script and a stored preference —
-a decision to make with the copy.
 
 ## The content model does not cover this yet
 

@@ -50,7 +50,7 @@ a.page {
   align-content: center;
   justify-items: center;
   gap: 1rem;
-  padding: 4rem 1rem 7rem;
+  padding: 4rem 1rem;
   text-align: center;
 }
 
@@ -124,19 +124,6 @@ a.page {
 
 .grid--photos {
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-}
-
-.cookie-bar {
-  position: fixed;
-  inset: auto 0 0 0;
-  border-top: 1px dashed #999;
-  background: #fff;
-  padding: 0.6rem 1rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
 }
 
 /* A block inside a centred page still needs a width of its own, or every slot
