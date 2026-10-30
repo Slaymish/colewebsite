@@ -34,31 +34,24 @@ a {
 
 /* A block that is also a link: the box is the target, not the words. */
 a.wire,
-a.slot {
-  display: block;
+a.slot,
+a.page {
+  display: grid;
   color: inherit;
 }
 
-/* The site's own chrome, drawn as chrome so the page content below it is not
-   mistaken for it. */
-.chrome {
-  border-bottom: 1px solid #ddd;
-  padding: 0.75rem 1rem;
-  display: flex;
+/* One block per page, and the page is the block. Centred on both axes, no
+   wrapper width, because "full page" is the layout decision being recorded. */
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  justify-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.chrome nav {
-  display: flex;
-  gap: 1rem;
-}
-
-.wrap {
-  padding: 1rem;
-  max-width: 60rem;
+  padding: 4rem 1rem 7rem;
+  text-align: center;
 }
 
 /* One box per block of page. Dashed = not built. */
@@ -146,13 +139,25 @@ a.slot {
   font-size: 12px;
 }
 
-/* Keeps the fixed bar from covering the last block on a short page. */
-main {
-  padding-bottom: 5rem;
+/* A block inside a centred page still needs a width of its own, or every slot
+   shrinks to the width of its label. */
+.page > .slot,
+.page > .grid {
+  width: min(100%, 40rem);
 }
 
-.wide-footer {
-  font-size: clamp(2rem, 12vw, 8rem);
-  line-height: 1;
-  margin: 2rem 0 0;
+/* Lists that are content rather than layout — materials, social links. */
+.bare {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* One word, at the size the page can carry. Used by the footer and the contact
+   address, which are the two places the site says any one thing loudly. */
+.shout {
+  font-size: clamp(3rem, 16vw, 13rem);
+  line-height: 0.9;
+  margin: 0;
+  letter-spacing: -0.02em;
 }

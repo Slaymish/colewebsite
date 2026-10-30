@@ -31,14 +31,13 @@ const path = ROUTES.photoSet(set.slug);
   description="A set of photographs, by Cole Anderson."
   path={path}
 >
-  <h1>{set.title}</h1>
-
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Cover</span>
+    <h1>{set.title}</h1>
     <div class="slot slot--cover">[cover]</div>
   </section>
 
-  <section class="wire">
+  <section class="wire page">
     <span class="wire-label">Photographs</span>
     <ul class="grid--photos grid">
       {
@@ -49,7 +48,7 @@ const path = ROUTES.photoSet(set.slug);
     </ul>
   </section>
 
-  <nav class="wire" aria-label="Previous and next set">
+  <nav class="wire page" aria-label="Previous and next set">
     <span class="wire-label">Prev / next</span>
     <p>
       {

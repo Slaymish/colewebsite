@@ -15,31 +15,28 @@ const description = settings.seo.description ?? SITE.description;
   description={description}
   jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
 >
-  <section class="wire wire--decided">
+  <section class="wire page wire--decided">
     <span class="wire-label">Hero</span>
     <h1>I am human</h1>
     <div class="slot slot--hero">[animated illustration] [wordmark]</div>
   </section>
 
-  <a class="wire slot slot--hero" href="/design">
+  <a class="wire page" href="/design">
     <span class="wire-label">Design CTA</span>
+    <span class="slot slot--hero">[design]</span>
   </a>
 
-  <a class="wire slot slot--hero" href="/photography">
+  <a class="wire page" href="/photography">
     <span class="wire-label">Photography CTA</span>
+    <span class="slot slot--hero">[photography]</span>
   </a>
 
-  <section class="wire wire--decided">
+  <section class="wire page wire--decided">
     <span class="wire-label">What makes me human</span>
     <div class="slot slot--hero">[about]</div>
   </section>
 
-  <a class="wire slot" href="/contact">
-    <span class="wire-label">Contact CTA</span>
-  </a>
-
-  <footer>
-    <span class="wire-label">Footer</span>
-    <p class="wide-footer"><a href="/contact">contact</a></p>
+  <footer class="page">
+    <a class="shout" href="/contact">contact me</a>
   </footer>
 </BaseLayout>
