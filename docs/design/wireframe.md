@@ -1,5 +1,11 @@
 # Wireframe — structure and open questions
 
+Update, 2026-11-01: the homepage hero now follows the supplied high-fidelity
+reference, with oversized three-line type and a blue SVG behind it. Wording and
+artwork are picked independently on each reload; see `src/lib/hero.ts` and
+`src/components/HomeHero.astro`. All other sections remain wireframes. The notes
+below record the original reset and the outstanding structural questions.
+
 Branch: `lofi/wireframe`. This file is the record of one step: the site's design
 was removed, and what replaced it is a set of pages that show only structure.
 Nothing here is a visual proposal. Where this file and `brief.md` disagree,

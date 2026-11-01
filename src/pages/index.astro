@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import HomeHero from '~/components/HomeHero.astro';
 import { getSiteSettings } from '~/lib/contentful';
 import { personJsonLd } from '~/lib/seo';
 import { SITE } from '~/lib/site';
@@ -15,11 +16,7 @@ const description = settings.seo.description ?? SITE.description;
   description={description}
   jsonLd={personJsonLd(jobTitle, description, settings.seo.profiles)}
 >
-  <section class="wire page wire--decided">
-    <span class="wire-label">Hero</span>
-    <h1>I am human</h1>
-    <div class="slot slot--hero">[animated illustration] [wordmark]</div>
-  </section>
+  <HomeHero />
 
   <a class="wire page" href="/design">
     <span class="wire-label">Design CTA</span>

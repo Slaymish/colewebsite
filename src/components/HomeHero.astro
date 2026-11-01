@@ -1,0 +1,99 @@
+---
+import { HERO_ARTWORK, HERO_PHRASES } from '~/lib/hero';
+
+const initialPhrase = HERO_PHRASES[0];
+---
+
+<section class="hero" aria-label="Introduction" data-home-hero>
+  <div
+    class="hero__art"
+    aria-hidden="true"
+    style={{ '--hero-art': `url("${HERO_ARTWORK[0]}")` }}
+  >
+  </div>
+  <h1 class="hero__title" aria-label={initialPhrase.label}>
+    <span aria-hidden="true">I am</span>
+    <span aria-hidden="true" data-hero-modifier>{initialPhrase.modifier}</span>
+    <span aria-hidden="true">human</span>
+  </h1>
+</section>
+
+<script>
+  import { HERO_ARTWORK, HERO_PHRASES } from '~/lib/hero';
+
+  const hero = document.querySelector<HTMLElement>('[data-home-hero]');
+  const title = hero?.querySelector('h1');
+  const modifier = hero?.querySelector('[data-hero-modifier]');
+  const art = hero?.querySelector<HTMLElement>('.hero__art');
+
+  if (title && modifier && art) {
+    // This runs in the browser: build-time randomness would be fixed for everyone.
+    const phrase =
+      HERO_PHRASES[Math.floor(Math.random() * HERO_PHRASES.length)] ?? HERO_PHRASES[0];
+    const artwork = HERO_ARTWORK[Math.floor(Math.random() * HERO_ARTWORK.length)];
+    title.setAttribute('aria-label', phrase.label);
+    modifier.textContent = phrase.modifier;
+    if (artwork) art.style.setProperty('--hero-art', `url("${artwork}")`);
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background: #f2f0f0;
+    color: #262626;
+  }
+
+  .hero__art {
+    position: absolute;
+    z-index: -1;
+    top: -5%;
+    right: -18vh;
+    width: 115vh;
+    height: 115%;
+    background: #0f5c8c;
+    mask: var(--hero-art) center / contain no-repeat;
+    pointer-events: none;
+  }
+
+  .hero__title {
+    position: absolute;
+    inset: 24% 3.5% 7%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin: 0;
+    font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    font-size: min(11.5vw, 20vh);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .hero__title span {
+    display: block;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .hero__art {
+      top: -4%;
+      right: -38%;
+      width: 125%;
+      height: 108%;
+      mask-size: cover;
+    }
+
+    .hero__title {
+      inset: auto 4.5% 9%;
+      gap: 0.35em;
+      font-size: 11.7vw;
+    }
+  }
+</style>

@@ -3,8 +3,8 @@
 Portfolio site for Cole Anderson. Static build, headless CMS, served from S3
 behind CloudFront.
 
-**This branch is a reset, not a design.** The first design round has been removed
-and replaced with an unstyled wireframe of the decided structure. Read
+**The home hero is the first high-fidelity section.** The rest of the site remains
+an unstyled wireframe of the decided structure. Read
 `docs/design/wireframe.md` before changing anything here — it carries the sitemap,
 the routes, and the open questions each page is waiting on. `docs/design/brief.md`
 is still the authority on what the site is for.
@@ -48,13 +48,24 @@ infra/                      CDK app — buckets, distributions, DNS, CI roles
 migrations/                 Contentful content model, declared as desired state
 ```
 
-There are no components on this branch. Every page is plain HTML in one file, on
-purpose: a wireframe that has been factored into reusable pieces has already
-started making layout decisions.
+The home hero lives in `src/components/HomeHero.astro`, with scoped styling.
+The remaining wireframe sections stay as plain HTML in their route files.
+
+### Home hero
+
+Edit `HERO_PHRASES` in `src/lib/hero.ts` to change the available words. Each entry
+has a middle-line `modifier` and a full `label` for screen readers. The visible
+first and last lines remain "I am" and "human".
+
+Add `hero_*.svg` files to `src/assets/` to expand the illustration pool; no import
+list needs updating. SVGs render as blue silhouettes using their transparency.
+The browser picks a phrase and illustration independently on every page load,
+so consecutive reloads can repeat. There is no timed rotation. Without JavaScript,
+the first phrase and illustration remain visible.
 
 ## What is not decided yet
 
-**The design, entirely.** No palette, typeface, scale, grid or motion. Colour
+**The design beyond the home hero.** No wider typeface, scale, grid or motion system. Colour
 tokens, the Tailwind utility layer, both fonts and every primitive were removed
 with the first design round. `lib/theme.ts` still exists — the CMS palette is
 framework, not design — but nothing renders it.
