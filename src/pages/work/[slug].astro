@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 import { getProjects } from '~/lib/contentful';
 import { creativeWorkJsonLd } from '~/lib/seo';
 import { ROUTES } from '~/lib/site';
@@ -35,6 +36,12 @@ const description = project.metaDescription ?? project.body[0] ?? '';
   path={path}
   jsonLd={creativeWorkJsonLd({ title: project.title, description, path })}
 >
+  <a
+    class="panel-close icon-control"
+    href="/design#work-cloud"
+    aria-label="Back to design"
+    title="Back to design"><Icon name="arrow-left" /></a
+  >
   <section class="wire page">
     <span class="wire-label">Title · materials</span>
     <h1>{project.title}</h1>
@@ -88,9 +95,25 @@ const description = project.metaDescription ?? project.body[0] ?? '';
   <nav class="wire page" aria-label="Previous and next">
     <span class="wire-label">Prev / next</span>
     <p>
-      {previous ? <a href={ROUTES.work(previous.slug)}>← {previous.title}</a> : '[start]'}
+      {
+        previous ? (
+          <a href={ROUTES.work(previous.slug)} class="icon-text">
+            <Icon name="arrow-left" size={16} /> {previous.title}
+          </a>
+        ) : (
+          '[start]'
+        )
+      }
       {' · '}
-      {next ? <a href={ROUTES.work(next.slug)}>{next.title} →</a> : '[end]'}
+      {
+        next ? (
+          <a href={ROUTES.work(next.slug)} class="icon-text">
+            {next.title} <Icon name="arrow-right" size={16} />
+          </a>
+        ) : (
+          '[end]'
+        )
+      }
     </p>
   </nav>
 </BaseLayout>

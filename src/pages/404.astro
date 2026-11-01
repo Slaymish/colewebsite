@@ -1,8 +1,13 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 ---
 
 <BaseLayout title="Not found" path="/404" noindex>
   <h1>404</h1>
-  <p><a href="/">← home</a></p>
+  <p>
+    <a class="icon-control" href="/" aria-label="Back to home" title="Back to home"
+      ><Icon name="arrow-left" /></a
+    >
+  </p>
 </BaseLayout>

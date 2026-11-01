@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 import { getProjects, getSiteSettings } from '~/lib/contentful';
 import { WIREFRAME } from '~/lib/wireframe-content';
 import { ROUTES } from '~/lib/site';
@@ -13,6 +14,13 @@ const description = settings.seo.description ?? 'Work, by Cole Anderson.';
 ---
 
 <BaseLayout title="Design" path={ROUTES.design} description={description}>
+  <a
+    class="panel-close icon-control"
+    href="/#design"
+    data-return-to-cta
+    aria-label="Back to design section"
+    title="Back to design section"><Icon name="arrow-left" /></a
+  >
   {
     showFeatured && (
       <section class="wire page wire--decided">
@@ -26,7 +34,14 @@ const description = settings.seo.description ?? 'Work, by Cole Anderson.';
             </li>
           ))}
         </ul>
-        <a href="#work-cloud">See all</a>
+        <a
+          class="icon-control"
+          href="#work-cloud"
+          aria-label="See all design work"
+          title="See all design work"
+        >
+          <Icon name="layout-grid" />
+        </a>
       </section>
     )
   }

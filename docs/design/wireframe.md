@@ -1,10 +1,17 @@
 # Wireframe — structure and open questions
 
 Update, 2026-11-01: the homepage hero now follows the supplied high-fidelity
-reference, with oversized three-line type and a blue SVG behind it. Wording and
-artwork are picked independently on each reload; see `src/lib/hero.ts` and
-`src/components/HomeHero.astro`. All other sections remain wireframes. The notes
-below record the original reset and the outstanding structural questions.
+reference, with oversized three-line type and a blue SVG behind it. The
+wording is picked on each reload, while illustrations rotate at full opacity
+(0.65 s normally, 4 s for reduced motion). The illustration opens `/illustrations`,
+a scroll-driven space with a grid alternative; selecting artwork returns home with
+that illustration. Design and photography links are oversized words and navigate
+through spatial panels with their own URLs. Forward movement follows the section's
+position, while Back centres the parent and moves horizontally. Gallery mode and
+camera position persist; Lenis smooths scrolling with a native reduced-motion fallback. A background texture is always present,
+with its final treatment still undecided. Other content remains wireframe. See
+`src/lib/hero.ts` and `src/components/HomeHero.astro`. The notes below record the
+original reset and the outstanding structural questions.
 
 Branch: `lofi/wireframe`. This file is the record of one step: the site's design
 was removed, and what replaced it is a set of pages that show only structure.

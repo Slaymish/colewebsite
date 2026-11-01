@@ -18,22 +18,47 @@ const description = settings.seo.description ?? SITE.description;
 >
   <HomeHero />
 
-  <a class="wire page" href="/design">
-    <span class="wire-label">Design CTA</span>
-    <span class="slot slot--hero">[design]</span>
-  </a>
+  <a class="home-section home-word" id="design" href="/design"><span>DESIGN</span></a>
 
-  <a class="wire page" href="/photography">
-    <span class="wire-label">Photography CTA</span>
-    <span class="slot slot--hero">[photography]</span>
-  </a>
+  <a class="home-section home-word" id="photography" href="/photography"
+    ><span>PHOTOGRAPHY</span></a
+  >
 
-  <section class="wire page wire--decided">
+  <section class="page">
     <span class="wire-label">What makes me human</span>
     <div class="slot slot--hero">[about]</div>
   </section>
 
-  <footer class="page">
-    <a class="shout" href="/contact">contact me</a>
+  <footer class="home-section" id="contact">
+    <a class="home-word" href="/contact">CONTACT ME</a>
   </footer>
 </BaseLayout>
+
+<style>
+  .home-section {
+    display: grid;
+    min-height: 100svh;
+    place-items: center;
+    margin: 0;
+    padding: 4vw;
+    text-align: center;
+  }
+  .home-word {
+    font-family: var(--display-font);
+    font-weight: 900;
+    font-size: clamp(1.5rem, 11vw, 16rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .home-word:focus-visible {
+    outline: 3px solid #0f5c8c;
+    outline-offset: 0.25em;
+  }
+  .home-section.home-word:focus-visible {
+    outline: none;
+  }
+  .home-section.home-word:focus-visible > span {
+    outline: 3px solid #0f5c8c;
+    outline-offset: 0.1em;
+  }
+</style>

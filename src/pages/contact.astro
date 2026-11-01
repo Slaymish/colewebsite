@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 import { getSiteSettings } from '~/lib/contentful';
 import { ROUTES } from '~/lib/site';
 
@@ -8,6 +9,13 @@ const email = settings.contact.email;
 ---
 
 <BaseLayout title="Contact" path={ROUTES.contact} description="Contact Cole Anderson.">
+  <a
+    class="panel-close icon-control"
+    href="/#contact"
+    data-return-to-cta
+    aria-label="Back to contact section"
+    title="Back to contact section"><Icon name="arrow-left" /></a
+  >
   <section class="wire page wire--decided">
     <span class="wire-label">Email</span>
     <p class="shout">

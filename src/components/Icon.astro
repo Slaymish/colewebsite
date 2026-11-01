@@ -1,0 +1,30 @@
+---
+import ArrowLeft from '~/assets/icons/arrow-left.svg';
+import ArrowRight from '~/assets/icons/arrow-right.svg';
+import ArrowDown from '~/assets/icons/arrow-down.svg';
+import LayoutGrid from '~/assets/icons/layout-grid.svg';
+import Orbit from '~/assets/icons/orbit.svg';
+import Sliders from '~/assets/icons/sliders-horizontal.svg';
+import Play from '~/assets/icons/play.svg';
+import Pause from '~/assets/icons/pause.svg';
+
+const icons = {
+  'arrow-left': ArrowLeft,
+  'arrow-right': ArrowRight,
+  'arrow-down': ArrowDown,
+  'layout-grid': LayoutGrid,
+  orbit: Orbit,
+  sliders: Sliders,
+  play: Play,
+  pause: Pause,
+};
+interface Props {
+  name: keyof typeof icons;
+  size?: number;
+}
+const { name, size = 20 } = Astro.props;
+const Glyph = icons[name];
+---
+
+<!-- Lucide icons, ISC license: /licenses/lucide.txt -->
+<Glyph width={size} height={size} aria-hidden="true" focusable="false" />

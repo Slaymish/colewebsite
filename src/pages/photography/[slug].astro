@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 import { WIREFRAME_PHOTO_SETS, type WireframePhotoSet } from '~/lib/wireframe-content';
 import { ROUTES } from '~/lib/site';
 
@@ -31,6 +32,12 @@ const path = ROUTES.photoSet(set.slug);
   description="A set of photographs, by Cole Anderson."
   path={path}
 >
+  <a
+    class="panel-close icon-control"
+    href="/photography#photo-sets"
+    aria-label="Back to photography"
+    title="Back to photography"><Icon name="arrow-left" /></a
+  >
   <section class="wire page">
     <span class="wire-label">Cover</span>
     <h1>{set.title}</h1>
@@ -53,13 +60,23 @@ const path = ROUTES.photoSet(set.slug);
     <p>
       {
         previous ? (
-          <a href={ROUTES.photoSet(previous.slug)}>← {previous.title}</a>
+          <a href={ROUTES.photoSet(previous.slug)} class="icon-text">
+            <Icon name="arrow-left" size={16} /> {previous.title}
+          </a>
         ) : (
           '[first]'
         )
       }
       {' · '}
-      {next ? <a href={ROUTES.photoSet(next.slug)}>{next.title} →</a> : '[last]'}
+      {
+        next ? (
+          <a href={ROUTES.photoSet(next.slug)} class="icon-text">
+            {next.title} <Icon name="arrow-right" size={16} />
+          </a>
+        ) : (
+          '[last]'
+        )
+      }
     </p>
   </nav>
 </BaseLayout>

@@ -10,13 +10,17 @@
  * What is gone is everything from the first design round: the palette layer in
  * `lib/theme.ts` (kept, but no longer rendered — a wireframe has no brand
  * colour), the font imports, the Tailwind utility layer, the header and footer
- * patterns, and the UI primitives. `src/styles/wireframe.css` is the only
- * stylesheet left and it exists to draw boxes, not to propose a look.
+ * patterns, and the UI primitives. `src/styles/wireframe.css` still describes
+ * unfinished content; `site.css` now adds the shared font, texture and panel motion.
  */
 import '~/styles/wireframe.css';
+import '~/styles/site.css';
+import 'lenis/dist/lenis.css';
 import { buildSeo, type SeoInput } from '~/lib/seo';
 import { SITE } from '~/lib/site';
 import { getSiteSettings } from '~/lib/contentful';
+import { ClientRouter } from 'astro:transitions';
+import { panelTransition } from '~/lib/navigation';
 
 interface Props extends SeoInput {
   jsonLd?: Record<string, unknown>;
@@ -33,10 +37,12 @@ const seo = buildSeo(seoInput, {
 });
 ---
 
-<html lang="en-NZ">
+<html lang="en-NZ" transition:name="root" transition:animate={panelTransition}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="/scripts/gallery-preference.js" is:inline></script>
+    <ClientRouter />
     <title>{seo.title}</title>
     <meta name="description" content={seo.description} />
     <link rel="canonical" href={seo.canonical} />
@@ -73,3 +79,16 @@ const seo = buildSeo(seoInput, {
     </main>
   </body>
 </html>
+
+<script>
+  import { setupSiteTexture } from '~/lib/site-texture';
+  import { setupPanelNavigation } from '~/lib/navigation';
+  import { setupIllustrationGallery } from '~/lib/illustration-gallery';
+  import { setupSmoothScroll } from '~/lib/scroll';
+  setupPanelNavigation();
+  document.addEventListener('astro:after-swap', setupIllustrationGallery);
+  document.addEventListener('astro:page-load', setupIllustrationGallery);
+  setupSmoothScroll();
+  document.addEventListener('astro:page-load', setupSiteTexture);
+  document.addEventListener('astro:after-swap', setupSiteTexture);
+</script>
