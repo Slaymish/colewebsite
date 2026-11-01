@@ -1,0 +1,137 @@
+:root {
+  --display-font: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+}
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  background: #f2f0f0;
+  color: #262626;
+}
+
+main > .wire.page {
+  border: 0;
+  margin: 0;
+}
+
+.icon-control {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #26262630;
+  border-radius: 50%;
+  padding: 0;
+  background: #f2f0f0e6;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+.icon-control[hidden] {
+  display: none;
+}
+.icon-control:hover {
+  color: #0f5c8c;
+  border-color: currentColor;
+}
+.icon-control:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.icon-control:focus-visible {
+  outline: 2px solid #0f5c8c;
+  outline-offset: 4px;
+}
+.icon-control svg {
+  display: block;
+}
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* A single static layer behind the content, shared by every section and route. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--site-texture, none);
+  background-size: var(--site-texture-size, 256px);
+  background-repeat: repeat;
+  opacity: var(--site-texture-strength, 0.18);
+}
+
+@keyframes panel-exit {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, calc(-1 * var(--panel-offset-y, 0px)), 0);
+  }
+}
+@keyframes panel-enter {
+  from {
+    transform: translate3d(100%, var(--panel-offset-y, 0px), 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes panel-leave {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, var(--panel-offset-y, 0px), 0);
+  }
+}
+@keyframes panel-return {
+  from {
+    transform: translate3d(-100%, calc(-1 * var(--panel-offset-y, 0px)), 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+/* Snapshot the viewport, not the full-height main: changing page heights must
+   not interpolate the scroll position through the top of the homepage. */
+::view-transition-group(root) {
+  animation: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  background-color: #f2f0f0;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+:root[data-astro-transition='back']::view-transition-old(root) {
+  z-index: 3;
+}
+
+.panel-close {
+  position: fixed;
+  z-index: 2;
+  top: 1.5rem;
+  left: 1.5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

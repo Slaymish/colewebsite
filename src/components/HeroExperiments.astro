@@ -1,0 +1,166 @@
+---
+import { SITE_TEXTURES } from '~/lib/site-texture';
+import Icon from '~/components/Icon.astro';
+---
+
+<details class="experiments" data-hero-panel>
+  <summary aria-label="Site lab" title="Site lab"
+    ><span class="experiments__title">Site lab</span><Icon name="sliders" /></summary
+  >
+  <div class="experiments__body" data-lenis-prevent>
+    <p class="experiments__heading">Illustration rotation</p>
+    <label for="hero-interval"
+      >Normal speed <output for="hero-interval">0.65 s</output></label
+    >
+    <input
+      id="hero-interval"
+      name="interval"
+      type="range"
+      min="0.25"
+      max="2"
+      step="0.05"
+      value="0.65"
+    />
+    <label for="hero-reducedInterval"
+      >Reduced motion speed <output for="hero-reducedInterval">4 s</output></label
+    >
+    <input
+      id="hero-reducedInterval"
+      name="reducedInterval"
+      type="range"
+      min="2"
+      max="10"
+      step="0.5"
+      value="4"
+    />
+    <p class="experiments__heading">Site background</p>
+    <label for="site-background">Texture</label>
+    <select id="site-background" name="background">
+      {SITE_TEXTURES.map(({ id, label }) => <option value={id}>{label}</option>)}
+    </select>
+    <label for="hero-backgroundScale"
+      >Texture scale <output for="hero-backgroundScale">1×</output></label
+    >
+    <input
+      id="hero-backgroundScale"
+      name="backgroundScale"
+      type="range"
+      min="0.25"
+      max="4"
+      step="0.05"
+      value="1"
+    />
+    <label for="hero-backgroundStrength"
+      >Texture strength <output for="hero-backgroundStrength">0.18</output></label
+    >
+    <input
+      id="hero-backgroundStrength"
+      name="backgroundStrength"
+      type="range"
+      min="0.03"
+      max="0.6"
+      step="0.01"
+      value="0.18"
+    />
+    <p class="experiments__note">
+      Settings stay in the URL. Copy the link to share this setup.
+    </p>
+  </div>
+</details>
+
+<style>
+  .experiments {
+    position: fixed;
+    z-index: 20;
+    right: 1rem;
+    bottom: 1rem;
+    width: min(18rem, calc(100vw - 2rem));
+    border: 1px solid #26262626;
+    border-radius: 0.75rem;
+    background: #f2f0f0f5;
+    color: #262626;
+    box-shadow: 0 4px 24px #2626260d;
+    font:
+      12px/1.5 Arial,
+      sans-serif;
+  }
+  .experiments:not([open]) {
+    width: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .experiments:not([open]) .experiments__title {
+    display: none;
+  }
+  .experiments:not([open]) summary {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #26262630;
+    border-radius: 50%;
+    background: #f2f0f0e6;
+    padding: 0;
+    justify-content: center;
+  }
+  .experiments:not([open]) summary:hover {
+    color: #0f5c8c;
+    border-color: currentColor;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.9rem;
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .experiments__body {
+    max-height: min(70svh, 34rem);
+    overflow-y: auto;
+    padding: 0 1rem 1rem;
+  }
+  .experiments__heading {
+    margin: 0.8rem 0 0.5rem;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  label {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  select {
+    width: 100%;
+    margin: 0.35rem 0 0.75rem;
+    padding: 0.5rem;
+    font: inherit;
+  }
+  input[type='range'] {
+    width: 100%;
+    margin: 0.5rem 0 0.9rem;
+    accent-color: #0f5c8c;
+  }
+  .experiments__pause {
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+  .experiments__note {
+    margin: 0.8rem 0 0;
+    opacity: 0.65;
+  }
+  summary:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #0f5c8c;
+    outline-offset: 3px;
+  }
+</style>

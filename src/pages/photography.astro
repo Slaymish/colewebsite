@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Icon from '~/components/Icon.astro';
 import { WIREFRAME_PHOTO_SETS } from '~/lib/wireframe-content';
 import { getSiteSettings } from '~/lib/contentful';
 import { ROUTES } from '~/lib/site';
@@ -9,7 +10,14 @@ const description = settings.seo.description ?? 'Photography, by Cole Anderson.'
 ---
 
 <BaseLayout title="Photography" path={ROUTES.photography} description={description}>
-  <section class="wire page wire--decided">
+  <a
+    class="panel-close icon-control"
+    href="/#photography"
+    data-return-to-cta
+    aria-label="Back to photography section"
+    title="Back to photography section"><Icon name="arrow-left" /></a
+  >
+  <section class="wire page wire--decided" id="photo-sets">
     <span class="wire-label">Sets</span>
     <h1>Photography</h1>
     <ul class="grid--sets grid">
