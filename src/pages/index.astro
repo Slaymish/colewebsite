@@ -37,10 +37,10 @@ const description = settings.seo.description ?? SITE.description;
 <style>
   .home-section {
     display: grid;
-    min-height: 100svh;
+    min-height: var(--lab-section-height, 100svh);
     place-items: center;
     margin: 0;
-    padding: var(--lab-section-padding, 4vw);
+    padding: 4vw;
     text-align: center;
   }
   .home-word {
