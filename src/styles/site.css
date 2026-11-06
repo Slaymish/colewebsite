@@ -8,8 +8,8 @@ html {
 body {
   position: relative;
   isolation: isolate;
-  background: #f2f0f0;
-  color: #262626;
+  background: var(--lab-ground, #f2f0f0);
+  color: var(--lab-ink, #262626);
 }
 
 main > .wire.page {
@@ -23,10 +23,10 @@ main > .wire.page {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
-  border: 1px solid #26262630;
+  border: 1px solid color-mix(in srgb, var(--lab-ink, #262626) 18.82%, transparent);
   border-radius: 50%;
   padding: 0;
-  background: #f2f0f0e6;
+  background: color-mix(in srgb, var(--lab-ground, #f2f0f0) 90.2%, transparent);
   color: inherit;
   cursor: pointer;
   transition:
@@ -38,7 +38,7 @@ main > .wire.page {
   display: none;
 }
 .icon-control:hover {
-  color: #0f5c8c;
+  color: var(--lab-accent, #0f5c8c);
   border-color: currentColor;
 }
 .icon-control:disabled {
@@ -46,7 +46,7 @@ main > .wire.page {
   cursor: default;
 }
 .icon-control:focus-visible {
-  outline: 2px solid #0f5c8c;
+  outline: 2px solid var(--lab-accent, #0f5c8c);
   outline-offset: 4px;
 }
 .icon-control svg {
@@ -69,6 +69,7 @@ body::before {
   background-size: var(--site-texture-size, 256px);
   background-repeat: repeat;
   opacity: var(--site-texture-strength, 0.18);
+  mix-blend-mode: var(--lab-texture-blend, normal);
 }
 
 @keyframes panel-exit {
@@ -111,7 +112,12 @@ body::before {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   mix-blend-mode: normal;
-  background-color: #f2f0f0;
+  background-color: var(--lab-ground, #f2f0f0);
+}
+:root[data-lab]::view-transition-old(root),
+:root[data-lab]::view-transition-new(root) {
+  animation-duration: var(--lab-transition-duration);
+  animation-timing-function: var(--lab-transition-easing);
 }
 ::view-transition-new(root) {
   z-index: 2;

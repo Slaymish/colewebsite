@@ -1,0 +1,421 @@
+---
+import { LAB_CONTROLS, LAB_PALETTE, LAB_TABS, type LabControl } from '~/lib/lab/controls';
+import Icon from '~/components/Icon.astro';
+
+const groupsFor = (tab: string) => {
+  const groups = new Map<string, LabControl[]>();
+  for (const control of LAB_CONTROLS as readonly LabControl[]) {
+    if (control.tab !== tab) continue;
+    groups.set(control.group, [...(groups.get(control.group) ?? []), control]);
+  }
+  return [...groups];
+};
+const id = (key: string) => `lab-${key}`;
+const shown = (control: LabControl) =>
+  control.kind === 'range' ? `${control.default}${control.unit}` : '';
+---
+
+<details class="lab" data-lab-panel>
+  <summary aria-label="Site lab" title="Site lab"
+    ><span class="lab__title">Site lab</span><Icon name="sliders" /></summary
+  >
+  <div class="lab__body" data-lenis-prevent>
+    <div class="lab__tabs" role="tablist" aria-label="Site lab sections">
+      {
+        LAB_TABS.map((tab, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`lab-tab-${tab.id}`}
+            aria-controls={`lab-section-${tab.id}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+            data-lab-tab={tab.id}
+          >
+            {tab.label}
+            <span class="lab__count" data-lab-count={tab.id} hidden />
+          </button>
+        ))
+      }
+    </div>
+    {
+      LAB_TABS.map((tab, index) => (
+        <div
+          class="lab__section"
+          role="tabpanel"
+          id={`lab-section-${tab.id}`}
+          aria-labelledby={`lab-tab-${tab.id}`}
+          data-lab-section={tab.id}
+          hidden={index !== 0}
+        >
+          {groupsFor(tab.id).map(([group, controls]) => (
+            <section class="lab__group">
+              <h2 class="lab__heading">{group}</h2>
+              {controls.map((control) => (
+                <div class="lab__control" data-lab-control={control.key}>
+                  {control.kind === 'swatch' ? (
+                    <fieldset class="lab__swatches">
+                      <legend class="lab__label">
+                        <span class="lab__name">{control.label}</span>
+                        <span data-lab-value={control.key} />
+                      </legend>
+                      <div class="lab__swatch-row">
+                        {LAB_PALETTE.map((swatch) => (
+                          <label
+                            class="lab__swatch"
+                            title={`${swatch.label} ${swatch.hex}`}
+                          >
+                            <input
+                              type="radio"
+                              name={control.key}
+                              value={swatch.value}
+                              checked={swatch.value === control.default}
+                              aria-label={`${swatch.label} ${swatch.hex}`}
+                            />
+                            <span style={{ background: swatch.hex }} />
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                  ) : control.kind === 'toggle' ? (
+                    <label class="lab__label lab__toggle" for={id(control.key)}>
+                      <span class="lab__name">{control.label}</span>
+                      <input
+                        id={id(control.key)}
+                        name={control.key}
+                        type="checkbox"
+                        role="switch"
+                        checked={control.default}
+                      />
+                    </label>
+                  ) : (
+                    <>
+                      <label class="lab__label" for={id(control.key)}>
+                        <span class="lab__name">{control.label}</span>
+                        {control.kind === 'range' && (
+                          <output for={id(control.key)} data-lab-value={control.key}>
+                            {shown(control)}
+                          </output>
+                        )}
+                      </label>
+                      {control.kind === 'range' ? (
+                        <input
+                          id={id(control.key)}
+                          name={control.key}
+                          type="range"
+                          min={control.min}
+                          max={control.max}
+                          step={control.step}
+                          value={control.default}
+                        />
+                      ) : (
+                        <select id={id(control.key)} name={control.key}>
+                          {control.options.map((option) => (
+                            <option
+                              value={option.value}
+                              selected={option.value === control.default}
+                            >
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </>
+                  )}
+                  {control.hint && <p class="lab__hint">{control.hint}</p>}
+                  <button
+                    class="lab__reset-one"
+                    type="button"
+                    data-lab-reset={control.key}
+                    aria-label={`Reset ${control.group} ${control.label}`}
+                    title="Reset to default"
+                    hidden
+                  >
+                    Reset
+                  </button>
+                </div>
+              ))}
+              {group === 'Roles' && (
+                <p class="lab__hint" data-lab-contrast aria-live="polite" />
+              )}
+            </section>
+          ))}
+        </div>
+      ))
+    }
+    <div class="lab__footer">
+      <button type="button" data-lab-copy>Copy link</button>
+      <button type="button" data-lab-reset-tab>Reset tab</button>
+      <button type="button" data-lab-reset-all>Reset all</button>
+    </div>
+    <p class="lab__status" data-lab-status aria-live="polite">
+      Settings stay in the URL and follow you across pages.
+    </p>
+  </div>
+</details>
+
+<style>
+  .lab {
+    position: fixed;
+    z-index: 20;
+    right: 1rem;
+    bottom: 1rem;
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid #26262626;
+    border-radius: 0.75rem;
+    background: #f2f0f0f5;
+    color: #262626;
+    box-shadow: 0 4px 24px #2626260d;
+    font:
+      12px/1.5 Arial,
+      sans-serif;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  .lab:not([open]) {
+    width: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .lab:not([open]) .lab__title {
+    display: none;
+  }
+  .lab:not([open]) summary {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #26262630;
+    border-radius: 50%;
+    background: #f2f0f0e6;
+    padding: 0;
+    justify-content: center;
+  }
+  .lab:not([open]) summary:hover {
+    color: #0f5c8c;
+    border-color: currentColor;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.9rem;
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .lab__body {
+    display: flex;
+    flex-direction: column;
+    max-height: min(75svh, 38rem);
+  }
+  .lab__tabs {
+    display: flex;
+    gap: 0.15rem;
+    margin: 0 0.75rem;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    background: #26262610;
+  }
+  .lab__tabs button {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    min-height: 32px;
+    border: 0;
+    border-radius: 0.35rem;
+    padding: 0 0.25rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .lab__tabs button[aria-selected='true'] {
+    background: #fff;
+    font-weight: 700;
+    box-shadow: 0 1px 3px #26262620;
+  }
+  .lab__count {
+    min-width: 1.5em;
+    border-radius: 1em;
+    padding: 0 0.25em;
+    background: #0f5c8c;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .lab__count[hidden] {
+    display: none;
+  }
+  .lab__section {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 1rem 0.5rem;
+  }
+  .lab__group + .lab__group {
+    border-top: 1px solid #2626261a;
+  }
+  .lab__heading {
+    margin: 0.9rem 0 0.4rem;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .lab__control {
+    position: relative;
+    margin-bottom: 0.65rem;
+  }
+  .lab__label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding-right: 3.25rem;
+  }
+  .lab__name::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 0.4rem 1px 0;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .lab__control[data-changed] .lab__name::before {
+    background: #0f5c8c;
+  }
+  .lab__control[data-changed] .lab__name {
+    font-weight: 700;
+  }
+  output,
+  [data-lab-value] {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+  .lab__reset-one {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+    padding: 0;
+    background: none;
+    color: #0f5c8c;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .lab__reset-one[hidden] {
+    display: none;
+  }
+  select {
+    width: 100%;
+    margin-top: 0.3rem;
+    padding: 0.4rem;
+    font: inherit;
+  }
+  input[type='range'] {
+    width: 100%;
+    margin: 0.35rem 0 0;
+    accent-color: #0f5c8c;
+  }
+  .lab__toggle {
+    cursor: pointer;
+  }
+  .lab__toggle input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #0f5c8c;
+  }
+  .lab__swatches {
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+  .lab__swatches legend {
+    width: 100%;
+    padding: 0 3.25rem 0 0;
+  }
+  .lab__swatch-row {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+  }
+  .lab__swatch {
+    position: relative;
+    cursor: pointer;
+  }
+  .lab__swatch input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .lab__swatch span {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #26262640;
+    border-radius: 50%;
+  }
+  .lab__swatch input:checked + span {
+    outline: 2px solid #262626;
+    outline-offset: 2px;
+  }
+  .lab__swatch input:focus-visible + span {
+    outline: 2px solid #0f5c8c;
+    outline-offset: 2px;
+  }
+  .lab__hint {
+    margin: 0.2rem 0 0;
+    opacity: 0.6;
+  }
+  .lab__footer {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.75rem 1rem 0;
+    border-top: 1px solid #2626261a;
+  }
+  .lab__footer button {
+    flex: 1;
+    min-height: 32px;
+    border: 1px solid #26262640;
+    border-radius: 0.35rem;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .lab__footer button:hover {
+    border-color: #0f5c8c;
+    color: #0f5c8c;
+  }
+  .lab__status {
+    margin: 0;
+    padding: 0.5rem 1rem 0.75rem;
+    opacity: 0.65;
+  }
+  summary:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #0f5c8c;
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import { setupLabPanel } from '~/lib/lab/panel';
+  document.addEventListener('astro:page-load', setupLabPanel);
+</script>

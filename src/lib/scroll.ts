@@ -1,4 +1,5 @@
 import Lenis from 'lenis';
+import { labValues, onLabChange } from '~/lib/lab/state';
 
 let engine: Lenis | undefined;
 const listeners = new Set<() => void>();
@@ -31,14 +32,15 @@ export function setupSmoothScroll() {
     engine = undefined;
   };
   const start = () => {
-    if (motion.matches) {
+    const { smoothScroll, scrollLerp } = labValues();
+    if (motion.matches || !smoothScroll) {
       destroy();
       return;
     }
     if (!engine) {
       engine = new Lenis({
         autoRaf: true,
-        lerp: 0.1,
+        lerp: scrollLerp,
         smoothWheel: true,
         syncTouch: false,
         anchors: false,
@@ -54,6 +56,11 @@ export function setupSmoothScroll() {
   document.addEventListener('astro:before-preparation', destroy);
   document.addEventListener('astro:page-load', start);
   motion.addEventListener('change', start);
+  onLabChange((_, changed) => {
+    if (!changed.includes('smoothScroll') && !changed.includes('scrollLerp')) return;
+    destroy();
+    start();
+  });
   document.addEventListener(
     'click',
     (event) => {
