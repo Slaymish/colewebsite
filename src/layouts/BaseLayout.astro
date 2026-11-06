@@ -21,6 +21,7 @@ import { SITE } from '~/lib/site';
 import { getSiteSettings } from '~/lib/contentful';
 import { ClientRouter } from 'astro:transitions';
 import { panelTransition } from '~/lib/navigation';
+import { LAB_ENABLED } from '~/lib/lab/controls';
 
 interface Props extends SeoInput {
   jsonLd?: Record<string, unknown>;
@@ -37,11 +38,17 @@ const seo = buildSeo(seoInput, {
 });
 ---
 
-<html lang="en-NZ" transition:name="root" transition:animate={panelTransition}>
+<html
+  lang="en-NZ"
+  transition:name="root"
+  transition:animate={panelTransition}
+  data-lab={LAB_ENABLED ? '' : undefined}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="/scripts/gallery-preference.js" is:inline></script>
+    {LAB_ENABLED && <script src="/scripts/lab-preference.js" is:inline />}
     <ClientRouter />
     <title>{seo.title}</title>
     <meta name="description" content={seo.description} />
@@ -81,7 +88,7 @@ const seo = buildSeo(seoInput, {
 </html>
 
 <script>
-  import { setupSiteTexture } from '~/lib/site-texture';
+  import { applyLab } from '~/lib/lab/state';
   import { setupPanelNavigation } from '~/lib/navigation';
   import { setupIllustrationGallery } from '~/lib/illustration-gallery';
   import { setupSmoothScroll } from '~/lib/scroll';
@@ -89,6 +96,6 @@ const seo = buildSeo(seoInput, {
   document.addEventListener('astro:after-swap', setupIllustrationGallery);
   document.addEventListener('astro:page-load', setupIllustrationGallery);
   setupSmoothScroll();
-  document.addEventListener('astro:page-load', setupSiteTexture);
-  document.addEventListener('astro:after-swap', setupSiteTexture);
+  applyLab();
+  document.addEventListener('astro:after-swap', () => applyLab());
 </script>

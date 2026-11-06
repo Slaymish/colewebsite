@@ -1,11 +1,10 @@
 ---
 import { HERO_ARTWORK, HERO_PHRASES } from '~/lib/hero';
-import HeroExperiments from '~/components/HeroExperiments.astro';
+import SiteLab from '~/components/SiteLab.astro';
+import { LAB_ENABLED } from '~/lib/lab/controls';
 import Icon from '~/components/Icon.astro';
 
 const initialPhrase = HERO_PHRASES[0];
-const experimentsEnabled =
-  import.meta.env.DEV || import.meta.env.PUBLIC_NOINDEX === 'true';
 ---
 
 <section class="hero" id="hero" aria-label="Introduction" data-home-hero>
@@ -37,7 +36,7 @@ const experimentsEnabled =
     <span class="hero__play-icon"><Icon name="play" /></span>
   </button>
 </section>
-{experimentsEnabled && <HeroExperiments />}
+{LAB_ENABLED && <SiteLab />}
 
 <script>
   import { setupHero } from '~/lib/hero/experiment';
@@ -52,11 +51,11 @@ const experimentsEnabled =
     height: 100vh;
     height: 100svh;
     overflow: hidden;
-    color: #262626;
+    color: var(--lab-ink, #262626);
   }
   .hero__art-window {
     position: absolute;
-    inset: 0 0 0 67%;
+    inset: 0 0 0 calc(100% - var(--lab-hero-art-width, 33%));
     overflow: hidden;
     cursor: pointer;
   }
@@ -66,17 +65,17 @@ const experimentsEnabled =
   }
   .hero__art {
     position: absolute;
-    inset: 5%;
+    inset: var(--lab-hero-art-padding, 5%);
     mask: var(--hero-art) center / contain no-repeat;
   }
   .hero__ink {
     position: absolute;
     inset: 0;
-    background: #0f5c8c;
+    background: var(--lab-illustration, #0f5c8c);
   }
   .hero__pause {
     position: absolute;
-    left: 83.5%;
+    left: calc(100% - var(--lab-hero-art-width, 33%) / 2);
     bottom: 9%;
     transform: translateX(-50%);
   }
@@ -88,28 +87,31 @@ const experimentsEnabled =
     display: block;
   }
   .hero__art-window:focus-visible {
-    outline: 2px solid #0f5c8c;
+    outline: 2px solid var(--lab-accent, #0f5c8c);
     outline-offset: -3px;
   }
   .hero__title {
     position: absolute;
-    inset: 15.5% 36% 15.5% 3.5%;
-    display: flex;
+    inset: var(--lab-hero-title-top, 15.5%) calc(var(--lab-hero-art-width, 33%) + 3%)
+      var(--lab-hero-title-top, 15.5%) var(--lab-hero-title-left, 3.5%);
+    display: var(--lab-hero-display, flex);
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     margin: 0;
     font-family: var(--display-font);
-    font-size: min(8.3cqw, 20svh);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.045em;
+    font-size: calc(min(8.3cqw, 20svh) * var(--lab-hero-scale, 1));
+    font-weight: var(--lab-display-weight, 900);
+    line-height: var(--lab-hero-line-height, 1);
+    letter-spacing: var(--lab-display-tracking, -0.045em);
     text-align: left;
-    text-transform: uppercase;
+    text-transform: var(--lab-hero-transform, uppercase);
+    hyphens: var(--lab-hero-hyphens, manual);
   }
   .hero__title span {
-    display: block;
-    white-space: nowrap;
+    display: var(--lab-hero-span-display, block);
+    white-space: var(--lab-hero-white-space, nowrap);
+    text-wrap: var(--lab-hero-text-wrap, wrap);
   }
   @media (max-aspect-ratio: 1/1) {
     .hero__pause {
@@ -121,7 +123,7 @@ const experimentsEnabled =
     }
     .hero__title {
       inset: 64% 4.5% 7%;
-      font-size: min(11.5cqw, 8.5svh);
+      font-size: calc(min(11.5cqw, 8.5svh) * var(--lab-hero-scale, 1));
     }
   }
 </style>

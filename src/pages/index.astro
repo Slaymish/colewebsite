@@ -37,7 +37,7 @@ const description = settings.seo.description ?? SITE.description;
 <style>
   .home-section {
     display: grid;
-    min-height: 100svh;
+    min-height: var(--lab-section-height, 100svh);
     place-items: center;
     margin: 0;
     padding: 4vw;
@@ -45,20 +45,20 @@ const description = settings.seo.description ?? SITE.description;
   }
   .home-word {
     font-family: var(--display-font);
-    font-weight: 900;
-    font-size: clamp(1.5rem, 11vw, 16rem);
+    font-weight: var(--lab-display-weight, 900);
+    font-size: calc(clamp(1.5rem, 11vw, 16rem) * var(--lab-word-scale, 1));
     line-height: 1;
-    letter-spacing: -0.045em;
+    letter-spacing: var(--lab-display-tracking, -0.045em);
   }
   .home-word:focus-visible {
-    outline: 3px solid #0f5c8c;
+    outline: 3px solid var(--lab-accent, #0f5c8c);
     outline-offset: 0.25em;
   }
   .home-section.home-word:focus-visible {
     outline: none;
   }
   .home-section.home-word:focus-visible > span {
-    outline: 3px solid #0f5c8c;
+    outline: 3px solid var(--lab-accent, #0f5c8c);
     outline-offset: 0.1em;
   }
 </style>

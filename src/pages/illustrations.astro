@@ -118,7 +118,7 @@ import { GALLERY_OFFSETS } from '~/lib/gallery-state';
     display: block;
     width: 100%;
     height: 100%;
-    background: #0f5c8c;
+    background: var(--lab-illustration, #0f5c8c);
     mask: var(--illustration-url) center / contain no-repeat;
   }
   .illustrations__number {
@@ -131,11 +131,11 @@ import { GALLERY_OFFSETS } from '~/lib/gallery-state';
     opacity: 0.6;
   }
   .illustrations__card:focus-visible {
-    outline: 2px solid #0f5c8c;
+    outline: 2px solid var(--lab-accent, #0f5c8c);
     outline-offset: 6px;
   }
   .illustrations__card:hover .illustrations__drawing {
-    background: #0d518c;
+    background: var(--lab-illustration-hover, #0d518c);
   }
   :global(html[data-gallery-view='flight']) .illustrations {
     height: calc(100svh + (var(--illustration-count) - 1) * 70svh);
